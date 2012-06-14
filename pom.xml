@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0     http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edu.berkeley.path</groupId>
+	<artifactId>bots</artifactId>
+	<packaging>pom</packaging>
+	<version>0.1-SNAPSHOT</version>
+
+	<name>Mobile Millennium</name>
+
+	<!--Setup the SCM using this blog information: http://www.sonatype.com/people/2009/09/maven-tips-and-tricks-using-github/ 
+		https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide 
+		http://www.sonatype.com/people/2010/01/how-to-generate-pgp-signatures-with-maven/ 
+		http://www.sonatype.com/people/2011/01/using-the-maven-release-plugin-things-to-know/ -->
+
+	<!--This thread contains information on how to deal with versioning i Maven: 
+		http://stackoverflow.com/questions/3428685/maven-duplicated-groupid-artifactid-and-versions-in-submodules -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<mm.scala.version>2.9.1</mm.scala.version>
+		<scala-maven-plugin.version>3.0.2</scala-maven-plugin.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>mm-maven-dependencies</id>
+			<url>http://www.eecs.berkeley.edu/~tjhunter/mm-maven-dependencies/releases</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${mm.scala.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- <plugin> <groupId>org.eclipse.m2e</groupId> <artifactId>lifecycle-mapping</artifactId> 
+					<version>1.0.0</version> <configuration> <lifecycleMappingMetadata> <pluginExecutions> 
+					<pluginExecution> <pluginExecutionFilter> <groupId>org.apache.maven.plugins</groupId> 
+					<artifactId>maven-resources-plugin</artifactId> <versionRange>[2.0,)</versionRange> 
+					<goals> <goal>resources</goal> <goal>testResources</goal> </goals> </pluginExecutionFilter> 
+					<action> <ignore /> </action> </pluginExecution> </pluginExecutions> </lifecycleMappingMetadata> 
+					</configuration> </plugin> -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>${scala-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<scalaVersion>${scala.version}</scalaVersion>
+					<args>
+						<arg>-make:transitivenocp</arg>
+						<arg>-dependencyfile</arg>
+						<arg>${project.build.directory}/.scala_dependencies</arg>
+					</args>
+				</configuration>
+			</plugin>
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-compiler-plugin</artifactId> -->
+			<!-- <version>2.3.2</version> -->
+			<!-- <configuration> -->
+			<!-- <source>1.5</source> -->
+			<!-- <target>1.5</target> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<modules>
+		<module>CORE</module>
+		<module>NETCONFIG</module>
+		<module>PATH_INFERENCE</module>
+	</modules>
+</project>
