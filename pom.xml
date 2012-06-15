@@ -117,6 +117,7 @@
 	<modules>
 		<module>CORE</module>
 		<module>NETCONFIG</module>
+		<module>NETCONFIG_IO</module>
 		<module>PATH_INFERENCE</module>
 	</modules>
 </project>
