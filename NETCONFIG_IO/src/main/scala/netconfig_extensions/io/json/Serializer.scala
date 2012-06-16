@@ -5,7 +5,6 @@
 
 package netconfig_extensions.io
 
-import netconfig.Network
 import netconfig.Link
 import netconfig.Spot
 import netconfig.Route
@@ -90,7 +89,7 @@ trait BaseSerializer[L<:Link] extends Serializer[L] {
   def spot(node: JsonNode): Spot[L] = {
     val l = link(node.get("link"))
     val offset = node.get("offset").asDouble
-    new Spot(l, offset.toFloat, 0) // FIXME: lane
+    Spot.from(l, offset) // FIXME: lane
   }
 
   def encode(sp: Spot[L]): JsonNode = {
@@ -108,7 +107,7 @@ trait BaseSerializer[L<:Link] extends Serializer[L] {
     val end = spot(node.get("end"))
     val dcts: Iterable[JsonNode] = node.get("links")
     val links = dcts.map(link _).toArray(m)
-    new Route(links, start.offset, end.offset)
+    Route.from(links, start.offset, end.offset)
   }
 
   def encode(r: Route[L]): JsonNode = {
@@ -185,7 +184,7 @@ trait BaseSerializer[L<:Link] extends Serializer[L] {
         null
       }
     }
-    new ProbeCoordinate(c, t, id, spots, speed, heading, hired, hdop)
+    ProbeCoordinate(id, t, c, spots, speed, heading, hired, hdop)
   }
 
   def encode(pc: ProbeCoordinate[L]): JsonNode = {
@@ -224,7 +223,7 @@ trait BaseSerializer[L<:Link] extends Serializer[L] {
       }
     }
     // FIXME: incomplete decoding
-    new PathInference(id, start, end, paths, null /*probas*/, hired)
+    PathInference(id, start, end, paths, null /*probas*/, hired)
   }
 
   def encode(pi: PathInference[L]): JsonNode = {

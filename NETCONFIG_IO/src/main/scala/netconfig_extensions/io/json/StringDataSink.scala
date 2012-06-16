@@ -20,16 +20,6 @@ class JsonStringDataSink(ostream: OutputStream) extends DataSink[String] {
   }
 }
 
-class MappedDataSink[-U, V](sink: DataSink[V], fun: U=>V) extends DataSink[U] {
-  def put(u:U) = sink.put(fun(u))
-  
-  def close() = sink.close()
-}
-
-object DataSinks {
-  def map[U,V](sink:DataSink[V], fun: U=>V) = new MappedDataSink(sink, fun)
-}
-
 object JsonStringDataSinkFactory {
   def openZipped(fname: String) = {
     val ostream = new GZIPOutputStream(new FileOutputStream(fname))

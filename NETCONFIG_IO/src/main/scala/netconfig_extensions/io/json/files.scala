@@ -7,53 +7,12 @@ import scala.sys.SystemProperties
 import java.io.File
 import core_extensions.MMLogging
 
-object Dates {
-
-  def dateStr(date: LocalDate): String = "%04d-%02d-%02d" format (date.getYear(), date.getMonthOfYear, date.getDayOfMonth)
-
-  def convertInt(s: String): Option[Int] = {
-    try {
-      Some(s.toInt)
-    } catch {
-      case _: java.lang.NumberFormatException => None
-    }
-  }
-
-  def toBerkeleyTime(ld: LocalDate) = Time.newTimeFromBerkeleyDateTime(ld.getYear, ld.getMonthOfYear, ld.getDayOfMonth, 0, 0, 0, 0)
-
-  def fromBerkeleyTime(t: Time) = new LocalDate(t.getYear(), t.getMonth(), t.getDayOfMonth())
-
-  def parseDate(s: String): Option[LocalDate] = {
-    s.split("-").map(convertInt _).toList match {
-      case Some(year) :: Some(month) :: Some(day) :: Nil => {
-        Some(new LocalDate(year, month, day))
-      }
-      case _ => None
-    }
-  }
-
-  def parseRange(s: String): Option[Seq[LocalDate]] = {
-    s.split(":").map(parseDate _).toList match {
-      case Some(from) :: Some(to) :: Nil => Some(dateRange(from, to))
-      case _ => None
-    }
-  }
-
-  def dateRange(from: LocalDate, to: LocalDate): List[LocalDate] = {
-    if (from.compareTo(to) <= 0) {
-      from :: dateRange(from.plusDays(1), to)
-    } else {
-      Nil
-    }
-  }
-}
-
 object Files {
   def dataDir() = {
     val s = new SystemProperties
     s.get("mm.data.dir") match {
       case Some(s) => s
-      case _ => "/windows/D/arterial_data"
+      case _ => "/tmp"
     }
   }
 
@@ -63,6 +22,9 @@ object Files {
   }
 }
 
+/**
+ * File format for raw probe data.
+ */
 object RawProbe extends MMLogging {
 
   case class FileIndex(val feed: String, val nid: Int, val date: LocalDate)
@@ -172,9 +134,9 @@ object ViterbiPathInference {
 }
 
 object ViterbiTrajectory {
-  def sanitizeVehicleId(s:String):String = s.filter(_.isLetterOrDigit)
+  def sanitizeVehicleId(s: String): String = s.filter(_.isLetterOrDigit)
 
-case class FileIndex(val feed: String,
+  case class FileIndex(val feed: String,
     val nid: Int,
     val date: LocalDate,
     val netType: String,
@@ -198,7 +160,7 @@ case class FileIndex(val feed: String,
           case Some(date) if (dic_dates.isEmpty || dic_dates.contains(date)) => {
             val f = new File(p)
             if (f.isDirectory())
-            	Some(f)
+              Some(f)
             else
               None
           }
@@ -208,17 +170,17 @@ case class FileIndex(val feed: String,
       })
       good_dates.flatMap(f => {
         f.listFiles().map(_.getAbsolutePath()).flatMap(p => p match {
-                case regex(base, ymd, vehicle, tr_idx) => (Dates.parseDate(ymd), Dates.convertInt(tr_idx)) match {
-                  case (Some(date), Some(idx)) => {
-                    if ((dic_drivers.isEmpty || dic_drivers.contains(vehicle)) &&
-                      (dic_tidxs.isEmpty || dic_tidxs.contains(idx))) {
-                      Some(FileIndex(feed, nid, date, net_type, vehicle, idx))
-                    } else None
-                  }
-                  case _ => None
-                }
-                case _ => None
-          
+          case regex(base, ymd, vehicle, tr_idx) => (Dates.parseDate(ymd), Dates.convertInt(tr_idx)) match {
+            case (Some(date), Some(idx)) => {
+              if ((dic_drivers.isEmpty || dic_drivers.contains(vehicle)) &&
+                (dic_tidxs.isEmpty || dic_tidxs.contains(idx))) {
+                Some(FileIndex(feed, nid, date, net_type, vehicle, idx))
+              } else None
+            }
+            case _ => None
+          }
+          case _ => None
+
         }).toSeq.sortBy(_.vehicle)
       }).toSeq.sortBy(_.date.toString)
     } else {
@@ -234,15 +196,9 @@ case class FileIndex(val feed: String,
 }
 
 object SerializedNetwork {
-  def fileName(nid:Int, net_type:String):String = {
+  def fileName(nid: Int, net_type: String): String = {
     "%s/network_nid%d_%s.json.gz".format(Files.dataDir(), nid, net_type)
-    
+
   }
 }
 
-object Test {
-  import netconfig_extensions.io.RawProbe._
-  import netconfig_extensions.io.Files._
-  setDataDir("//home/tjhunter/tmp/data/")
-  list("navteq", 1)
-}

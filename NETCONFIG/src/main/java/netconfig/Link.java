@@ -78,12 +78,12 @@ public interface Link extends Serializable {
     /**
      * @return a list of links that flow out of this link.
      */
-    public ImmutableCollection<Link> outLinks() throws NetconfigException;
+    public ImmutableCollection<? extends Link> outLinks() throws NetconfigException;
 
     /**
      * @return a list of links that flow into this link.
      */
-    public ImmutableCollection<Link> inLinks() throws NetconfigException;
+    public ImmutableCollection<? extends Link> inLinks() throws NetconfigException;
 
     /**
      * 

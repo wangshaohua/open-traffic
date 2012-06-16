@@ -19,11 +19,18 @@
 		http://stackoverflow.com/questions/3428685/maven-duplicated-groupid-artifactid-and-versions-in-submodules -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<mm.scala.version>2.9.1</mm.scala.version>
+		<scala.version>2.9.1</scala.version>
 		<scala-maven-plugin.version>3.0.2</scala-maven-plugin.version>
 	</properties>
 
 	<repositories>
+<!-- 	We cannot publish to maven central as long as we have external repositories.   -->
+<!--  Would be nice to find a workaround. -->
+  <repository>
+    <id>repo.codahale.com</id>
+    <url>http://repo.codahale.com</url>
+  </repository>
+
 <!--		<repository>
 			<id>mm-maven-dependencies</id>
 			<url>http://www.eecs.berkeley.edu/~tjhunter/mm-maven-dependencies/releases</url>
@@ -47,7 +54,7 @@
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
-			<version>${mm.scala.version}</version>
+			<version>${scala.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -9,7 +9,7 @@ import core.Coordinate
 import netconfig.Spot
 import core_extensions.MMLogging
 import netconfig_extensions.projection.ProjectorFactory
-import netconfig.Network
+import netconfig_extensions.io.json.RawProbe
 
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.
@@ -22,7 +22,11 @@ import netconfig.Network
 object ImportProbeData extends MMLogging {
   type ParseFun = String=>Option[ProbeCoordinate[Link]]
   
-  def formatPaulB(line:String):Option[ProbeCoordinate[Link]] = {
+  /**
+   * Takes lines of a CSV file of the form:
+   * Time[YYY-MM-DD HH:MM:SS],id[String],speed[Float],heading[Short],lat[Double],lon[Double]
+   */
+  def formatCSV1(line:String):Option[ProbeCoordinate[Link]] = {
     val elts = line.split(",")
     if (elts.length == 6) {
       val t_str = "%s.000" format elts(0)
@@ -40,7 +44,7 @@ object ImportProbeData extends MMLogging {
           val c = new Coordinate(4326, lat, lng)
           val speed:java.lang.Float = if (speed_opt.isEmpty) null else speed_opt.get
           val heading:java.lang.Short = if (heading_opt.isEmpty) null else heading_opt.get
-          return Some(new ProbeCoordinate(c, time, id, Array.empty[Spot[Link]], Array.empty[Double], speed, heading, null, null))
+          return Some(ProbeCoordinate.from(id, time, c, Array.empty[Spot[Link]], Array.empty[Double], speed, heading, null, null))
       }
          logWarning("Failed to parse lat/lng in line: %s" format line)
          return None
@@ -74,29 +78,15 @@ object ImportProbeData extends MMLogging {
     logInfo("end time:"+ end_time)
     
     val parsing_fun:ParseFun = format match {
-      case "paulb" => formatPaulB _
+      case "paulb" => formatCSV1 _
       case x => assert(false); null
     }
-    val geo_filter_fun:ProbeCoordinate[Link]=>Option[ProbeCoordinate[Link]] = if (geo_filter) {
-      val net = new Network(Network.MODEL_GRAPH, network_id)
-      val max_lat = net.getLinks().map(_.getGeoMultiLine().getCoordinates().map(_.lat).max).max
-      val max_lng = net.getLinks().map(_.getGeoMultiLine().getCoordinates().map(_.lon).max).max
-      val min_lat = net.getLinks().map(_.getGeoMultiLine().getCoordinates().map(_.lat).min).min
-      val min_lng = net.getLinks().map(_.getGeoMultiLine().getCoordinates().map(_.lon).min).min
-      def f(x:ProbeCoordinate[Link]) = {
-        if (x.coordinate.lat >= min_lat && x.coordinate.lat <= max_lat && x.coordinate.lon >= min_lng && x.coordinate.lon <= max_lng) {
-          Some(x)
-        } else None
-      }
-      f      
-    } else {
+    val geo_filter_fun:ProbeCoordinate[Link]=>Option[ProbeCoordinate[Link]] = {
       val f = (x:ProbeCoordinate[Link]) => Some(x)
       f
     }
     
     def time_filter_fun(pc:ProbeCoordinate[Link]):Option[ProbeCoordinate[Link]] = {
-//      logInfo(pc.toString())
-//      logInfo("start_time "+start_time)
       val c1 = (start_time == null) || (pc.time > start_time)
       val c2 = (end_time == null) || (pc.time < end_time)
       if (c1 && c2) Some(pc) else None
