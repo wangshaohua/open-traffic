@@ -1,11 +1,11 @@
 package netconfig.generic
-
 import netconfig.Node
+import netconfig.Link
 
-trait GenericNode extends Node {
-
-  val id: String
-  
-  override def toString: String = id
+// We are cheating a bit here: the underlying representation of the outgoing and incoming
+// links is mutable, but the client will not see it.
+class GenericNode[L<:Link](
+    val incomingLinks:Seq[L],
+    val outgoingLinks:Seq[L]) extends Node {
 
 }
