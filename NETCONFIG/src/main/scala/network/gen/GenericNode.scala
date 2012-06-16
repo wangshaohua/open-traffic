@@ -1,4 +1,4 @@
-package netconfig.generic
+package network.gen
 import netconfig.Node
 import netconfig.Link
 
