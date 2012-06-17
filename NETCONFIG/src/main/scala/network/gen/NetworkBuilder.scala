@@ -30,6 +30,7 @@ class NetworkBuilder {
       }
     }
     val link = new GenericLink {
+      val idRepr = lr.id
       def length: Double = {
         if (l <= 0) {
           throw new NetconfigException(null, "You did not provide link liegnth in the representation")
@@ -59,7 +60,7 @@ class NetworkBuilder {
   }
 
   def materializeNode(nid: NodeIDRepr, incomingLinks: Seq[GenericLink], outgoingLinks: Seq[GenericLink]): GenericNode[GenericLink] = {
-    val n = new GenericNode(incomingLinks, outgoingLinks)
+    val n = new GenericNode(nid, incomingLinks, outgoingLinks)
     n
   }
 

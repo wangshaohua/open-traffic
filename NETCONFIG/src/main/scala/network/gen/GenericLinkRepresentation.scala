@@ -22,3 +22,12 @@ case class GenericLinkRepresentation(
     val length:Option[Double]=None) {
     // Add a few more options here...
 }
+
+object GenericLinkRepr {
+  def toRepr(l:GenericLink):GenericLinkRepresentation = {
+    GenericLinkRepresentation(
+        l.idRepr,
+        l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr,
+        l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr)
+  }
+}

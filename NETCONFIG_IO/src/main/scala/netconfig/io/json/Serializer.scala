@@ -5,39 +5,35 @@
 
 package netconfig.io.json
 
-import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.PathInference
-import core.Coordinate
-import core.Time
-import java.io.FileReader
 import java.io.FileInputStream
+import java.io.FileReader
 import java.io.InputStreamReader
-import java.util.{Collection => JCollection}
 import java.util.zip.GZIPInputStream
-import com.codahale.jerkson.Json._
+import java.util.{Collection => JCollection}
 import scala.collection.JavaConversions._
-import netconfig.io.DataSink
-import netconfig.io.Serializer
-import netconfig.io.TrackPiece
-import netconfig.Datum.storage.ProbeCoordinateRepr
+import com.codahale.jerkson.Json._
+import com.google.common.collect.ImmutableList
 import netconfig.Datum.storage.Codec
-import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.Datum.storage.PathInferenceRepr
-import netconfig.io.storage.TrackPieceRepr
+import netconfig.Datum.storage.ProbeCoordinateRepr
+import netconfig.Datum.PathInference
+import netconfig.Datum.ProbeCoordinate
 import netconfig.io.storage.TrackPieceRepr
 import netconfig.io.Connection
-import netconfig_extensions.CollectionUtils._
-import com.google.common.collect.ImmutableList
+import netconfig.io.DataSink
 import netconfig.io.DataSinks
+import netconfig.io.Serializer
 import netconfig.io.StringDataSink
-import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.io.StringSource
-import netconfig.storage.NodeIDRepr
+import netconfig.io.TrackPiece
 import netconfig.storage.LinkIDRepr
-
+import netconfig_extensions.CollectionUtils.asImmutableList1
+import netconfig.Link
+import netconfig.Route
+import network.gen.GenericLink
+import network.gen.GenericLinkRepr
+import network.gen.GenericLinkRepresentation
+import network.gen.GenericLinkRepresentation
 
 /**
  * New implementation for serializing data.
@@ -45,27 +41,27 @@ import netconfig.storage.LinkIDRepr
  *
  * Depending on the network you are using, you should use one of the concrete classes.
  */
-trait JsonSerializer[L<:Link] extends Serializer[L] with Codec[L] {
+trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   def encodeExtensiveInfo = true
 
   // TODO(?) These functions should be moved to netconfig.Datum.Codec
-  
-  def toRepr(tp:TrackPiece[L]):TrackPieceRepr = {
-    val first = tp.firstConnections.map(c=>(c.from,c.to))
-    val second = tp.firstConnections.map(c=>(c.from,c.to))
+
+  def toRepr(tp: TrackPiece[L]): TrackPieceRepr = {
+    val first = tp.firstConnections.map(c => (c.from, c.to))
+    val second = tp.firstConnections.map(c => (c.from, c.to))
     new TrackPieceRepr(
-        first,
-        tp.routes.map(toRepr _),
-        second,
-        toRepr(tp.point))
+      first,
+      tp.routes.map(toRepr _),
+      second,
+      toRepr(tp.point))
   }
-  
-  def fromRepr(tpr:TrackPieceRepr):TrackPiece[L] = {
-    val first:ImmutableList[Connection] = tpr.firstConnections.map(z=>new Connection(z._1, z._2))
-    val second:ImmutableList[Connection] = tpr.firstConnections.map(z=>new Connection(z._1, z._2))
+
+  def fromRepr(tpr: TrackPieceRepr): TrackPiece[L] = {
+    val first: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
+    val second: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
     val p = probeCoordinateFromRepr(tpr.point)
-    val routes_ :ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
+    val routes_ : ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
     new TrackPiece[L] {
       def firstConnections = first
       def routes = routes_
@@ -73,8 +69,7 @@ trait JsonSerializer[L<:Link] extends Serializer[L] with Codec[L] {
       def point = p
     }
   }
-  
-  
+
   /*********** Reading functions *************/
 
   def readFlow(fname: String): Iterable[String] = {
@@ -95,25 +90,26 @@ trait JsonSerializer[L<:Link] extends Serializer[L] with Codec[L] {
 
   def readProbeCoordinates(fname: String): Iterable[ProbeCoordinate[L]] =
     readFlow(fname).map(s => probeCoordinateFromRepr(parse[ProbeCoordinateRepr](s)))
-  
+
   def readPathInferences(fname: String): Iterable[PathInference[L]] =
     readFlow(fname).map(s => pathInferenceFromRepr(parse[PathInferenceRepr](s)))
-  
-    
+
   // TODO(?) add other accessors for the other basic types in netconfig.
-  
+
+  //******** WRITER FUNCTIONS *********/
+
   def writerProbeCoordinate(fname: String): DataSink[ProbeCoordinate[L]] = {
-    def f(pc:ProbeCoordinate[L]):String = generate(toRepr(pc))
+    def f(pc: ProbeCoordinate[L]): String = generate(toRepr(pc))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
   def writerPathInference(fname: String): DataSink[PathInference[L]] = {
-    def f(pi:PathInference[L]):String = generate(toRepr(pi))
+    def f(pi: PathInference[L]): String = generate(toRepr(pi))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
   def writerTrack(fname: String): DataSink[TrackPiece[L]] = {
-    def f(tp:TrackPiece[L]):String = generate(toRepr(tp))
+    def f(tp: TrackPiece[L]): String = generate(toRepr(tp))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
@@ -127,14 +123,28 @@ trait JsonSerializer[L<:Link] extends Serializer[L] with Codec[L] {
 }
 
 object JSonSerializer {
-  def from[L<:Link](fromFun:LinkIDRepr=>L,toFun:L=>LinkIDRepr):JsonSerializer[L] = {
+  def from[L <: Link](fromFun: LinkIDRepr => L, toFun: L => LinkIDRepr): JsonSerializer[L] = {
     new JsonSerializer[L] {
-      def fromLinkID(lid:LinkIDRepr):L = fromFun(lid)
-      def toLinkID(l:L):LinkIDRepr = toFun(l)
+      def fromLinkID(lid: LinkIDRepr): L = fromFun(lid)
+      def toLinkID(l: L): LinkIDRepr = toFun(l)
     }
   }
-  def from[L<:Link](links:Map[LinkIDRepr, L]):JsonSerializer[L] = {
-    val map2:Map[L, LinkIDRepr] = links.map(z=>(z._2, z._1))
+  def from[L <: Link](links: Map[LinkIDRepr, L]): JsonSerializer[L] = {
+    val map2: Map[L, LinkIDRepr] = links.map(z => (z._2, z._1))
     from(links.apply _, map2.apply _)
+  }
+  
+  def storeLinks(fname:String, links:Seq[GenericLink]):Unit = {
+    
+    def f(l: GenericLink): String = generate(GenericLinkRepr.toRepr(l))
+    val sink = DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
+    for (l <- links) {
+      sink.put(l)
+    }
+    sink.close()
+  }
+  
+  def getGenericLinks(fname:String):Iterable[GenericLinkRepresentation] = {
+    StringSource.readLines(fname).map(s=>parse[GenericLinkRepresentation](s))
   }
 }

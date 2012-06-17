@@ -12,10 +12,10 @@ class LineIterator(private[this] val reader: Reader) extends Iterator[String] {
   private[this] val buffered_reader = new BufferedReader(reader)
 
   // Constructor logic
-  {
-    // Skip the first line
-    buffered_reader.readLine()
-  }
+//  {
+//    // Skip the first line
+//    buffered_reader.readLine()
+//  }
 
   private[this] var current_line: String = buffered_reader.readLine()
 
@@ -55,7 +55,7 @@ object StringSource {
    * The files is accessed lazily.
    */
   def strings(istream_gen: () => Reader): Iterable[String] = {
-    source_string(istream_gen).map(_.dropRight(1))
+    source_string(istream_gen) //.map(_.dropRight(1))
   }
   
   private[this] def getIstreamGen(fname:String): (() => Reader) = {
