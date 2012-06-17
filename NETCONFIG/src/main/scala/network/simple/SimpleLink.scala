@@ -49,17 +49,17 @@ class SimpleLink(
     new GeoMultiLine(Array(c1, c2))
   }
 
-  override def partialGeoMultiLine(start: Double, end: Double): GeoMultiLine = {
-    def getP(off: Double) = {
-      val r = off / length
-      val x1 = start_node.coordinate.lat * r + end_node.coordinate.lat * (1 - r)
-      val y1 = start_node.coordinate.lon * r + end_node.coordinate.lon * (1 - r)
-      new Coordinate(Coordinate.SRID_CARTESIAN, x1, y1)
-    }
-    val c1: Coordinate = getP(start)
-    val c2: Coordinate = getP(end)
-    new GeoMultiLine(Array(c1, c2))
-  }
+//  override def partialGeoMultiLine(start: Double, end: Double): GeoMultiLine = {
+//    def getP(off: Double) = {
+//      val r = off / length
+//      val x1 = start_node.coordinate.lat * r + end_node.coordinate.lat * (1 - r)
+//      val y1 = start_node.coordinate.lon * r + end_node.coordinate.lon * (1 - r)
+//      new Coordinate(Coordinate.SRID_CARTESIAN, x1, y1)
+//    }
+//    val c1: Coordinate = getP(start)
+//    val c2: Coordinate = getP(end)
+//    new GeoMultiLine(Array(c1, c2))
+//  }
 
   override def toString: String = "Link[" + id + "]"
 
