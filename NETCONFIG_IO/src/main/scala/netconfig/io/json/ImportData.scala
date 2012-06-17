@@ -9,7 +9,12 @@ import core.Coordinate
 import netconfig.Spot
 import core_extensions.MMLogging
 import netconfig_extensions.projection.ProjectorFactory
-import netconfig_extensions.io.json.RawProbe
+import netconfig.io.Dates
+import netconfig.io.DataSink
+import netconfig.io.StringSource
+import netconfig.io.files._
+import netconfig.io.Serializer
+import netconfig.io.files.RawProbe
 
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.
@@ -106,9 +111,9 @@ object ImportProbeData extends MMLogging {
   
   def mapFile(fname:String, network_id:Int, feed_name:String, parsing_fun:ParseFun):Unit = {
     logInfo("Opening file %s" format fname)
-    val source = JSONSource.readLines(fname).map(parsing_fun)
+    val source:Iterable[Option[ProbeCoordinate[Link]]] = StringSource.readLines(fname).map(parsing_fun)
     val files = MMap.empty[String,DataSink[ProbeCoordinate[Link]]]
-    val serializer = new DummySerializer
+    val serializer:Serializer[Link] = null
     for (pc_opt <- source;
         pc <- pc_opt) {
       val localDate = Dates.fromBerkeleyTime(pc.time)

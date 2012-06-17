@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableList
 import netconfig.io.DataSinks
 import netconfig.io.StringDataSink
 import netconfig.Datum.storage.ProbeCoordinateRepr
+import netconfig.io.StringSource
 
 
 /**
@@ -84,7 +85,7 @@ trait BaseSerializer[L<:Link] extends Serializer[L] with Codec[L] {
         new FileReader(fname)
       }
     }
-    JSONSource.strings(istream_gen)
+    StringSource.strings(istream_gen)
   }
 
   def readTrack(fname: String): Iterable[TrackPiece[L]] =
