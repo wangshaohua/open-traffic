@@ -32,7 +32,9 @@ trait Serializer[L<:Link] {
 
   def writerPathInference(fname: String): DataSink[PathInference[L]] 
 
-  def writerTrack(fname: String): DataSink[TrackPiece[L]] 
+  def writerTrack(fname: String): DataSink[TrackPiece[L]]
+  
+  // TODO(?) add other accessors for the other basic types in netconfig.
 
   /***************** Java wrappers **************/
 

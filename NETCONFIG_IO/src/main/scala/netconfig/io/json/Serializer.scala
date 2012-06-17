@@ -35,6 +35,8 @@ import netconfig.io.DataSinks
 import netconfig.io.StringDataSink
 import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.io.StringSource
+import netconfig.storage.NodeIDRepr
+import netconfig.storage.LinkIDRepr
 
 
 /**
@@ -43,7 +45,7 @@ import netconfig.io.StringSource
  *
  * Depending on the network you are using, you should use one of the concrete classes.
  */
-trait BaseSerializer[L<:Link] extends Serializer[L] with Codec[L] {
+trait JsonSerializer[L<:Link] extends Serializer[L] with Codec[L] {
 
   def encodeExtensiveInfo = true
 
@@ -117,9 +119,22 @@ trait BaseSerializer[L<:Link] extends Serializer[L] with Codec[L] {
 
   /***************** Java wrappers **************/
 
-//  def readTrackJava(fname: String): JCollection[TrackPiece[L]] =
-//    readTrack(fname)
-//
-//  def readProbeCoordinateJava(fname: String): JCollection[ProbeCoordinate[L]] =
-//    readProbeCoordinates(fname)
+  def readTrackJava(fname: String): JCollection[TrackPiece[L]] =
+    readTrack(fname)
+
+  def readProbeCoordinateJava(fname: String): JCollection[ProbeCoordinate[L]] =
+    readProbeCoordinates(fname)
+}
+
+object JSonSerializer {
+  def from[L<:Link](fromFun:LinkIDRepr=>L,toFun:L=>LinkIDRepr):JsonSerializer[L] = {
+    new JsonSerializer[L] {
+      def fromLinkID(lid:LinkIDRepr):L = fromFun(lid)
+      def toLinkID(l:L):LinkIDRepr = toFun(l)
+    }
+  }
+  def from[L<:Link](links:Map[LinkIDRepr, L]):JsonSerializer[L] = {
+    val map2:Map[L, LinkIDRepr] = links.map(z=>(z._2, z._1))
+    from(links.apply _, map2.apply _)
+  }
 }

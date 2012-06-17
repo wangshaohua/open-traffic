@@ -1,6 +1,8 @@
 package netconfig.io.files
-import org.joda.time.LocalDate
 import java.io.File
+
+import org.joda.time.LocalDate
+
 import netconfig.io.Dates
 
 object TrajectoryViterbif {

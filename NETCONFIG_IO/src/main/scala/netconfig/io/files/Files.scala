@@ -6,7 +6,7 @@ object Files {
     val s = new SystemProperties
     s.get("mm.data.dir") match {
       case Some(s) => s
-      case _ => "/tmp"
+      case _ => "/tmp/"
     }
   }
 
