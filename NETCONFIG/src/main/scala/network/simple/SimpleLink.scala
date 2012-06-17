@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package test_network
+package network.simple
 
 import scala.reflect.BeanProperty
 import netconfig.Link

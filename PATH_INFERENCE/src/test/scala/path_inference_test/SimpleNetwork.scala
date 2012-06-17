@@ -16,12 +16,13 @@
 
 package path_inference_test
 
-import test_network._
+import network.simple._
 import core.Coordinate
 import netconfig_extensions.projection.ProjectorFactory
-//import test_network.Coordinate._
 import org.junit._
 import org.junit.Assert._
+import network.simple.SimpleNetwork
+import network.simple.SimpleNetworkBuilder
 
 object SyntheticNetworks {
 

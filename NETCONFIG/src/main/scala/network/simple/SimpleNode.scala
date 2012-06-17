@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package test_network
+package network.simple
 
 import netconfig.Node
 import java.io.Serializable

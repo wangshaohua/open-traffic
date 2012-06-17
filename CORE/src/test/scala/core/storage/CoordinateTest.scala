@@ -6,8 +6,8 @@ import core.Coordinate
 object CoordinateTestUtils {
   def assertEqual(c1:Coordinate, c2:Coordinate):Unit = {
     assertEquals(c1.srid, c2.srid)
-    assertEquals(c1.lat, c2.lat)
-    assertEquals(c1.lon, c2.lon)
+    assertEquals(c1.lat, c2.lat, 0.0)
+    assertEquals(c1.lon, c2.lon, 0.0)
   }
 }
 
