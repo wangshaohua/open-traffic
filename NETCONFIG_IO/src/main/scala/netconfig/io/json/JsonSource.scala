@@ -1,4 +1,4 @@
-package netconfig_extensions.io
+package netconfig.io.json
 
 import java.io.BufferedReader
 import java.io.FileReader

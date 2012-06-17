@@ -16,5 +16,15 @@
 			<artifactId>NETCONFIG</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.berkeley.path</groupId>
+			<artifactId>CORE</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.codahale</groupId>
+			<artifactId>jerkson_${scala.version}</artifactId>
+			<version>0.5.0</version>
+		</dependency>
 	</dependencies>
 </project>

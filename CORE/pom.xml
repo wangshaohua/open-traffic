@@ -22,10 +22,5 @@
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 		</dependency>
-		<dependency>
-			<groupId>com.codahale</groupId>
-			<artifactId>jerkson_${scala.version}</artifactId>
-			<version>0.5.0</version>
-		</dependency>
 	</dependencies>
 </project>

@@ -1,4 +1,4 @@
-package netconfig_extensions.io
+package netconfig.io
 /**
  * Objects that store data sequentially.
  *

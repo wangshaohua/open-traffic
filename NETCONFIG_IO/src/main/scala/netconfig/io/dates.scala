@@ -1,4 +1,4 @@
-package netconfig_extensions.io
+package netconfig.io
 import core.Time
 import org.joda.time.LocalDate
 

@@ -1,4 +1,4 @@
-package netconfig_extensions.io
+package netconfig.io.json
 import scala.collection.mutable.ArrayBuffer
 import core.Time
 import org.joda.time.LocalDate
