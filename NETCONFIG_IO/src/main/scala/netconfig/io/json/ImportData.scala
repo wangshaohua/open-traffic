@@ -1,7 +1,6 @@
 package netconfig.io.json
 
 import scala.collection.mutable.{ Map => MMap }
-
 import core_extensions.MMLogging
 import core.Coordinate
 import core.Time
@@ -12,10 +11,16 @@ import netconfig.io.Dates
 import netconfig.io.Serializer
 import netconfig.io.StringSource
 import netconfig.storage.LinkIDRepr
-import netconfig.Link
 import netconfig.NetconfigException
 import netconfig.Spot
 import scopt.OptionParser
+import netconfig.Datum.storage.ProbeCoordinateRepr
+import core.storage.TimeRepr
+import core.storage.CoordinateRepresentation
+import netconfig.io.StringDataSink
+import com.codahale.jerkson.Json._
+import netconfig.Datum.storage.ProbeCoordinateRepr
+import netconfig.io.DataSinks
 
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.
@@ -26,35 +31,28 @@ import scopt.OptionParser
  * MAVEN_OPTS="-Xmx1g -verbose:gc -Dmm.data.dir=/windows/D/arterial_data" mvn exec:java -pl NETCONFIG -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
  */
 object ImportProbeData extends MMLogging {
-  type ParseFun = String => Option[ProbeCoordinate[Link]]
+  type ParseFun = String => Option[ProbeCoordinateRepr]
 
   /**
    * Takes lines of a CSV file of the form:
-   * Time[YYY-MM-DD HH:MM:SS],id[String],speed[Float],heading[Short],lat[Double],lon[Double]
+   * Time[YYY-MM-DD HH:MM:SS],id[String],lat[Double],lon[Double],speed[Float],heading[Short],...
    */
-  def formatCSV1(line: String): Option[ProbeCoordinate[Link]] = {
+  def formatCSV1(line: String): Option[ProbeCoordinateRepr] = {
     val elts = line.split(",")
-    if (elts.length == 6) {
-      val t_str = "%s.000" format elts(0)
-      val t_opt = try { Some(Time.newTimeFromStringLikeBerkeleyDB(t_str)) } catch {
-        case _ =>
-          logWarning("Could not parse time string: %s" format elts(0))
-          None
-      }
+    if (elts.length >= 6) {
+      val t_opt = TimeRepr.berkeleyFromString(elts(0))
       val id = elts(1)
-      val speed_opt = try { Some(elts(2).toFloat) } catch { case _ => None }
-      val heading_opt = try { Some(elts(3).toShort) } catch { case _ => None }
-      val lng_opt = try { Some(elts(4).toDouble) } catch { case _ => None }
-      val lat_opt = try { Some(elts(5).toDouble) } catch { case _ => None }
+      val lng_opt = try { Some(elts(2).toDouble) } catch { case _ => None }
+      val lat_opt = try { Some(elts(3).toDouble) } catch { case _ => None }
+      val speed_opt = try { Some(elts(4).toDouble) } catch { case _ => None }
+      val heading_opt = try { Some(elts(5).toDouble) } catch { case _ => None }
       for (
         time <- t_opt;
         lat <- lat_opt;
         lng <- lng_opt
       ) {
-        val c = new Coordinate(4326, lat, lng)
-        val speed: java.lang.Float = if (speed_opt.isEmpty) null else speed_opt.get
-        val heading: java.lang.Short = if (heading_opt.isEmpty) null else heading_opt.get
-        return Some(ProbeCoordinate.from(id, time, c, Array.empty[Spot[Link]], Array.empty[Double], speed, heading, null, null))
+        val c = CoordinateRepresentation(Some(4326), lat, lng)
+        return Some(ProbeCoordinateRepr(id, time, c, speed=speed_opt, heading=heading_opt))
       }
       logWarning("Failed to parse lat/lng in line: %s" format line)
       return None
@@ -88,21 +86,22 @@ object ImportProbeData extends MMLogging {
     logInfo("end time:" + end_time)
 
     val parsing_fun: ParseFun = format match {
-      case "paulb" => formatCSV1 _
+      case "csv1" => formatCSV1 _
       case x => assert(false); null
     }
-    val geo_filter_fun: ProbeCoordinate[Link] => Option[ProbeCoordinate[Link]] = {
-      val f = (x: ProbeCoordinate[Link]) => Some(x)
+    val geo_filter_fun: ProbeCoordinateRepr => Option[ProbeCoordinateRepr] = {
+      val f = (x: ProbeCoordinateRepr) => Some(x)
       f
     }
 
-    def time_filter_fun(pc: ProbeCoordinate[Link]): Option[ProbeCoordinate[Link]] = {
-      val c1 = (start_time == null) || (pc.time > start_time)
-      val c2 = (end_time == null) || (pc.time < end_time)
-      if (c1 && c2) Some(pc) else None
+    def time_filter_fun(pcr: ProbeCoordinateRepr): Option[ProbeCoordinateRepr] = {
+      val t = TimeRepr.fromRepr(pcr.time)
+      val c1 = (start_time == null) || (t > start_time)
+      val c2 = (end_time == null) || (t < end_time)
+      if (c1 && c2) Some(pcr) else None
     }
 
-    def fun(s: String): Option[ProbeCoordinate[Link]] = {
+    def fun(s: String): Option[ProbeCoordinateRepr] = {
       for (
         x <- parsing_fun(s);
         y <- geo_filter_fun(x);
@@ -118,22 +117,20 @@ object ImportProbeData extends MMLogging {
 
   def mapFile(fname: String, network_id: Int, feed_name: String, parsing_fun: ParseFun): Unit = {
     logInfo("Opening file %s" format fname)
-    val source: Iterable[Option[ProbeCoordinate[Link]]] = StringSource.readLines(fname).map(parsing_fun)
-    val files = MMap.empty[String, DataSink[ProbeCoordinate[Link]]]
-    // Since it is raw data,there is no need to know the types of links
-    // Creating a dummy serializer.
-    val serializer: Serializer[Link] = new JsonSerializer[Link] {
-      def fromLinkID(lid: LinkIDRepr): Link = throw new NetconfigException(null, "Should not happen"); null
-      def toLinkID(l: Link): LinkIDRepr = throw new NetconfigException(null, "Should not happen"); null
-    }
+    val source: Iterable[Option[ProbeCoordinateRepr]] = StringSource.readLines(fname).map(parsing_fun)
+    val files = MMap.empty[String, DataSink[ProbeCoordinateRepr]]
+    def f(pcr_ : ProbeCoordinateRepr):String = generate(pcr_)
     for (
-      pc_opt <- source;
-      pc <- pc_opt
+      pcr_opt <- source;
+      pcr <- pcr_opt
     ) {
-      val localDate = Dates.fromBerkeleyTime(pc.time)
+      val localDate = Dates.fromBerkeleyTime(TimeRepr.fromRepr(pcr.time))
       val this_fname = RawProbe.fileName(feed = feed_name, nid = network_id, date = localDate)
-      val sink = files.getOrElseUpdate(this_fname, serializer.writerProbeCoordinate(this_fname))
-      sink.put(pc)
+      val sink = files.getOrElseUpdate(this_fname, {
+        val ssink = StringDataSink.writeableZippedFile(this_fname)
+        DataSinks.map(ssink, f _)
+      })
+      sink.put(pcr)
     }
     for (sink <- files.values) {
       sink.close()

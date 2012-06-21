@@ -2,15 +2,15 @@ package core.storage
 import core.Time
 import core_extensions.MMLogging
 
-case class TimeRepr(
+case class TimeRepr  (
     var locale:String,
     var year:Int,
     var month:Int,
     var day:Int,
-    var hour:Int,
-    var minute:Int,
-    var second:Int,
-    var milli:Int) {
+    var hour:Int=0,
+    var minute:Int=0,
+    var second:Int=0,
+    var milli:Int=0) extends MMLogging {
 }
 
 object TimeRepr extends MMLogging {
@@ -32,5 +32,42 @@ object TimeRepr extends MMLogging {
         t.getMinute(),
         t.getSecond(),
         t.getMillisecond())
+  }
+  
+  /**
+   * Format is YYYY-MM-DD [HH:[MM:[SS[.SSS]]]]
+   */
+  def berkeleyFromString(s:String):Option[TimeRepr] = {
+    val r1 = """([0-9]+)\-([0-9]*[1-9]+)\-([0-9]*[1-9]+)(.*)""".r
+    s match {
+      case r1(y,m,d,o) => {
+        val year = y.toInt
+        val month = m.toInt
+        val day = d.toInt
+        val os = o.replace(" ","").split(":")
+        val hour = if(os.length>=1) {
+          os(0).toInt
+        } else {
+          0
+        }
+        val minute = if(os.length>=2) {
+          os(1).toInt
+        } else {
+          0
+        }
+        val second = if(os.length>=3) {
+          math.floor(os(2) toDouble) toInt
+        } else {
+          0
+        }
+        val milli = if(os.length>=3) {
+          math.floor(1 + 1000*((os(2) toDouble)%1)) toInt
+        } else {
+          0
+        }
+        Some(TimeRepr("berkeley",year, month, day, hour, minute, second, milli))
+      }
+      case _ => None
+    }
   }
 }

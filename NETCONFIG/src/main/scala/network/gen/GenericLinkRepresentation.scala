@@ -30,19 +30,19 @@ import core.storage.GeoMultiLineRepr
  *  a length is not provided, the length of the geometry will be used instead.
  */
 case class GenericLinkRepresentation(
-    val id:LinkIDRepr, 
-    val startNodeId:NodeIDRepr, 
-    val endNodeId:NodeIDRepr,
-    val geom:Option[GeoMultiLineRepr]=None,
-    val length:Option[Double]=None) {
-    // Add a few more options here...
+  var id: LinkIDRepr,
+  var startNodeId: NodeIDRepr,
+  var endNodeId: NodeIDRepr,
+  var geom: Option[GeoMultiLineRepr] = None,
+  var length: Option[Double] = None) {
+  // Add a few more options here...
 }
 
 object GenericLinkRepr {
-  def toRepr(l:GenericLink):GenericLinkRepresentation = {
+  def toRepr(l: GenericLink): GenericLinkRepresentation = {
     GenericLinkRepresentation(
-        l.idRepr,
-        l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr,
-        l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr)
+      l.idRepr,
+      l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr,
+      l.startNode.asInstanceOf[GenericNode[GenericLink]].idRepr)
   }
 }
