@@ -42,8 +42,8 @@ object ImportProbeData extends MMLogging {
     if (elts.length >= 6) {
       val t_opt = TimeRepr.berkeleyFromString(elts(0))
       val id = elts(1)
-      val lng_opt = try { Some(elts(2).toDouble) } catch { case _ => None }
-      val lat_opt = try { Some(elts(3).toDouble) } catch { case _ => None }
+      val lat_opt = try { Some(elts(2).toDouble) } catch { case _ => None }
+      val lng_opt = try { Some(elts(3).toDouble) } catch { case _ => None }
       val speed_opt = try { Some(elts(4).toDouble) } catch { case _ => None }
       val heading_opt = try { Some(elts(5).toDouble) } catch { case _ => None }
       for (
