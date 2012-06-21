@@ -24,6 +24,7 @@ import path_inference.PathInferenceFilter
 import path_inference.PathInferenceParameters2
 import scopt.OptionParser
 import netconfig.io.Dates
+import scala.actors.Futures._
 
 /**
  * Runs the path inference on some serialized data, using a generic network representation.
@@ -61,8 +62,10 @@ object RunPif extends MMLogging {
     var feed: String = ""
     var driver_id: String = ""
     var net_type: String = ""
+    var num_threads: Int = 1
     val parser = new OptionParser("test") {
       intOpt("nid", "the net id", network_id = _)
+      intOpt("num-threads", "the number of threads (the program will use one thread per day)", num_threads = _)
       opt("date", "the date", { s: String => { for (d <- parseDate(s)) { date = d } } })
       opt("range", "the date", (s: String) => for (r <- parseRange(s)) { range = r })
       opt("feed", "data feed", feed = _)
@@ -101,10 +104,16 @@ object RunPif extends MMLogging {
     logInfo("Selected dates: %s" format date_range.toString)
     logInfo("Feed:" + feed)
     logInfo("Driver whitelist: %s" format drivers_whitelist.toString)
+    logInfo("Using %d thread(s)" format num_threads)
 
-    for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) {
-      runPIF(projection_hook, serialier, parameters, findex, drivers_whitelist)
+    val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
+      future {runPIF(projection_hook, serialier, parameters, findex, drivers_whitelist)}     
     }
+    
+    for (task <- tasks) {
+      task()
+    }
+    logInfo("Done")
   }
 
   def pifParameters() = {

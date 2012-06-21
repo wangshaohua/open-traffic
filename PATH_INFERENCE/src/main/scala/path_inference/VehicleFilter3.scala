@@ -462,7 +462,7 @@ object ShortestPaths extends MMLogging {
     previous_paths_regrouped ++= paths_regrouped
 
     val filtered_paths: Seq[Path] = paths_regrouped.values.flatMap(_.values.toSeq.flatten.toSeq).toSeq
-    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
+//    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
