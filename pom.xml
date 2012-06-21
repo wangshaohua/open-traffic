@@ -126,5 +126,6 @@
 		<module>NETCONFIG</module>
 		<module>NETCONFIG_IO</module>
 		<module>PATH_INFERENCE</module>
+    <module>PATH_INFERENCE_IO</module>
 	</modules>
 </project>
