@@ -96,8 +96,8 @@ object ImportProbeData extends MMLogging {
 
     def time_filter_fun(pcr: ProbeCoordinateRepr): Option[ProbeCoordinateRepr] = {
       val t = TimeRepr.fromRepr(pcr.time)
-      val c1 = (start_time == null) || (t > start_time)
-      val c2 = (end_time == null) || (t < end_time)
+      val c1 = (null == start_time) || (t > start_time)
+      val c2 = (null == end_time) || (t < end_time)
       if (c1 && c2) Some(pcr) else None
     }
 

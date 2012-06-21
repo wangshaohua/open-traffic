@@ -70,7 +70,7 @@
 
 		</pluginManagement>
 		<plugins>
-      <plugin>
+<!--      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
 	<version>1.4</version>
@@ -83,7 +83,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
