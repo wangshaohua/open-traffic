@@ -75,7 +75,7 @@ object RunPif extends MMLogging {
 
     logInfo("Loading links...")
     var links: Seq[Link] = getLinks(network_id, net_type)
-    println(links.head.geoMultiLine())
+//    println(links.head.geoMultiLine())
 
     val serialier: Serializer[Link] = getSerializer(network_id, feed, links)
 
@@ -115,7 +115,7 @@ object RunPif extends MMLogging {
     params.setMinPathProbability(0.1)
     params.setMinProjectionProbability(0.1)
     params.setShuffleProbeCoordinateSpots(true)
-    params.setComputingStrategy(ComputingStrategy.LookAhead2)
+    params.setComputingStrategy(ComputingStrategy.Viterbi)
     params
   }
 
@@ -146,14 +146,14 @@ object RunPif extends MMLogging {
 //      println((drivers_whitelist.isEmpty,pc.id == null,drivers_whitelist.contains(pc.id)))
 //      logInfo("pc: %s" format pc.toString())
       if (drivers_whitelist.isEmpty || pc.id == null || drivers_whitelist.contains(pc.id)) {
-        logInfo("Adding point: %s" format pc.toString())
+//        logInfo("Adding point: %s" format pc.toString())
         pif.addPoint(pc)
         for (out_pi <- pif.getPathInferences) {
-          logInfo("Output PI: %s" format out_pi.toString())
+//          logInfo("Output PI: %s" format out_pi.toString())
           writer_pi.put(out_pi)
         }
         for (out_pc <- pif.getProbeCoordinates) {
-          logInfo("Output PC: %s" format out_pc.toString())
+//          logInfo("Output PC: %s" format out_pc.toString())
           writer_pc.put(out_pc)
         }
       }
