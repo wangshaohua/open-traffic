@@ -1,6 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright 2012. The Regents of the University of California (Regents).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
  */
 
 package netconfig.io.json
@@ -9,7 +20,7 @@ import java.io.FileInputStream
 import java.io.FileReader
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
-import java.util.{Collection => JCollection}
+import java.util.{ Collection => JCollection }
 import scala.collection.JavaConversions._
 import com.codahale.jerkson.Json._
 import com.google.common.collect.ImmutableList
@@ -133,9 +144,9 @@ object JSonSerializer {
     val map2: Map[L, LinkIDRepr] = links.map(z => (z._2, z._1))
     from(links.apply _, map2.apply _)
   }
-  
-  def storeLinks(fname:String, links:Seq[GenericLink]):Unit = {
-    
+
+  def storeLinks(fname: String, links: Seq[GenericLink]): Unit = {
+
     def f(l: GenericLink): String = generate(GenericLinkRepr.toRepr(l))
     val sink = DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
     for (l <- links) {
@@ -143,8 +154,8 @@ object JSonSerializer {
     }
     sink.close()
   }
-  
-  def getGenericLinks(fname:String):Iterable[GenericLinkRepresentation] = {
-    StringSource.readLines(fname).map(s=>parse[GenericLinkRepresentation](s))
+
+  def getGenericLinks(fname: String): Iterable[GenericLinkRepresentation] = {
+    StringSource.readLines(fname).map(s => parse[GenericLinkRepresentation](s))
   }
 }

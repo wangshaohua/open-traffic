@@ -77,7 +77,7 @@ class ViterbiDecoder(obs_model: ObservationModel,
       val old_frame = vqueue.last
       old_frame.sp_transition = transitions
     }
-    
+
     // Wrap the array in a vector
     val wrapper_vec = new DenseVectorCol(point.probabilities.rawData)
     val wrapper_obs_log = new DenseVectorCol(obs_log)

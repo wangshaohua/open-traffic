@@ -1,3 +1,19 @@
+/**
+ * Copyright 2012. The Regents of the University of California (Regents).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package netconfig.Datum.storage
 import netconfig.Link
 import netconfig.Datum.ProbeCoordinate
@@ -12,9 +28,9 @@ import com.google.common.collect.ImmutableCollection
 import netconfig.Spot
 import netconfig_extensions.CollectionUtils._
 
-trait Codec[L<:Link] extends netconfig.storage.Codec[L] {
+trait Codec[L <: Link] extends netconfig.storage.Codec[L] {
 
-  def toRepr(pc:ProbeCoordinate[L]):ProbeCoordinateRepr = {
+  def toRepr(pc: ProbeCoordinate[L]): ProbeCoordinateRepr = {
     val speed = if (pc.speed == null) {
       None
     } else {
@@ -36,77 +52,77 @@ trait Codec[L<:Link] extends netconfig.storage.Codec[L] {
       Some(pc.hdop.floatValue())
     }
     new ProbeCoordinateRepr(
-        pc.id, 
-        TimeRepr.toRepr(pc.time),
-        CoordinateRepresentation.toRepr(pc.coordinate),
-        pc.spots.map(toRepr _),
-        pc.probabilities.toSeq.map(_.doubleValue()),
-        speed,
-        heading,
-        hired,
-        hdop)
-  }
-  
-  def toRepr(tsp:TSpot[L]):ProbeCoordinateRepr = {
-    toRepr(tsp.toProbeCoordinate())
-  }
-  
-  def toRepr(rtt:RouteTT[L]):PathInferenceRepr = {
-    toRepr(rtt.toPathInference())
-  }
-  
-  def toRepr(pi:PathInference[L]):PathInferenceRepr = {
-    new PathInferenceRepr(pi.id, 
-        TimeRepr.toRepr(pi.startTime),
-        TimeRepr.toRepr(pi.endTime),
-        pi.routes.map(toRepr _),
-        pi.probabilities.toSeq.map(_.doubleValue()))
+      pc.id,
+      TimeRepr.toRepr(pc.time),
+      CoordinateRepresentation.toRepr(pc.coordinate),
+      pc.spots.map(toRepr _),
+      pc.probabilities.toSeq.map(_.doubleValue()),
+      speed,
+      heading,
+      hired,
+      hdop)
   }
 
-  def probeCoordinateFromRepr(pcr:ProbeCoordinateRepr): ProbeCoordinate[L] = {
-    val speed:java.lang.Float = pcr.speed match {
+  def toRepr(tsp: TSpot[L]): ProbeCoordinateRepr = {
+    toRepr(tsp.toProbeCoordinate())
+  }
+
+  def toRepr(rtt: RouteTT[L]): PathInferenceRepr = {
+    toRepr(rtt.toPathInference())
+  }
+
+  def toRepr(pi: PathInference[L]): PathInferenceRepr = {
+    new PathInferenceRepr(pi.id,
+      TimeRepr.toRepr(pi.startTime),
+      TimeRepr.toRepr(pi.endTime),
+      pi.routes.map(toRepr _),
+      pi.probabilities.toSeq.map(_.doubleValue()))
+  }
+
+  def probeCoordinateFromRepr(pcr: ProbeCoordinateRepr): ProbeCoordinate[L] = {
+    val speed: java.lang.Float = pcr.speed match {
       case None => null
       case Some(x) => x.floatValue()
     }
-    val heading:java.lang.Short = pcr.heading match {
+    val heading: java.lang.Short = pcr.heading match {
       case None => null
       case Some(x) => x.shortValue()
     }
-    val hired:java.lang.Boolean = pcr.hired match {
+    val hired: java.lang.Boolean = pcr.hired match {
       case None => null
       case Some(x) => x.booleanValue()
     }
-    val hdop:java.lang.Float = pcr.hdop match {
+    val hdop: java.lang.Float = pcr.hdop match {
       case None => null
       case Some(x) => x.floatValue()
     }
     val spots = pcr.spots.map(fromRepr _).toArray
-    val probs:Array[Double] = pcr.probabilities.toArray
+    val probs: Array[Double] = pcr.probabilities.toArray
     ProbeCoordinate.from(
-        pcr.id,
-        TimeRepr.fromRepr(pcr.time),
-        CoordinateRepresentation.fromRepr(pcr.coordinate),
-        spots,
-        probs,
-        speed,
-        heading,
-        hired,
-        hdop)
+      pcr.id,
+      TimeRepr.fromRepr(pcr.time),
+      CoordinateRepresentation.fromRepr(pcr.coordinate),
+      spots,
+      probs,
+      speed,
+      heading,
+      hired,
+      hdop)
   }
-  
-  def tSpotFromRepr(pcr:ProbeCoordinateRepr):TSpot[L] = {
+
+  def tSpotFromRepr(pcr: ProbeCoordinateRepr): TSpot[L] = {
     probeCoordinateFromRepr(pcr).toTSpot()
   }
-  
-  def pathInferenceFromRepr(pir:PathInferenceRepr):PathInference[L] = {
+
+  def pathInferenceFromRepr(pir: PathInferenceRepr): PathInference[L] = {
     val routes = pir.routes.map(fromRepr _).toArray
     val probs = pir.probabilities.toArray
-    PathInference.from(pir.id, 
-        TimeRepr.fromRepr(pir.startTime), 
-        TimeRepr.fromRepr(pir.endTime),
-        routes,
-        probs, null)
-     // TODO(tjh) add the hired field
+    PathInference.from(pir.id,
+      TimeRepr.fromRepr(pir.startTime),
+      TimeRepr.fromRepr(pir.endTime),
+      routes,
+      probs, null)
+    // TODO(tjh) add the hired field
   }
 }
 

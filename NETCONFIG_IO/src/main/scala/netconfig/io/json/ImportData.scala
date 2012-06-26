@@ -1,3 +1,19 @@
+/**
+ * Copyright 2012. The Regents of the University of California (Regents).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package netconfig.io.json
 
 import scala.collection.mutable.{ Map => MMap }
@@ -25,10 +41,14 @@ import netconfig.io.DataSinks
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.
  *
- * --nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time "2012-04-29 16:30:00" --end-time "2012-04-29 17:30:00" --use-geo-filter true
+ * --nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb \
+ --start-time "2012-04-29 16:30:00" --end-time "2012-04-29 17:30:00" --use-geo-filter true
  *
  * mvn install
- * MAVEN_OPTS="-Xmx1g -verbose:gc -Dmm.data.dir=/windows/D/arterial_data" mvn exec:java -pl NETCONFIG -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
+ * MAVEN_OPTS="-Xmx1g -verbose:gc -Dmm.data.dir=/windows/D/arterial_data" mvn exec:java -pl NETCONFIG \
+ -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file \
+ /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" \
+  --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
  */
 object ImportProbeData extends MMLogging {
   type ParseFun = String => Option[ProbeCoordinateRepr]
@@ -52,7 +72,7 @@ object ImportProbeData extends MMLogging {
         lng <- lng_opt
       ) {
         val c = CoordinateRepresentation(Some(4326), lat, lng)
-        return Some(ProbeCoordinateRepr(id, time, c, speed=speed_opt, heading=heading_opt))
+        return Some(ProbeCoordinateRepr(id, time, c, speed = speed_opt, heading = heading_opt))
       }
       logWarning("Failed to parse lat/lng in line: %s" format line)
       return None
@@ -77,8 +97,10 @@ object ImportProbeData extends MMLogging {
       opt("file", "the name of the file", fname = _)
       opt("format", "The format of the file (formats currently supported:paulb)", format = _)
       booleanOpt("use-geo-filter", "Use the bounding box of the network to discard points outside the network area", geo_filter = _)
-      opt("start-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format", s => start_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
-      opt("end-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format", s => end_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
+      opt("start-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format",
+          s => start_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
+      opt("end-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format",
+          s => end_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
     }
     parser.parse(args)
 
@@ -119,7 +141,7 @@ object ImportProbeData extends MMLogging {
     logInfo("Opening file %s" format fname)
     val source: Iterable[Option[ProbeCoordinateRepr]] = StringSource.readLines(fname).map(parsing_fun)
     val files = MMap.empty[String, DataSink[ProbeCoordinateRepr]]
-    def f(pcr_ : ProbeCoordinateRepr):String = generate(pcr_)
+    def f(pcr_ : ProbeCoordinateRepr): String = generate(pcr_)
     for (
       pcr_opt <- source;
       pcr <- pcr_opt
