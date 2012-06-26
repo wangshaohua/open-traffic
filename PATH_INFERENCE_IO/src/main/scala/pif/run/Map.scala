@@ -168,86 +168,6 @@ class Merger[L <: Link](
   }
 }
 
-trait MapData[L <: Link] extends MMLogging {
-  /**
-   * A serializer object that will apply to all the objects processed by this instance.
-   */
-  def serializer: Serializer[L]
-
-  def mapTrajectory(findex: ProbeCoordinateViterbi.FileIndex): Unit = {
-    import findex._
-    logInfo("Mapping traj: %s" format findex.toString())
-    val mg_pcs = {
-      val fname_pcs = ProbeCoordinateViterbi.fileName(feed = findex.feed, nid = findex.nid,
-        date = findex.date,
-        net_type = netType)
-      serializer.readProbeCoordinates(fname_pcs)
-        .iterator
-    }
-    val mg_pis = {
-      val fname_pis = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
-        date = findex.date,
-        net_type = netType)
-      // This file may not exist.
-      if (!(new File(fname_pis)).exists()) {
-        logInfo("File " + fname_pis + " does not exists, skipping.")
-        return
-      }
-      serializer.readPathInferences(fname_pis)
-        .iterator
-    }
-
-    def writer_trajs_fun(vehicle: String, traj_idx: Int) = {
-      val fname_trajs_out = TrajectoryViterbif.fileName(feed, nid, date, net_type = findex.netType, vehicle, traj_idx)
-      serializer.writerTrack(fname_trajs_out)
-    }
-
-    // Perform the merge
-    val mergers = MMap.empty[String, Merger[L]]
-
-    while (mg_pis.hasNext || mg_pcs.hasNext) {
-      if (mg_pis.hasNext) {
-        val mg_pi = mg_pis.next()
-        val vehicle = mg_pi.id
-        val merger = mergers.getOrElseUpdate(vehicle, new Merger(writer_trajs_fun, vehicle))
-        merger.addPathInference(mg_pi)
-      }
-      if (mg_pcs.hasNext) {
-        val mg_pc = mg_pcs.next()
-        val vehicle = mg_pc.id
-        val merger = mergers.getOrElseUpdate(vehicle, new Merger(writer_trajs_fun, vehicle))
-        merger.addProbeCoordinate(mg_pc)
-      }
-    }
-    for (merger <- mergers.values) {
-      merger.finish()
-    }
-  }
-
-  def mapRouteTT(findex: PathInferenceViterbi.FileIndex): Unit = {
-    val fname_pis = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
-      date = findex.date,
-      net_type = findex.netType)
-    logInfo("Opening for reading : " + fname_pis)
-    val data = serializer.readPathInferences(fname_pis)
-
-    // TODO(tjh) use RouteTTViterbi instead
-    val fname_pis_out = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
-      date = findex.date,
-      net_type = findex.netType)
-    logInfo("Opening for writing : " + fname_pis_out)
-    val writer_pi = serializer.writerPathInference(fname_pis_out)
-
-    for (
-      nt_pi <- data;
-      mg_pi <- PathInferenceUtils.projectPathInferenceToRouteTT(nt_pi)
-    ) {
-      writer_pi.put(mg_pi.toPathInference)
-    }
-    writer_pi.close()
-  }
-}
-
 object MapDataGeneric extends MMLogging {
 
   val longHelp = """ Generic data mapper.
@@ -308,6 +228,12 @@ This assumes the network uses generic links.
       action match {
         case "tspot" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
           mapTSpot(serializer, net_type, fidx)
+        }
+        case "traj" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
+          mapTrajectory(serializer, net_type, fidx)
+        }
+        case "routett" => for (fidx <- PathInferenceViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
+          mapRouteTT(serializer, net_type, fidx)
         }
         case _ => {
           logInfo("Unknown action " + action)
