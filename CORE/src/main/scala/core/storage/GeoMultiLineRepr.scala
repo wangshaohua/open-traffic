@@ -13,29 +13,19 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package test_network
 
-import netconfig.Node
-import java.io.Serializable
-import core.Coordinate
+package core.storage
+import core.GeoMultiLine
 
-class SimpleNode(c: Coordinate, _id: NodeKey) extends Node with Serializable {
-  val coordinate = c
-  val id = _id
+case class GeoMultiLineRepr(val points: Seq[CoordinateRepresentation]) {
+}
 
-  override def hashCode: Int = id.hashCode
-
-  override def equals(other: Any): Boolean = {
-    other match {
-      case sn: SimpleNode => sn.id == id
-      case _ => assert(false); false
-    }
+object GeoMultiLineRepr {
+  def fromRepr(gr: GeoMultiLineRepr): GeoMultiLine = {
+    new GeoMultiLine(gr.points.map(CoordinateRepresentation.fromRepr _).toArray)
   }
 
-  override def toString: String = "SimpleNode[" + id + "]"
-
-  def moved(dx: Double, dy: Double): SimpleNode = {
-    val c2 = new core.Coordinate(c.srid, c.lat + dx, c.lon + dy)
-    new SimpleNode(c2, id)
+  def toRepr(g: GeoMultiLine): GeoMultiLineRepr = {
+    new GeoMultiLineRepr(g.getCoordinates().map(CoordinateRepresentation.toRepr _))
   }
 }

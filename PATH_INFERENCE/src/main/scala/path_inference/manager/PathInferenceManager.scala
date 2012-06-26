@@ -105,10 +105,10 @@ abstract class PathInferenceManager {
    * is the case, look at EHCacheAstar.
    */
   def addPoints(points: JCollection[ProbeCoordinate[Link]]): Unit = {
-      assert(points != null)
-      points.foreach(addPoint _)
-    }
-  
+    assert(points != null)
+    points.foreach(addPoint _)
+  }
+
   /**
    * Adds points to the filter and launches some computations.
    *
@@ -160,9 +160,9 @@ abstract class PathInferenceManager {
     throw new FeatureNotImplementedException
   }
 
-//  def getTrajectories: Array[Trajectory[Link]] = {
-//    throw new FeatureNotImplementedException
-//  }
+  //  def getTrajectories: Array[Trajectory[Link]] = {
+  //    throw new FeatureNotImplementedException
+  //  }
 
 }
 

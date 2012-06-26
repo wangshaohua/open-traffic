@@ -78,12 +78,12 @@ public interface Link extends Serializable {
     /**
      * @return a list of links that flow out of this link.
      */
-    public ImmutableCollection<Link> outLinks() throws NetconfigException;
+    public ImmutableCollection<? extends Link> outLinks() throws NetconfigException;
 
     /**
      * @return a list of links that flow into this link.
      */
-    public ImmutableCollection<Link> inLinks() throws NetconfigException;
+    public ImmutableCollection<? extends Link> inLinks() throws NetconfigException;
 
     /**
      * 
@@ -92,18 +92,18 @@ public interface Link extends Serializable {
      */
     public GeoMultiLine geoMultiLine() throws NetconfigException;
 
-    /**
-     * Return the partial geometry of the link between two offsets.
-     * 
-     * @param start_offset
-     *            the beginning offset along the link (meters)
-     * @param end_offset
-     *            the ending offset along the link (meters)
-     * @return the partial geometry of the link between the two specified
-     *         offsets
-     * @throws NetconfigException if no geometry is defined for this link.
-     */
-    public GeoMultiLine partialGeoMultiLine(double start_offset,
-            double end_offset) throws NetconfigException;
+//    /**
+//     * Return the partial geometry of the link between two offsets.
+//     * 
+//     * @param start_offset
+//     *            the beginning offset along the link (meters)
+//     * @param end_offset
+//     *            the ending offset along the link (meters)
+//     * @return the partial geometry of the link between the two specified
+//     *         offsets
+//     * @throws NetconfigException if no geometry is defined for this link.
+//     */
+//    public GeoMultiLine partialGeoMultiLine(double start_offset,
+//            double end_offset) throws NetconfigException;
 
 } // class

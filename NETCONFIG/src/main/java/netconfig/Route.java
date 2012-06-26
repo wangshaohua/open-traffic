@@ -148,14 +148,14 @@ public class Route<LINK extends Link> implements Serializable {
     public GeoMultiLine geoMultiLine() throws NetconfigException {
         // Grrr where is my for all?
         if (all_from_same_link()) {
-            return startSpot().link.partialGeoMultiLine(startOffset(),
+            return startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
                     endOffset());
         }
         GeoMultiLine res = null;
         final double first_offset_diff = startSpot().link.length()
                 - startOffset();
         if (first_offset_diff > 0) {
-            res = startSpot().link.partialGeoMultiLine(startOffset(),
+            res = startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
                     startSpot().link.length());
         }
 
@@ -167,7 +167,7 @@ public class Route<LINK extends Link> implements Serializable {
         final double last_offset_dff = endOffset();
         if (last_offset_dff > 0) {
             res = GeoMultiLine.greedyConcatenation(res,
-                    endSpot().link.partialGeoMultiLine(0, endOffset()), 2.0);
+                    endSpot().link.geoMultiLine().getPartialGeometry(0, endOffset()), 2.0);
         }
         return res;
     }

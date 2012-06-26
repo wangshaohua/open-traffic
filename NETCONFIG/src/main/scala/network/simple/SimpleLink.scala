@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package test_network
+package network.simple
 
 import scala.reflect.BeanProperty
 import netconfig.Link
@@ -22,10 +22,10 @@ import collection.JavaConversions._
 import com.google.common.collect.ImmutableList
 
 class SimpleLink(
-    start_node: SimpleNode, 
-    end_node: SimpleNode,
-    _id: Int, 
-    private[this] val net: SimpleNetwork) extends Link {
+  start_node: SimpleNode,
+  end_node: SimpleNode,
+  _id: Int,
+  private[this] val net: SimpleNetwork) extends Link {
 
   @BeanProperty val startNode = start_node
 
@@ -37,7 +37,7 @@ class SimpleLink(
 
   lazy val inLinks: ImmutableList[Link] =
     ImmutableList.copyOf(net.inLinks(start_node.id).map(net.links(_).asInstanceOf[Link]))
-    
+
   lazy val outLinks: ImmutableList[Link] =
     ImmutableList.copyOf(net.outLinks(end_node.id).map(net.links(_).asInstanceOf[Link]))
 
@@ -49,18 +49,5 @@ class SimpleLink(
     new GeoMultiLine(Array(c1, c2))
   }
 
-  override def partialGeoMultiLine(start: Double, end: Double): GeoMultiLine = {
-    def getP(off: Double) = {
-      val r = off / length
-      val x1 = start_node.coordinate.lat * r + end_node.coordinate.lat * (1 - r)
-      val y1 = start_node.coordinate.lon * r + end_node.coordinate.lon * (1 - r)
-      new Coordinate(Coordinate.SRID_CARTESIAN, x1, y1)
-    }
-    val c1: Coordinate = getP(start)
-    val c2: Coordinate = getP(end)
-    new GeoMultiLine(Array(c1, c2))
-  }
-
   override def toString: String = "Link[" + id + "]"
-
 }

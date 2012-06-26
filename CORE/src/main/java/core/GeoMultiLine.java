@@ -23,12 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.postgis.LineString;
-import org.postgis.LinearRing;
-import org.postgis.MultiPolygon;
-import org.postgis.Point;
-import org.postgis.Polygon;
-
 /**
  * This is the replacement of postgis.LineString to get around some issues with
  * it. It should be used instead. This class is final. If you want to manipulate
@@ -50,10 +44,6 @@ public final class GeoMultiLine implements Serializable {
      */
     public final double[] cumulative_lengths; // should be private!
     public final int srid;
-
-    public GeoMultiLine(LineString ls) {
-        this(fromLineString(ls));
-    }
 
     public GeoMultiLine(List<Coordinate> wps) {
         this(wps.toArray(new Coordinate[0]));
@@ -404,29 +394,6 @@ public final class GeoMultiLine implements Serializable {
         return new GeoMultiLine(shifted);
     }
 
-    private static Coordinate[] fromLineString(LineString ls) {
-        final int n = ls.numGeoms();
-        Coordinate[] wps = new Coordinate[n];
-        for (int i = 0; i < n; ++i) {
-            wps[i] = new Coordinate(ls.srid, ls.getPoint(i).y, ls.getPoint(i).x);
-        }
-        return wps;
-    }
-
-    public MultiPolygon toMultiPolygon() {
-        Point[] points = new Point[waypoints.length + 1];
-        for (int i = waypoints.length - 1; i >= 0; --i) {
-            points[i] = new Point(waypoints[i].lon, waypoints[i].lat);
-        }
-        points[waypoints.length] = points[0];
-        LinearRing[] rings = { new LinearRing(points) };
-        Polygon[] polys = { new Polygon(rings) };
-        MultiPolygon mpoly = new MultiPolygon(polys);
-        mpoly.setSrid(this.srid);
-        assert (this.srid == mpoly.getSrid());
-        return mpoly;
-    }
-
     /**
      * Creates a new line such that the first point is also copied at the last
      * position to create a ring.
@@ -444,23 +411,10 @@ public final class GeoMultiLine implements Serializable {
         return new GeoMultiLine(newWaypoints);
     }
 
-    public LineString toLineString() {
-        Point[] points = new Point[this.waypoints.length];
-
-        for (int i = 0; i < this.waypoints.length; i++) {
-            points[i] = new Point(waypoints[i].lon, waypoints[i].lat);
-            points[i].setSrid(waypoints[i].srid);
-        }
-
-        LineString line = new LineString(points);
-        line.setSrid(this.srid);
-        return line;
-    }
-
-    @Override
-    public String toString() {
-        return this.toLineString().toString()
-                .replace("LINESTRING", "GeoMultiLine");
-    }
+//    @Override
+//    public String toString() {
+//        return this.toLineString().toString()
+//                .replace("LINESTRING", "GeoMultiLine");
+//    }
 } // class
 
