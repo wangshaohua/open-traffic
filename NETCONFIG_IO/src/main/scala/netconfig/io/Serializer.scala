@@ -33,8 +33,6 @@ import scala.collection.JavaConversions._
 /**
  * This is the main interface for the serializer which users should be using.
  * FIXME add some documentation.
- * Use of the concrete classes (ArterialSerializer, NavteqSerializer, ModelGraphSerializer)
- * for an implementation.
  */
 trait Serializer[L <: Link] {
   def readTrack(fname: String): Iterable[TrackPiece[L]]

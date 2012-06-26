@@ -145,8 +145,8 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
     }
 
     /**
-     * Computes the "direction" of travel between two coordinates as defined by
-     * Navteq. If the starting latitude is less than the ending latitude then
+     * Computes the "direction" of travel between two coordinates.
+     * If the starting latitude is less than the ending latitude then
      * the direction is "true" and if greater than, the direction is "false". If
      * the latitudes are exactly equal then the direction is true if the
      * starting longitude is less than the ending longitude

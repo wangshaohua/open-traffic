@@ -25,6 +25,7 @@ import path_inference.PathInferenceParameters2
 import scopt.OptionParser
 import netconfig.io.Dates
 import scala.actors.Futures._
+import netconfig.io.json.NetworkUtils
 
 /**
  * Runs the path inference on some serialized data, using a generic network representation.
@@ -37,21 +38,6 @@ import scala.actors.Futures._
  *
  */
 object RunPif extends MMLogging {
-
-  def getLinks(network_id: Int, source_name: String): Seq[Link] = {
-    val fname = SerializedNetwork.fileName(network_id, source_name)
-    val glrs = JSonSerializer.getGenericLinks(fname)
-    val builder = new NetworkBuilder
-    builder.build(glrs)
-  }
-
-  def getSerializer(network_id: Int, source_name: String, links: Seq[Link]): Serializer[Link] = {
-    val map: Map[LinkIDRepr, Link] = Map.empty ++ links.map(l => {
-      val linkId = l.asInstanceOf[GenericLink].idRepr
-      (linkId, l)
-    })
-    JSonSerializer.from(map)
-  }
 
   def main(args: Array[String]) = {
     // All the options
@@ -77,10 +63,10 @@ object RunPif extends MMLogging {
     val parameters = pifParameters()
 
     logInfo("Loading links...")
-    var links: Seq[Link] = getLinks(network_id, net_type)
+    var links: Seq[Link] = NetworkUtils.getLinks(network_id, net_type)
 //    println(links.head.geoMultiLine())
 
-    val serialier: Serializer[Link] = getSerializer(network_id, feed, links)
+    val serialier: Serializer[Link] = NetworkUtils.getSerializer(links)
 
     logInfo("Building projector...")
     val projection_hook: ProjectionHookInterface = ProjectionHook.create(links, parameters)
@@ -107,7 +93,7 @@ object RunPif extends MMLogging {
     logInfo("Using %d thread(s)" format num_threads)
 
     val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
-      future {runPIF(projection_hook, serialier, parameters, findex, drivers_whitelist)}     
+      future {runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist)}     
     }
     
     for (task <- tasks) {
@@ -128,20 +114,20 @@ object RunPif extends MMLogging {
     params
   }
 
-  def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link],
+  def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link], net_type:String, 
     parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String]): Unit = {
     val fname_in = RawProbe.fileName(file_index)
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = file_index.feed,
       nid = file_index.nid,
       date = file_index.date,
-      net_type = "navteq")
+      net_type = net_type)
     val fname_pis = PathInferenceViterbi.fileName(feed = file_index.feed,
       nid = file_index.nid,
       date = file_index.date,
-      net_type = "navteq")
+      net_type = net_type)
     val fname_trajs = (vid: String, traj_idx: Int) =>
       TrajectoryViterbif.fileName(feed = file_index.feed, nid = file_index.nid, date = file_index.date,
-        net_type = "navteq", vid, traj_idx)
+        net_type = net_type, vid, traj_idx)
 
     assert((new File(fname_in)).exists())
 
