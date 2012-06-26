@@ -32,8 +32,8 @@ object ProbeCoordinateUtils extends MMLogging {
    */
   def projectProbeCoordinateToTSpot[L <: Link](pc: ProbeCoordinate[L]): Option[TSpot[L]] = {
     // Do not forget case when init values are dummy negative values.
-    if ((pc.probabilities.min >= -netconfig.Datum.ProbeCoordinate.probabilityPrecision)) {
-      logWarning("Invalid probability distribution " + pc)
+    if ((pc.probabilities.min <= -netconfig.Datum.ProbeCoordinate.probabilityPrecision)) {
+      logWarning("Invalid probability distribution (negative elements) " + pc)
       return None
     }
 
