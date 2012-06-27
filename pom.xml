@@ -64,7 +64,7 @@ http://code.google.com/p/avro-scala-compiler-plugin/wiki/MavenUsage
             <dependency>
               <groupId>edu.berkeley.cs</groupId>
               <artifactId>avro-plugin_${scala.version}</artifactId>
-              <version>2.1.2-SNAPSHOT</version>
+              <version>2.1.4-SNAPSHOT</version>
             </dependency>
 	    <dependency>
               <groupId>org.apache.avro</groupId>
@@ -116,7 +116,7 @@ http://code.google.com/p/avro-scala-compiler-plugin/wiki/MavenUsage
             <compilerPlugin>
               <groupId>edu.berkeley.cs</groupId>
               <artifactId>avro-plugin_${scala.version}</artifactId>
-              <version>2.1.2-SNAPSHOT</version>
+              <version>2.1.4-SNAPSHOT</version>
             </compilerPlugin>
           </compilerPlugins>
           <dependencies>
