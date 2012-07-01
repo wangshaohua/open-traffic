@@ -18,6 +18,10 @@ package core.storage
 import core.Time
 import core_extensions.MMLogging
 
+/**
+ * A standard representation of the Time object.
+ * @note This class may evolve like the Time class itself.
+ */
 case class TimeRepr(
   var locale: String,
   var year: Int,
@@ -29,7 +33,15 @@ case class TimeRepr(
   var milli: Int = 0) extends MMLogging {
 }
 
+/**
+ * Contains some conversions between [[core.Time]] and [[core.storage.TimeRepr]].
+ */
 object TimeRepr extends MMLogging {
+  /** Creates a [[core.Time]] class from a [[core.storage.TimeRepre]] representation. 
+   *
+   * Only Berkeley time is supported for now. Other times will be supported after porting
+   * the time class to joda-time.
+   */
   def fromRepr(r: TimeRepr): Time = {
     if (r.locale != "berkeley") {
       logError("Only berkeley time supported for now")
@@ -38,6 +50,12 @@ object TimeRepr extends MMLogging {
     Time.newTimeFromBerkeleyDateTime(r.year, r.month, r.day, r.hour, r.minute, r.second, r.milli)
   }
 
+  /**
+   * Creates the corresponding [[core.storage.TimeRepr]] representation from a [[core.Time]] class.
+   *
+   * Only Berkeley time is supported for now. Other times will be supported after porting
+   * the time class to joda-time.
+   */
   def toRepr(t: Time): TimeRepr = {
     new TimeRepr(
       "berkeley",
@@ -51,7 +69,9 @@ object TimeRepr extends MMLogging {
   }
 
   /**
-   * Format is YYYY-MM-DD [HH:[MM:[SS[.SSS]]]]
+   * Creates a [[core.storage.TimeRepr]] object from a string.
+   * 
+   * The format is YYYY-MM-DD [HH:[MM:[SS[.SSS]]]]
    */
   def berkeleyFromString(s: String): Option[TimeRepr] = {
     val r1 = """([0-9]+)\-([0-9]*[1-9]+)\-([0-9]*[1-9]+)(.*)""".r
