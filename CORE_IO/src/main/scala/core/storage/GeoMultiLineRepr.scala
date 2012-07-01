@@ -16,8 +16,10 @@
 
 package core.storage
 import core.GeoMultiLine
+import edu.berkeley.cs.avro.marker.AvroRecord
 
-case class GeoMultiLineRepr(val points: Seq[CoordinateRepresentation]) {
+case class GeoMultiLineRepr(
+    var points: Seq[CoordinateRepresentation]) extends AvroRecord {
 }
 
 object GeoMultiLineRepr {

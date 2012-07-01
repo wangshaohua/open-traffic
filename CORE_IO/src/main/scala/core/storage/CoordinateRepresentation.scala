@@ -16,11 +16,15 @@
 
 package core.storage
 import core.Coordinate
+import edu.berkeley.cs.avro.marker.AvroRecord
 
+/**
+ * Representation of a coordinate.
+ */
 case class CoordinateRepresentation(
   var srid: Option[Int],
   var lat: Double,
-  var lon: Double) {
+  var lon: Double) extends AvroRecord {
 }
 
 object CoordinateRepresentation {

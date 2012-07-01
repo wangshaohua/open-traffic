@@ -9,12 +9,6 @@
 	<version>0.1-SNAPSHOT</version>
 
 	<name>Mobile Millennium</name>
-	
-<!-- AVRO PLUGIN INFORMATION
-https://github.com/radlab/SCADS/wiki/Avro-Plugin
-http://code.google.com/p/avro-scala-compiler-plugin/wiki/MavenUsage
--->
-
 	<!--Setup the SCM using this blog information: http://www.sonatype.com/people/2009/09/maven-tips-and-tricks-using-github/ 
 		https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide 
 		http://www.sonatype.com/people/2010/01/how-to-generate-pgp-signatures-with-maven/ 
@@ -29,106 +23,105 @@ http://code.google.com/p/avro-scala-compiler-plugin/wiki/MavenUsage
 	</properties>
 
 	<repositories>
-<!-- 	We cannot publish to maven central as long as we have external repositories.   -->
-<!--  Would be nice to find a workaround. -->
-  <repository>
-    <id>repo.codahale.com</id>
-    <url>http://repo.codahale.com</url>
-  </repository>
+		<!-- We cannot publish to maven central as long as we have external repositories. -->
+		<!-- Would be nice to find a workaround. -->
+		<!-- Needed for jackson/jerkson -->
+		<repository>
+			<id>repo.codahale.com</id>
+			<url>http://repo.codahale.com</url>
+		</repository>
+		<!-- Needed for avro-scala -->
+		<repository>
+			<id>Radlab Repository</id>
+			<url>http://scads.knowsql.org/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:calpath/open-traffic.git</connection>
+		<developerConnection>scm:git:git@github.com:calpath/open-traffic.git</developerConnection>
+		<url>git@github.com:calpath/open-traffic.git</url>
+	</scm>
 
 
-<repository>
-	<id>Radlab Repository</id>
-	<url>http://scads.knowsql.org/nexus/content/groups/public/</url>
-</repository>
-</repositories>
-<licenses>
-	<license>
-		<name>The Apache Software License, Version 2.0</name>
-		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		<distribution>repo</distribution>
-	</license>
-</licenses>
-<scm>
-	<connection>scm:git:git@github.com:calpath/open-traffic.git</connection>
-	<developerConnection>scm:git:git@github.com:calpath/open-traffic.git</developerConnection>
-	<url>git@github.com:calpath/open-traffic.git</url>
-</scm>	
+	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.berkeley.cs</groupId>
+			<artifactId>avro-plugin_${scala.version}</artifactId>
+			<version>2.1.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro</artifactId>
+			<version>1.6.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
-<dependencies>
-	<dependency>
-		<groupId>org.scala-lang</groupId>
-		<artifactId>scala-library</artifactId>
-		<version>${scala.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>edu.berkeley.cs</groupId>
-		<artifactId>avro-plugin_${scala.version}</artifactId>
-		<version>2.1.4-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.avro</groupId>
-		<artifactId>avro</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
-	</dependency>
-</dependencies>
-
-<build>
-	<pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-			</plugin>
-
-		</plugins>
-
-	</pluginManagement>
-	<plugins>
-		<plugin>
-			<groupId>net.alchim31.maven</groupId>
-			<artifactId>scala-maven-plugin</artifactId>
-			<version>${scala-maven-plugin.version}</version>
-			<executions>
-				<execution>
-					<goals>
-						<goal>compile</goal>
-						<goal>testCompile</goal>
-					</goals>
-				</execution>
-			</executions>
-			<configuration>
-				<compilerPlugins>
-					<compilerPlugin>
-						<groupId>edu.berkeley.cs</groupId>
-						<artifactId>avro-plugin_${scala.version}</artifactId>
-						<version>2.1.4-SNAPSHOT</version>
-					</compilerPlugin>
-					<compilerPlugin>
-						<groupId>org.apache.avro</groupId>
-						<artifactId>avro</artifactId>
-						<version>1.6.0-SNAPSHOT</version>
-					</compilerPlugin>
-					<compilerPlugin>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-core-asl</artifactId>
-						<version>1.7.3</version>
-					</compilerPlugin>
-					<compilerPlugin>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-mapper-asl</artifactId>
-						<version>1.7.3</version>
-					</compilerPlugin>
-					<compilerPlugin>
-						<groupId>com.thoughtworks.paranamer</groupId>
-						<artifactId>paranamer</artifactId>
-						<version>2.3</version>
-					</compilerPlugin>
-					<compilerPlugin>
-						<groupId>org.xerial.snappy</groupId>
-						<artifactId>snappy-java</artifactId>
-						<version>1.0.3.2</version>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>${scala-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<compilerPlugins>
+						<compilerPlugin>
+							<groupId>edu.berkeley.cs</groupId>
+							<artifactId>avro-plugin_${scala.version}</artifactId>
+							<version>2.1.4-SNAPSHOT</version>
+						</compilerPlugin>
+						<compilerPlugin>
+							<groupId>org.apache.avro</groupId>
+							<artifactId>avro</artifactId>
+							<version>1.6.0-SNAPSHOT</version>
+						</compilerPlugin>
+						<compilerPlugin>
+							<groupId>org.codehaus.jackson</groupId>
+							<artifactId>jackson-core-asl</artifactId>
+							<version>1.7.3</version>
+						</compilerPlugin>
+						<compilerPlugin>
+							<groupId>org.codehaus.jackson</groupId>
+							<artifactId>jackson-mapper-asl</artifactId>
+							<version>1.7.3</version>
+						</compilerPlugin>
+						<compilerPlugin>
+							<groupId>com.thoughtworks.paranamer</groupId>
+							<artifactId>paranamer</artifactId>
+							<version>2.3</version>
+						</compilerPlugin>
+						<compilerPlugin>
+							<groupId>org.xerial.snappy</groupId>
+							<artifactId>snappy-java</artifactId>
+							<version>1.0.3.2</version>
 						</compilerPlugin>
 					</compilerPlugins>
 					<dependencies>
@@ -173,6 +166,6 @@ http://code.google.com/p/avro-scala-compiler-plugin/wiki/MavenUsage
 		<module>NETCONFIG</module>
 		<module>NETCONFIG_IO</module>
 		<module>PATH_INFERENCE</module>
-    <module>PATH_INFERENCE_IO</module>
+		<module>PATH_INFERENCE_IO</module>
 	</modules>
 </project>

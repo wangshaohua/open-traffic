@@ -17,6 +17,7 @@
 package core.storage
 import core.Time
 import core_extensions.MMLogging
+import edu.berkeley.cs.avro.marker.AvroRecord
 
 case class TimeRepr(
   var locale: String,
@@ -26,7 +27,7 @@ case class TimeRepr(
   var hour: Int = 0,
   var minute: Int = 0,
   var second: Int = 0,
-  var milli: Int = 0) extends MMLogging {
+  var milli: Int = 0) extends AvroRecord {
 }
 
 object TimeRepr extends MMLogging {
