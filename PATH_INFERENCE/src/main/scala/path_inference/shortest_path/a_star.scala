@@ -17,16 +17,11 @@
 package path_inference.shortest_path
 
 import collection.mutable.ArrayBuffer
-//import collection.mutable.HashMap
 import collection.mutable.{ WeakHashMap => WHashMap }
 import collection.mutable.PriorityQueue
 import collection.JavaConversions._
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
-import net.sf.ehcache.config.CacheConfiguration
-import net.sf.ehcache.Cache
-import net.sf.ehcache.CacheManager
-import net.sf.ehcache.Element
 
 import netconfig.Link
 import core_extensions.MMLogging
@@ -303,93 +298,3 @@ class AStar(val heuristic: AStarHeuristic,
 
 class ConcurrentAStar(heuristic: AStarHeuristic,
   maxIters: Int) extends AStar(heuristic, maxIters) with ConcurrentCachedPathGenerator2
-
-class DistributedAStar(heuristic: AStarHeuristic,
-  maxIters: Int, maxNumPaths: Int) extends AStar(heuristic, maxIters) {
-
-  var _manager: CacheManager = null
-  var _cache_paths: Cache = null
-
-  def manager: CacheManager = {
-    if (_manager == null) {
-      _manager = CacheManager.create()
-      logInfo("Create new cache manager: " + _manager.getName())
-    }
-    _manager
-  }
-
-  val maxInMemory = 10000
-
-  def cache_path: Cache = {
-    val cache_key = "single_" + maxIters + "-" + maxNumPaths
-    if (manager.getCache(cache_key) == null) {
-      val temp_dir = System.getProperty("java.io.tmpdir")
-      logInfo("Creating cache " + cache_key + " in directory " + temp_dir)
-      if (temp_dir == null) {
-        logError("You are trying to use a disk cache but you have not specified a temporary directory (java.io.tmpdir)")
-      }
-      val cache_config = (new CacheConfiguration(cache_key, maxInMemory))
-        .eternal(true).copyOnRead(false).overflowToDisk(true).diskPersistent(true).diskStorePath(temp_dir + "/" + cache_key)
-      manager.addCache(new Cache(cache_config))
-    }
-    manager.getCache(cache_key)
-  }
-
-  def cache_paths: Cache = {
-    val cache_key = "multi_" + maxIters + "-" + maxNumPaths
-    if (_cache_paths == null) {
-      // See if a cache with the same name already exists (unclean shutdown)
-      _cache_paths = manager.getCache(cache_key)
-      if (_cache_paths == null) {
-        val temp_dir = System.getProperty("java.io.tmpdir")
-        if (temp_dir == null) {
-          logError("You are trying to use a disk cache but you have not specified a temporary directory (java.io.tmpdir)")
-        }
-        logInfo("Creating cache " + cache_key + " in directory " + temp_dir)
-        val cache_config = (new CacheConfiguration(cache_key, maxInMemory))
-          .eternal(true).copyOnRead(false).overflowToDisk(true).diskPersistent(true).diskStorePath(temp_dir + "/" + cache_key)
-        _cache_paths = new Cache(cache_config)
-        manager.addCache(_cache_paths)
-      }
-    }
-    _cache_paths
-  }
-
-  override def getPathInCache(key: PathKey): Option[Array[Link]] = {
-    val res = cache_path.get(key.toString)
-    if (res == null)
-      None
-    else Some(res.getValue().asInstanceOf[Array[Link]])
-  }
-
-  override def putPathInCache(key: PathKey, path: Array[Link]): Unit = {
-    val elem = new Element(key.toString, path)
-    cache_path.putIfAbsent(elem)
-  }
-
-  override def getPathsInCache(key: PathKey): Option[Array[Array[Link]]] = {
-    val res = cache_paths.get(key.toString)
-    if (res == null) {
-      None
-    } else {
-      Some(res.getValue().asInstanceOf[Array[Array[Link]]])
-    }
-  }
-
-  override def putPathsInCache(key: PathKey, paths: Array[Array[Link]]): Unit = {
-    val elem = new Element(key.toString, paths)
-    cache_paths.putIfAbsent(elem)
-  }
-
-  override def getApproximatePathsCacheSize: Int = cache_paths.getSize()
-
-  override def getApproximatePathCacheSize: Int = cache_path.getSize()
-
-  override def finalizeOperations(): Unit = {
-    cache_path.flush()
-    cache_paths.flush()
-    manager.removeCache("multi_" + maxIters + "-" + maxNumPaths)
-    manager.removeCache("single_" + maxIters + "-" + maxNumPaths)
-    logInfo(this + " : cache offloaded to disk")
-  }
-}
