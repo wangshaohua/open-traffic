@@ -146,8 +146,8 @@ object RunPif extends MMLogging {
 
     assert((new File(fname_in)).exists())
 
-    val writer_pi = serializer.writerPathInference(fname_pis)
-    val writer_pc = serializer.writerProbeCoordinate(fname_pcs)
+    val writer_pi = serializer.writerPathInference(fname_pis, false)
+    val writer_pc = serializer.writerProbeCoordinate(fname_pcs, false)
     logInfo("Opening data source: %s" format fname_in)
     val data = serializer.readProbeCoordinates(fname_in)
     val pif = PathInferenceFilter.createManager(parameters, projector)

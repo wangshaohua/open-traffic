@@ -41,11 +41,11 @@ trait Serializer[L <: Link] {
 
   def readPathInferences(fname: String): Iterable[PathInference[L]]
 
-  def writerProbeCoordinate(fname: String): DataSink[ProbeCoordinate[L]]
+  def writerProbeCoordinate(fname: String, extended_representation: Boolean): DataSink[ProbeCoordinate[L]]
 
-  def writerPathInference(fname: String): DataSink[PathInference[L]]
+  def writerPathInference(fname: String, extended_representation: Boolean): DataSink[PathInference[L]]
 
-  def writerTrack(fname: String): DataSink[TrackPiece[L]]
+  def writerTrack(fname: String, extended_representation: Boolean): DataSink[TrackPiece[L]]
 
   // TODO(?) add other accessors for the other basic types in netconfig.
 

@@ -58,14 +58,14 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   // TODO(?) These functions should be moved to netconfig.Datum.Codec
 
-  def toRepr(tp: TrackPiece[L]): TrackPieceRepr = {
+  def toRepr(tp: TrackPiece[L], extended_representation: Boolean): TrackPieceRepr = {
     val first = tp.firstConnections.map(c => (c.from, c.to))
     val second = tp.firstConnections.map(c => (c.from, c.to))
     new TrackPieceRepr(
       first,
-      tp.routes.map(toRepr _),
+      tp.routes.map(r=>(toRepr(r, extended_representation))),
       second,
-      toRepr(tp.point))
+      toRepr(tp.point, extended_representation))
   }
 
   def fromRepr(tpr: TrackPieceRepr): TrackPiece[L] = {
@@ -109,18 +109,18 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   //******** WRITER FUNCTIONS *********/
 
-  def writerProbeCoordinate(fname: String): DataSink[ProbeCoordinate[L]] = {
-    def f(pc: ProbeCoordinate[L]): String = generate(toRepr(pc))
+  def writerProbeCoordinate(fname: String, extended_representation:Boolean): DataSink[ProbeCoordinate[L]] = {
+    def f(pc: ProbeCoordinate[L]): String = generate(toRepr(pc, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerPathInference(fname: String): DataSink[PathInference[L]] = {
-    def f(pi: PathInference[L]): String = generate(toRepr(pi))
+  def writerPathInference(fname: String, extended_representation:Boolean): DataSink[PathInference[L]] = {
+    def f(pi: PathInference[L]): String = generate(toRepr(pi, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerTrack(fname: String): DataSink[TrackPiece[L]] = {
-    def f(tp: TrackPiece[L]): String = generate(toRepr(tp))
+  def writerTrack(fname: String, extended_representation:Boolean): DataSink[TrackPiece[L]] = {
+    def f(tp: TrackPiece[L]): String = generate(toRepr(tp, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 

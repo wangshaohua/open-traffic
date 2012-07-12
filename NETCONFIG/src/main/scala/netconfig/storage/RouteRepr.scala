@@ -15,6 +15,10 @@
  */
 
 package netconfig.storage
+import core.storage.GeoMultiLineRepr
 
-case class RouteRepr(var links: Seq[LinkIDRepr], var spots: Seq[SpotRepr]) {
+case class RouteRepr(
+    var links: Seq[LinkIDRepr],
+    var spots: Seq[SpotRepr],
+    var geometry: Option[GeoMultiLineRepr] = None) {
 }
