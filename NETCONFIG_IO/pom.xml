@@ -26,5 +26,10 @@
 			<artifactId>jerkson_${scala.version}</artifactId>
 			<version>0.5.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.scalacheck</groupId>
+			<artifactId>scalacheck_${scala.version}</artifactId>
+			<version>1.9</version>
+		</dependency>
 	</dependencies>
 </project>

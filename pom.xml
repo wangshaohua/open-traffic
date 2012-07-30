@@ -24,32 +24,30 @@
 	</properties>
 
 	<repositories>
-<!-- 	We cannot publish to maven central as long as we have external repositories.   -->
-<!--  Would be nice to find a workaround. -->
-  <repository>
-    <id>repo.codahale.com</id>
-    <url>http://repo.codahale.com</url>
-  </repository>
+		<!-- We cannot publish to maven central as long as we have external repositories. -->
+		<!-- Would be nice to find a workaround. -->
+		<repository>
+			<id>repo.codahale.com</id>
+			<url>http://repo.codahale.com</url>
+		</repository>
 
-<!--		<repository>
-			<id>mm-maven-dependencies</id>
-			<url>http://www.eecs.berkeley.edu/~tjhunter/mm-maven-dependencies/releases</url>
-		</repository>-->
+		<!-- <repository> <id>mm-maven-dependencies</id> <url>http://www.eecs.berkeley.edu/~tjhunter/mm-maven-dependencies/releases</url> 
+			</repository> -->
 	</repositories>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-    <connection>scm:git:git@github.com:calpath/open-traffic.git</connection>
-    <developerConnection>scm:git:git@github.com:calpath/open-traffic.git</developerConnection>
-    <url>git@github.com:calpath/open-traffic.git</url>
-  </scm>	
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:calpath/open-traffic.git</connection>
+		<developerConnection>scm:git:git@github.com:calpath/open-traffic.git</developerConnection>
+		<url>git@github.com:calpath/open-traffic.git</url>
+	</scm>
 
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
@@ -70,20 +68,20 @@
 
 		</pluginManagement>
 		<plugins>
-<!--      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-	<version>1.4</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>-->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-gpg-plugin</artifactId> 
+				<version>1.4</version> <executions> <execution> <id>sign-artifacts</id> <phase>verify</phase> 
+				<goals> <goal>sign</goal> </goals> </execution> </executions> </plugin> -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
@@ -100,6 +98,7 @@
 					<scalaVersion>${scala.version}</scalaVersion>
 					<args>
 						<arg>-make:transitivenocp</arg>
+						<arg>-deprecation</arg>
 						<arg>-dependencyfile</arg>
 						<arg>${project.build.directory}/.scala_dependencies</arg>
 					</args>
@@ -126,6 +125,6 @@
 		<module>NETCONFIG</module>
 		<module>NETCONFIG_IO</module>
 		<module>PATH_INFERENCE</module>
-    <module>PATH_INFERENCE_IO</module>
+		<module>PATH_INFERENCE_IO</module>
 	</modules>
 </project>
