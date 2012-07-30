@@ -8,6 +8,7 @@ import netconfig.Route
 import netconfig.Link
 import org.scalatest.junit.JUnitSuite
 import network.gen.test.SimpleGen
+import collection.JavaConversions._
 
 trait RouteTests extends Checkers {
 
@@ -23,6 +24,11 @@ trait RouteTests extends Checkers {
     })
     check((r: Route[Link]) => {
       r.links.size() >= 1
+    })
+    check((r: Route[Link]) => {
+      val links1 = r.links.toSet
+      val links2 = r.spots.map(_.link).toSet
+      links1 == links2
     })
   }
 }

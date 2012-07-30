@@ -541,7 +541,8 @@ public class Route<LINK extends Link> implements Serializable {
                 spotsBuilder.add(Spot.from(links0.get(i), 0.5 * links0.get(i)
                         .length()));
             }
-
+            // Do not forget the last spot...
+            spotsBuilder.add(endSpot);
             spots0 = spotsBuilder.build();
         }
         sanityChecks(spots0, links0);
