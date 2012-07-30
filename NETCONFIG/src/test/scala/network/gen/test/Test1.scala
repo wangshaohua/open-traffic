@@ -32,8 +32,8 @@ class GenericTest {
     val builder = new NetworkBuilder()
     val links = builder.build(glrs)
     assertEquals(links.length, 1)
-    assertTrue(links.first.inLinks().isEmpty())
-    assertTrue(links.first.outLinks().isEmpty())
+    assertTrue(links.head.inLinks().isEmpty())
+    assertTrue(links.head.outLinks().isEmpty())
   }
 
   @Test def test2: Unit = {
@@ -46,10 +46,10 @@ class GenericTest {
     val builder = new NetworkBuilder()
     val links = builder.build(glrs).sortBy(_.toString())
     assertEquals(2, links.length)
-    assertTrue(links.first.toString, links.first.inLinks().isEmpty())
+    assertTrue(links.head.toString, links.head.inLinks().isEmpty())
     assertTrue(links.last.outLinks().isEmpty())
-    assertEquals(1, links.first.outLinks().size())
+    assertEquals(1, links.head.outLinks().size())
     assertEquals(1, links.last.inLinks().size())
-    assert(links.first.endNode() == links.last.startNode())
+    assert(links.head.endNode() == links.last.startNode())
   }
 }
