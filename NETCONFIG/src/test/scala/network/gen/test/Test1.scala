@@ -25,12 +25,7 @@ import network.gen.NetworkBuilder
 class GenericTest {
 
   @Test def test1: Unit = {
-    val n1 = NodeIDRepr(0, 0)
-    val n2 = NodeIDRepr(1, 0)
-    val l1 = GenericLinkRepresentation(LinkIDRepr(0, 0), n1, n2, None, None)
-    val glrs = Seq(l1)
-    val builder = new NetworkBuilder()
-    val links = builder.build(glrs)
+	val links = SimpleGen.line(1)
     assertEquals(links.length, 1)
     assertTrue(links.head.inLinks().isEmpty())
     assertTrue(links.head.outLinks().isEmpty())
