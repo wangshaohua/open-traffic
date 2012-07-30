@@ -30,10 +30,8 @@
 			<id>repo.codahale.com</id>
 			<url>http://repo.codahale.com</url>
 		</repository>
-
-		<!-- <repository> <id>mm-maven-dependencies</id> <url>http://www.eecs.berkeley.edu/~tjhunter/mm-maven-dependencies/releases</url> 
-			</repository> -->
 	</repositories>
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -41,18 +39,23 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
 	<scm>
 		<connection>scm:git:git@github.com:calpath/open-traffic.git</connection>
 		<developerConnection>scm:git:git@github.com:calpath/open-traffic.git</developerConnection>
 		<url>git@github.com:calpath/open-traffic.git</url>
 	</scm>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
 			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
 		</dependency>
 	</dependencies>
 
@@ -63,15 +66,9 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 				</plugin>
-
 			</plugins>
-
 		</pluginManagement>
 		<plugins>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-gpg-plugin</artifactId> 
-				<version>1.4</version> <executions> <execution> <id>sign-artifacts</id> <phase>verify</phase> 
-				<goals> <goal>sign</goal> </goals> </execution> </executions> </plugin> -->
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

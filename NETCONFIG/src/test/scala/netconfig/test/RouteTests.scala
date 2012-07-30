@@ -9,6 +9,7 @@ import netconfig.Link
 import org.scalatest.junit.JUnitSuite
 import network.gen.test.SimpleGen
 import collection.JavaConversions._
+import netconfig.test.RouteGen
 
 trait RouteTests extends Checkers {
 
