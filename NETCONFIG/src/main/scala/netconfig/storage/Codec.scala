@@ -21,6 +21,8 @@ import netconfig.Route
 import collection.JavaConversions._
 import netconfig_extensions.CollectionUtils._
 import com.google.common.collect.ImmutableList
+import core.storage.CoordinateRepresentation
+import core.storage.GeoMultiLineRepr
 
 trait Codec[L <: Link] {
 
@@ -28,12 +30,32 @@ trait Codec[L <: Link] {
 
   def toLinkID(l: L): LinkIDRepr
 
-  def toRepr(s: Spot[L]): SpotRepr = {
-    new SpotRepr(toLinkID(s.link), s.offset)
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(s: Spot[L], extended_representation: Boolean): SpotRepr = {
+    val coo = if (extended_representation) {
+      Some(CoordinateRepresentation.toRepr(s.toCoordinate()))
+    } else {
+      None
+    }
+    new SpotRepr(toLinkID(s.link), s.offset, coo)
   }
 
-  def toRepr(r: Route[L]): RouteRepr = {
-    new RouteRepr(r.links.map(toLinkID _), r.spots.map(toRepr _))
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(r: Route[L], extended_representation: Boolean): RouteRepr = {
+    val geom = if (extended_representation) {
+      Some(GeoMultiLineRepr.toRepr(r.geoMultiLine()))
+    } else {
+      None
+    }
+    new RouteRepr(
+        r.links.map(toLinkID _),
+        r.spots.map(sp => toRepr(sp, extended_representation)), geom)
   }
 
   def fromRepr(sr: SpotRepr): Spot[L] = {

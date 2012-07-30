@@ -209,6 +209,7 @@ This assumes the network uses generic links.
     var date: LocalDate = null
     var range: Seq[LocalDate] = Seq.empty
     var feed: String = ""
+    var extended_info = false
     val parser = new OptionParser("test") {
       intOpt("nid", "the net id", network_id = _)
       opt("date", "the date", { s: String => { for (d <- parseDate(s)) { date = d } } })
@@ -216,6 +217,9 @@ This assumes the network uses generic links.
       opt("feed", "data feed", feed = _)
       opt("actions", "data feed", (s: String) => { actions = s.split(",") })
       opt("net-type", "The type of network", net_type = _)
+      booleanOpt("extended-info",
+        "Saves redundant info in the output, like geometry information (useful when interfacing with another language)",
+        extended_info = _)
     }
     parser.parse(args)
 
@@ -243,13 +247,13 @@ This assumes the network uses generic links.
     for (action <- actions) {
       action match {
         case "tspot" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTSpot(serializer, net_type, fidx)
+          mapTSpot(serializer, net_type, fidx, extended_info)
         }
         case "traj" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTrajectory(serializer, net_type, fidx)
+          mapTrajectory(serializer, net_type, fidx, extended_info)
         }
         case "routett" => for (fidx <- PathInferenceViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapRouteTT(serializer, net_type, fidx)
+          mapRouteTT(serializer, net_type, fidx, extended_info)
         }
         case _ => {
           logInfo("Unknown action " + action)
@@ -260,7 +264,7 @@ This assumes the network uses generic links.
   }
 
   def mapRouteTT[L <: Link](serializer: Serializer[L], net_type: String,
-    findex: PathInferenceViterbi.FileIndex): Unit = {
+    findex: PathInferenceViterbi.FileIndex, extended_information: Boolean): Unit = {
     val fname_pis = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
       net_type = net_type)
@@ -275,7 +279,7 @@ This assumes the network uses generic links.
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pis_out)
-    val writer_pi = serializer.writerPathInference(fname_pis_out)
+    val writer_pi = serializer.writerPathInference(fname_pis_out, extended_information)
 
     for (
       pi <- data;
@@ -287,7 +291,7 @@ This assumes the network uses generic links.
   }
 
   def mapTSpot[L <: Link](serializer: Serializer[L], net_type: String,
-    findex: ProbeCoordinateViterbi.FileIndex): Unit = {
+    findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
       net_type = net_type)
@@ -302,7 +306,7 @@ This assumes the network uses generic links.
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pcs_out)
-    val writer_pc = serializer.writerProbeCoordinate(fname_pcs_out)
+    val writer_pc = serializer.writerProbeCoordinate(fname_pcs_out, extended_information)
 
     for (
       pc <- data;
@@ -314,7 +318,7 @@ This assumes the network uses generic links.
   }
 
   def mapTrajectory[L <: Link](serializer: Serializer[L], net_type: String,
-    findex: ProbeCoordinateViterbi.FileIndex): Unit = {
+    findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
     import findex._
     logInfo("Mapping traj: %s" format findex.toString())
     val mg_pcs = {
@@ -341,7 +345,7 @@ This assumes the network uses generic links.
     }
     def writer_trajs_fun(vehicle: String, traj_idx: Int) = {
       val fname_trajs_out = TrajectoryViterbif.fileName(feed, nid, date, net_type = net_type, vehicle, traj_idx)
-      serializer.writerTrack(fname_trajs_out)
+      serializer.writerTrack(fname_trajs_out, extended_information)
     }
 
     // Perform the merge

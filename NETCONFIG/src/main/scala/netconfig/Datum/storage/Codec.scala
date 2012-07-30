@@ -30,7 +30,11 @@ import netconfig_extensions.CollectionUtils._
 
 trait Codec[L <: Link] extends netconfig.storage.Codec[L] {
 
-  def toRepr(pc: ProbeCoordinate[L]): ProbeCoordinateRepr = {
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(pc: ProbeCoordinate[L], extended_representation: Boolean): ProbeCoordinateRepr = {
     val speed = if (pc.speed == null) {
       None
     } else {
@@ -55,7 +59,7 @@ trait Codec[L <: Link] extends netconfig.storage.Codec[L] {
       pc.id,
       TimeRepr.toRepr(pc.time),
       CoordinateRepresentation.toRepr(pc.coordinate),
-      pc.spots.map(toRepr _),
+      pc.spots.map(sp => (toRepr(sp, extended_representation))),
       pc.probabilities.toSeq.map(_.doubleValue()),
       speed,
       heading,
@@ -63,19 +67,31 @@ trait Codec[L <: Link] extends netconfig.storage.Codec[L] {
       hdop)
   }
 
-  def toRepr(tsp: TSpot[L]): ProbeCoordinateRepr = {
-    toRepr(tsp.toProbeCoordinate())
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(tsp: TSpot[L], extended_representation: Boolean): ProbeCoordinateRepr = {
+    toRepr(tsp.toProbeCoordinate(), extended_representation)
   }
 
-  def toRepr(rtt: RouteTT[L]): PathInferenceRepr = {
-    toRepr(rtt.toPathInference())
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(rtt: RouteTT[L], extended_representation: Boolean): PathInferenceRepr = {
+    toRepr(rtt.toPathInference(), extended_representation)
   }
 
-  def toRepr(pi: PathInference[L]): PathInferenceRepr = {
+  /**
+   * @param extended_presentation: encodes redundant information like coordinates
+   *   (useful for interacting with matlab or python).
+   */
+  def toRepr(pi: PathInference[L], extended_representation: Boolean): PathInferenceRepr = {
     new PathInferenceRepr(pi.id,
       TimeRepr.toRepr(pi.startTime),
       TimeRepr.toRepr(pi.endTime),
-      pi.routes.map(toRepr _),
+      pi.routes.map(r => (toRepr(r, extended_representation))),
       pi.probabilities.toSeq.map(_.doubleValue()))
   }
 
