@@ -18,7 +18,7 @@ package network.gen
 import netconfig.Link
 import netconfig.storage.NodeIDRepr
 import netconfig.Node
-import com.google.common.collect.ImmutableCollection
+import com.google.common.collect.ImmutableList
 import netconfig_extensions.CollectionUtils._
 import core.GeoMultiLine
 import netconfig.NetconfigException
@@ -58,8 +58,8 @@ class NetworkBuilder {
       val startNode = start_node
       val endNode = end_node
       // The lazy factor is important to delay initialization here.
-      lazy val outLinks: ImmutableCollection[GenericLink] = end_node.outgoingLinks
-      lazy val inLinks: ImmutableCollection[GenericLink] = start_node.incomingLinks
+      lazy val outLinks: ImmutableList[GenericLink] = end_node.outgoingLinks
+      lazy val inLinks: ImmutableList[GenericLink] = start_node.incomingLinks
       def geoMultiLine: GeoMultiLine = {
         if (g == null) {
           throw new NetconfigException(null, "You are trying to use the link geometry but it was not provided in the representation")

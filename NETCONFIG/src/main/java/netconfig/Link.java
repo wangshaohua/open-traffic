@@ -26,7 +26,7 @@ import java.io.Serializable;
 
 import core.GeoMultiLine;
 
-import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Abstract class (must sub-class) for a link. Implements comparable (using the
@@ -78,12 +78,12 @@ public interface Link extends Serializable {
     /**
      * @return a list of links that flow out of this link.
      */
-    public ImmutableCollection<? extends Link> outLinks() throws NetconfigException;
+    public ImmutableList<? extends Link> outLinks() throws NetconfigException;
 
     /**
      * @return a list of links that flow into this link.
      */
-    public ImmutableCollection<? extends Link> inLinks() throws NetconfigException;
+    public ImmutableList<? extends Link> inLinks() throws NetconfigException;
 
     /**
      * 
