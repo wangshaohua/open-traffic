@@ -151,6 +151,15 @@ public class Route<LINK extends Link> implements Serializable {
             return startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
                     endOffset());
         }
+        // This route is close to degenerate
+        // This is not great because it does not check if adding some offset goes beyond the 
+        // length of the link.
+        // TODO(?) write the invariants of Route.
+        if (length() <= Link.LENGTH_PRECISION) {
+        	Spot<LINK> start_sp = spots.get(0);
+        	Spot<LINK> end_sp = Spot.from(start_sp.link, start_sp.offset+Link.LENGTH_PRECISION*0.5);
+        	return new GeoMultiLine(ImmutableList.of(start_sp.toCoordinate(), end_sp.toCoordinate()));
+        }
         GeoMultiLine res = null;
         final double first_offset_diff = startSpot().link.length()
                 - startOffset();
