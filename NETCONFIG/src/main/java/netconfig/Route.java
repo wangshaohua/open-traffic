@@ -153,9 +153,7 @@ public class Route<LINK extends Link> implements Serializable {
                     endOffset());
         }
         List<Coordinate> start_cs = new ArrayList<Coordinate>();
-        LINK first_link = startSpot().link;
-        double start_offset = (startOffset() >= first_link.length() ? first_link.length() - 0.1 * Link.LENGTH_PRECISION : startOffset());
-        for (Coordinate c:first_link.geoMultiLine().getPartialGeometry(start_offset,
+        for (Coordinate c:startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
                     startSpot().link.length()).getCoordinates()) {
         	start_cs.add(c);
         }
@@ -170,8 +168,7 @@ public class Route<LINK extends Link> implements Serializable {
         }
         List<Coordinate> end_cs = new ArrayList<Coordinate>();
         GeoMultiLine end_gmm = endSpot().link.geoMultiLine();
-        double end_offset = (endOffset()==0.0 ? 0.1 * Link.LENGTH_PRECISION : endOffset());
-        for (Coordinate c : end_gmm.getPartialGeometry(0.0, end_offset)
+        for (Coordinate c : end_gmm.getPartialGeometry(0.0, endOffset())
         		.getCoordinates()) {
         	end_cs.add(c);
         }

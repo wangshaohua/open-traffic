@@ -156,13 +156,21 @@ public final class GeoMultiLine implements Serializable {
     public GeoMultiLine getPartialGeometry(double start_offset,
             double end_offset) {
         // TODO(tjh) remove asserts and use exceptions instead
-        assert (start_offset < end_offset);
+        // We allow singular offsets.
+    	assert (start_offset <= end_offset);
         assert (start_offset <= this.getLength());
         assert (start_offset >= 0);
         assert (end_offset <= this.getLength());
         assert (end_offset >= 0);
         int start_idx = indexBeforeOffset(start_offset);
         int end_idx = indexBeforeOffset(end_offset);
+        
+        if (start_offset == end_offset) {
+            ArrayList<Coordinate> points = new ArrayList<Coordinate>();
+            points.add(getCoordinate(start_offset));
+            points.add(getCoordinate(start_offset));
+            return new GeoMultiLine(points);
+        }
 
         ArrayList<Coordinate> points = new ArrayList<Coordinate>();
         points.add(getCoordinate(start_offset));
