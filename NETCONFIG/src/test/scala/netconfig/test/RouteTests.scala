@@ -9,7 +9,6 @@ import netconfig.Link
 import org.scalatest.junit.JUnitSuite
 import network.gen.test.SimpleGen
 import collection.JavaConversions._
-import netconfig.test.RouteGen
 
 trait RouteTests extends Checkers {
 
@@ -30,6 +29,18 @@ trait RouteTests extends Checkers {
       val links1 = r.links.toSet
       val links2 = r.spots.map(_.link).toSet
       links1 == links2
+    })
+  }
+
+  @Test
+  def testGeo() {
+    check((r: Route[Link]) => {
+      val geom = r.geoMultiLine
+      geom != null
+    })
+    check((r: Route[Link]) => {
+      val geom = r.geoMultiLine
+      geom.getLength() >= 0
     })
   }
 }

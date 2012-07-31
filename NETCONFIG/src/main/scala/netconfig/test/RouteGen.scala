@@ -18,6 +18,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Choose._
 import netconfig.Link
 import netconfig.Route
+import netconfig.Spot
 import collection.JavaConversions._
 
 /**
@@ -50,8 +51,47 @@ object RouteGen {
     for (l <- buildRouteInner(List(start_link), turn_choices.toList)) yield l.reverse.toIndexedSeq
   }
 
+  def genSingularRoute[L <: Link](links: IndexedSeq[L]): Gen[Route[L]] = {
+    val idx_gen = Gen.choose(0, links.size - 1)
+    val offset_gen = Gen.choose(0.0, 1.0)
+    for (idx <- idx_gen; offset_x <- offset_gen) yield {
+      val link = links(idx)
+      val offset = offset_x * link.length
+      val sp = Spot.from(link, offset)
+      Route.fromSpots(Seq(sp, sp))
+    }
+  }
+
   /**
-   * Creates a random generate route of given length with given turns.
+   * A route that starts or ends at nodes. May be singular.
+   */
+  def genCompleteRoute[L <: Link](links: IndexedSeq[L], g: Gen[Int], route_length: Int): Gen[Route[L]] = {
+    val idxs_gen = Gen.listOfN(route_length, g)
+    val start_link_gen = Gen.pick(1, links).map(_.head)
+    val start_gen = Gen.choose(0.0, 1.0)
+    val end_gen = Gen.choose(0.0, 1.0)
+    val r_gen0 = for {
+      idxs <- idxs_gen
+      start_link <- start_link_gen
+      route_links <- buildRoute(start_link, idxs)
+    } yield {
+      route_links
+    }
+    val r_gen = r_gen0 suchThat (_ != None) map (_.get)
+    val r_gen2 = for {
+      route_links <- r_gen
+      start_offset <- Gen.oneOf(Seq(0.0, route_links.head.length))
+      end_offset <- Gen.oneOf(Seq({
+        if (route_links.size > 1) 0.0 else start_offset
+      }, route_links.last.length))
+    } yield {
+      Route.from(route_links, start_offset, end_offset)
+    }
+    r_gen2
+  }
+
+  /**
+   * Creates a random generate route of given number of turns.
    */
   def genRoute[L <: Link](links: IndexedSeq[L], g: Gen[Int], route_length: Int): Gen[Route[L]] = {
     val idxs_gen = Gen.listOfN(route_length, g)
@@ -80,9 +120,15 @@ object RouteGen {
 
   def genSmallRoutes[L <: Link](links: IndexedSeq[L], max_length: Int): Gen[Route[L]] = {
     val g = Gen.choose(0, 100)
-    val gens = for (route_length <- 0 to (max_length + 1)) yield {
+    val gens1 = for (route_length <- 0 to (max_length + 1)) yield {
       genRoute(links, g, route_length)
     }
-    for (i <- Gen.choose(1, max_length); r <- gens(i)) yield r
+    val gens2 = for (route_length <- 0 to (max_length + 1)) yield {
+      genCompleteRoute(links, g, route_length)
+    }
+    val gen3 = genSingularRoute(links)
+    val gens = (gens1 ++ gens2 ++ Seq(gen3)).toIndexedSeq
+    val num_gens = gens.size
+    for (i <- Gen.choose(0, num_gens - 1); r <- gens(i)) yield r
   }
 }
