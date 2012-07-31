@@ -244,7 +244,7 @@ public final class GeoMultiLine implements Serializable {
 
         return new GeoMultiLine(ll);
     }
-
+    
     /**
      * Conversion to array of doubles.
      * 
@@ -411,10 +411,5 @@ public final class GeoMultiLine implements Serializable {
         return new GeoMultiLine(newWaypoints);
     }
 
-//    @Override
-//    public String toString() {
-//        return this.toLineString().toString()
-//                .replace("LINESTRING", "GeoMultiLine");
-//    }
 } // class
 

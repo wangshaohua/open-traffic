@@ -24,6 +24,9 @@ package core;
 
 import org.apache.commons.math.util.FastMath;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * Java class which should be used to represent both PostGIS and PostgreSQL
@@ -441,39 +444,6 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         return 2.02117036255978; // Smallest length in dca.streets.
     }
 
-    // /**
-    // * Calls the DB to get a real distance is meters,
-    // * unsupported for now.
-    // * @param dbr the database reader to use
-    // * @param otherCoord
-    // * @return the most accurate distance in meters.
-    // * Note: in practice for the cases currently supported,
-    // distanceVincentyInMeters
-    // * is much faster and gives the same precision.
-    // */
-    // public double distanceSpheroidInMeters(DatabaseReader dbr,
-    // Coordinate otherCoord)
-    // throws DatabaseException {
-    // if (4326 != this.srid || 4326 != otherCoord.srid) {
-    // throw new ClassCastException(
-    // "Only SRID 4326 accepted for now.");
-    // }
-    // if (!dbr.psHasPS(psDistanceName)) {
-    // dbr.psCreate(psDistanceName, psDistance);
-    // }
-    // dbr.psSetPostGISPoint(psDistanceName, 1, this);
-    // dbr.psSetPostGISPoint(psDistanceName, 2, otherCoord);
-    // dbr.psQuery(psDistanceName);
-    // if (dbr.psRSNext(psDistanceName)) {
-    // double res = dbr.psRSGetDouble(psDistanceName, "spheroid_dist");
-    // dbr.psRSDestroy(psDistanceName);
-    // return res;
-    // } else {
-    // throw new DatabaseException(null,
-    // "Could not get result for spheroid calculation", dbr, psDistanceName);
-    // }
-    // }
-
     /**
      * This will eventually do something similar to the less function but error
      * on the other side.
@@ -705,5 +675,69 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         return b * A * (sigma - deltasigma);
         // CHECKSTYLE:ON
     } // distanceVincentyInMeters()
+
+    
+    /**
+     * Concatenates two lists of coordinates, by minimizing the distance between the end coordinates.
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public static List<Coordinate> greedyConcatenation(List<Coordinate> l1,
+            List<Coordinate> l2) {
+        if (l1 == null || l1.isEmpty())
+            return l2;
+        if (l2 == null || l2.isEmpty())
+            return l1;
+        final int n1 = l1.size();
+        final int n2 = l2.size();
+        Coordinate l1_first = l1.get(0);
+        Coordinate l1_last = l1.get(n1-1);
+        Coordinate l2_first = l2.get(0);
+        Coordinate l2_last = l2.get(n2-1);
+
+        double best = Double.POSITIVE_INFINITY;
+        boolean r1 = true;
+        boolean r2 = true;
+        double d = l1_last.distanceDefaultMethodInMeters(
+                l2_first);
+        if (d < best) {
+            r1 = false;
+            r2 = false;
+            best = d;
+        }
+
+        d = l1_last.distanceDefaultMethodInMeters(
+                l2_last);
+        if (d < best) {
+            r1 = false;
+            r2 = true;
+            best = d;
+        }
+
+        d = l1_first.distanceDefaultMethodInMeters(
+                l2_first);
+        if (d < best) {
+            r1 = true;
+            r2 = false;
+            best = d;
+        }
+
+        d = l1_first.distanceDefaultMethodInMeters(
+                l2_last);
+        if (d < best) {
+            r1 = true;
+            r2 = true;
+            best = d;
+        }
+
+        List<Coordinate> ll = new ArrayList<Coordinate>();
+        for (Coordinate c : (r1 ? Lists.reverse(l1) : l1))
+            ll.add(c);
+
+        for (Coordinate c : (r2 ? Lists.reverse(l2) : l2))
+            ll.add(c);
+        return ll;
+    }
 
 } // end class

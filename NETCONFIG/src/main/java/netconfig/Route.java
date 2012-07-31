@@ -25,10 +25,11 @@ import java.io.Serializable;
 //import java.util.ArrayList;
 //import java.util.Collection;
 //import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 //import java.util.Map.Entry;
-//import java.util.TreeMap;
+import core.Coordinate;
 
 import core.GeoMultiLine;
 import core.Monitor;
@@ -151,249 +152,30 @@ public class Route<LINK extends Link> implements Serializable {
             return startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
                     endOffset());
         }
-        // This route is close to degenerate
-        // This is not great because it does not check if adding some offset goes beyond the 
-        // length of the link.
-        // TODO(?) write the invariants of Route.
-        if (length() <= Link.LENGTH_PRECISION) {
-        	Spot<LINK> start_sp = spots.get(0);
-        	Spot<LINK> end_sp = Spot.from(start_sp.link, start_sp.offset+Link.LENGTH_PRECISION*0.5);
-        	return new GeoMultiLine(ImmutableList.of(start_sp.toCoordinate(), end_sp.toCoordinate()));
+        List<Coordinate> start_cs = new ArrayList<Coordinate>();
+        for (Coordinate c:startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
+                    startSpot().link.length()).getCoordinates()) {
+        	start_cs.add(c);
         }
-        GeoMultiLine res = null;
-        final double first_offset_diff = startSpot().link.length()
-                - startOffset();
-        if (first_offset_diff > 0) {
-            res = startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
-                    startSpot().link.length());
-        }
-
+        List<Coordinate> cs = start_cs;
         for (int i = 1; i < links.size() - 1; ++i) {
             final LINK l = links.get(i);
-            res = GeoMultiLine.greedyConcatenation(res, l.geoMultiLine(), 2.0);
+            List<Coordinate> link_cs = new ArrayList<Coordinate>();
+            for (Coordinate c: l.geoMultiLine().getCoordinates()) {
+            	link_cs.add(c);
+            }
+            cs = Coordinate.greedyConcatenation(cs, link_cs);
         }
-
-        final double last_offset_dff = endOffset();
-        if (last_offset_dff > 0) {
-            res = GeoMultiLine.greedyConcatenation(res,
-                    endSpot().link.geoMultiLine().getPartialGeometry(0, endOffset()), 2.0);
+        List<Coordinate> end_cs = new ArrayList<Coordinate>();
+        GeoMultiLine end_gmm = endSpot().link.geoMultiLine();
+        for (Coordinate c : end_gmm.getPartialGeometry(0.0, endOffset())
+        		.getCoordinates()) {
+        	end_cs.add(c);
         }
-        return res;
+        cs = Coordinate.greedyConcatenation(cs, end_cs);
+        
+        return new GeoMultiLine(cs);
     }
-
-    // // returns turn by turn directions with one direction per each element in
-    // // this array
-    // public String[] getDirections() {
-    // return null;
-    // }
-
-    // /**
-    // * Gets a spot along the route given the specified route offset. The
-    // * returned spot will have no lane information (i.e. lane = 0).
-    // *
-    // * @param offset
-    // * The offset along the route
-    // * @return A spot along the route
-    // * @throws NetconfigException
-    // * if there's an error creating the spot
-    // */
-    // public Spot<LINK> getSpotFromRouteOffset(float offset)
-    // throws NetconfigException {
-    // if (offset < -1e-9 || offset > this.getRouteLength()) {
-    // throw new IllegalArgumentException(
-    // "offset must be greater than 0 and less than the length of the route");
-    // }
-    //
-    // Entry<Float, LINK> e = this.reverseOffsetMap.floorEntry(offset);
-    //
-    // return new Spot<LINK>(e.getValue(), offset - e.getKey(), (short) 0);
-    // }
-    // /**
-    // * Gets the offset along the route of the given spot
-    // *
-    // * @param spot
-    // * A spot to determine its offset along the route
-    // * @return The offset along the route of the given spot
-    // * @throws NetconfigException
-    // * If the spot is not on the route
-    // */
-    // public float offsetOnRoute(Spot<LINK> spot) throws NetconfigException {
-    // if (!this.offsetMap.containsKey(spot.link) || !this.isSpotOnRoute(spot))
-    // {
-    // throw new NetconfigException(null, "Spot is not on route.");
-    // }
-    // if (spot.link.equals(this.getFirstSpot().link)) {
-    // return spot.offset - this.getFirstSpot().offset;
-    // }
-    // return spot.offset + this.offsetMap.get(spot.link);
-    // }
-    // /**
-    // * Fills a hashmap ({@link #offsetMap}) with the beginning offset for each
-    // * link on the route. This allows for quick access to the offset instead
-    // of
-    // * having to search for it everytime its needed
-    // */
-    // private void createOffsetMap() {
-    // this.offsetMap.put(this.links[0], 0.0f);
-    // this.reverseOffsetMap.put(0.0f, this.links[0]);
-    // float cur_offset = this.links[0].length()
-    // - this.getFirstSpot().offset;
-    // for (int i = 1; i < this.links.size() - 1; i++) {
-    // this.offsetMap.put(this.links[i], cur_offset);
-    // this.reverseOffsetMap.put(cur_offset, this.links[i]);
-    // cur_offset += this.links[i].length();
-    // }
-    // if (this.links.size() > 1) {
-    // this.offsetMap.put(this.links[this.links.size() - 1], cur_offset);
-    // this.reverseOffsetMap.put(cur_offset,
-    // this.links[this.links.size() - 1]);
-    // }
-    // }
-
-    // public LINK[] getLinks() {
-    // return this.links;
-    // }
-
-    // @SuppressWarnings("rawtypes")
-    // @Override
-    // public boolean equals(Object obj) {
-    // if (obj == null) {
-    // return false;
-    // }
-    // if (getClass() != obj.getClass()) {
-    // return false;
-    // }
-    // final Route other = (Route) obj;
-    // if (this.spots.size() != other.spots.size()) {
-    // return false;
-    // }
-    // for (int i = 0; i < this.spots.size(); i++) {
-    // if (!this.spots[i].equals(other.spots[i])) {
-    // return false;
-    // }
-    // }
-    // return true;
-    // }
-
-    // /**
-    // * Checks the equality of two routes within the tolerance margin of all
-    // * offsets on a network.
-    // *
-    // * TODO(tjh) document
-    // *
-    // * @param other
-    // * @return true if this route is equal to the given route within some
-    // small
-    // * tolerance
-    // */
-    // public boolean equalsWithinTolerance(Route<LINK> other) {
-    // if (other.links.size() != links.size()) {
-    // return false;
-    // }
-    // final double diff1 = this.startOffset() - other.startOffset();
-    // if (Math.abs(diff1) > Link.size()_PRECISION) {
-    // return false;
-    // }
-    // if (Math.abs(this.endOffset() - other.endOffset()) >
-    // Link.size()_PRECISION) {
-    // return false;
-    // }
-    // for (int i = 0; i < links.size(); ++i) {
-    // if (links[i] != other.links[i]) {
-    // return false;
-    // }
-    // }
-    // return true;
-    // }
-
-    // @Override
-    // public int hashCode() {
-    // int hash = 5;
-    // hash = 59 * hash + (this.spots != null ? this.spots.hashCode() : 0);
-    // return hash;
-    // }
-    // /**
-    // * Determines if this route is entirely contained within the given route.
-    // *
-    // * @param other_route
-    // * A route to compare this route to, in order to see if this
-    // * route is entirely contained with the supplied route
-    // * @return True if this route is contained within the given route
-    // *
-    // * NOTE: <b>THIS FUNCTION DOES NOT TAKE INTO ACCOUNT LANE
-    // * INFORMATION AS OF RIGHT NOW</b>
-    // *
-    // * TODO(?) Change function to take lane information into account
-    // */
-    // public boolean isContainedWithinRoute(Route<LINK> other_route) {
-    // if (this.links.size() == 0 || other_route.links.size() == 0
-    // || this.links.size() > other_route.links.size()) {
-    // return false;
-    // }
-    // if (this.links[0].equals(other_route.links[0])) {
-    // if (this.startOffset() < other_route.startOffset()) {
-    // return false;
-    // }
-    // }
-    // if (this.links[this.links.size() - 1]
-    // .equals(other_route.links[other_route.links.size() - 1])) {
-    // if (this.endOffset() > other_route.endOffset()) {
-    // return false;
-    // }
-    // }
-    // Integer startIndex = null;
-    // for (int i = 0; i < other_route.links.size(); i++) {
-    // if (this.links[0].equals(other_route.links[i])) {
-    // startIndex = i;
-    // break;
-    // }
-    // }
-    // if (startIndex == null) {
-    // return false;
-    // }
-    //
-    // for (int i = 1; i < this.links.size(); i++) {
-    // if (i + startIndex >= other_route.links.size()) {
-    // break;
-    // }
-    // if (!this.links[i].equals(other_route.links[i + startIndex])) {
-    // return false;
-    // }
-    // }
-    //
-    // return true;
-    // }
-    // /**
-    // * This function determines if this spot is on this route object. If true,
-    // * it means that this spot would be "driven over" if traversing the entire
-    // * route.
-    // *
-    // * TODO(?) THIS FUNCTION DOES NOT CURRENTLY TAKE LANES INTO ACCOUNT
-    // *
-    // * @param spot
-    // * A spot to check if it is on this route
-    // * @return True if the given spot is on the route
-    // */
-    // public boolean isSpotOnRoute(Spot<LINK> spot) {
-    // if (!this.offsetMap.containsKey(spot.link)) {
-    // return false;
-    // }
-    // if (spot.link.equals(this.getFirstSpot().link)) {
-    // if (spot.link.equals(this.getLastSpot().link)) {
-    // return spot.offset >= this.getFirstSpot().offset
-    // && spot.offset <= this.getLastSpot().offset;
-    // } else {
-    // return spot.offset >= this.getFirstSpot().offset;
-    // }
-    // }
-    // if (spot.link.equals(this.getLastSpot().link)) {
-    // return spot.offset <= this.getLastSpot().offset;
-    // }
-    //
-    // return this.offsetMap.containsKey(spot.link); // spot must be in the
-    // // "middle links" of the
-    // // route
-    // }
 
     /********** Static factory methods **************/
     // These should be the only methods avaialable to the user to create a Route
