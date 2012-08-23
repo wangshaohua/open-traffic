@@ -19,24 +19,24 @@ import core.Time;
 public class RouteTT<LINK extends Link> {
 
     /** Route that the travel time is on. (never null). */
-    public final Route<LINK> route;
+    private final Route<LINK> route_;
     /** Start time, never null. */
-    public final Time startTime;
+    private final Time startTime_;
     /** End time, never null. More or equal than startTime. */
-    public final Time endTime;
+    private final Time endTime_;
     /** Travel time for this data record, non negative. */
-    public final float tt;
+    private final float tt_;
     /**
      * Can be null. If not null, this is the id of the probe vehicle that
      * generated this record.
      */
-    public final String id;
+    private final String id_;
     /**
      * Indicate wether the vehicle was hired between two points. If it null, the
      * hired status is not available, or it is changing from between the start
      * and end point.
      */
-    public final Boolean hired;
+    private final Boolean hired_;
 
     /**
      * Constructor taking start/end and calculating TT.
@@ -57,16 +57,16 @@ public class RouteTT<LINK extends Link> {
      */
     private RouteTT(Route<LINK> route, Time startTime, Time endTime, String id,
             Boolean hired) throws NetconfigException {
-        this.route = route;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.tt = endTime.secondsSince(startTime);
-        this.id = id;
-        this.hired = hired;
+        this.route_ = route;
+        this.startTime_ = startTime;
+        this.endTime_ = endTime;
+        this.tt_ = endTime.secondsSince(startTime);
+        this.id_ = id;
+        this.hired_ = hired;
     }
 
     public double averageSpeedOnRoute() {
-        return this.route.length() / this.tt;
+        return this.route().length() / this.tt();
     }
 
     /**
@@ -75,14 +75,14 @@ public class RouteTT<LINK extends Link> {
      * @return A path inference object representing this route travel time
      */
     public PathInference<LINK> toPathInference() throws NetconfigException {
-        ImmutableList<Route<LINK>> routes = ImmutableList.of(route);
-        return PathInference.from(id, startTime, endTime, routes, null, null);
+        ImmutableList<Route<LINK>> routes = ImmutableList.of(route());
+        return PathInference.from(id(), startTime(), endTime(), routes, null, null);
     }
 
     public String toString() {
         return String.format(
                 "RouteTT[id = %s, start time = %s, end time = %s, route = %s]",
-                id, startTime.toString(), endTime.toString(), route.toString());
+                id(), startTime().toString(), endTime().toString(), route().toString());
     }
 
     // ************** PUBLIC CONSTRUCTORS ***************
@@ -109,6 +109,48 @@ public class RouteTT<LINK extends Link> {
             Time startTime, Time endTime, String id) throws NetconfigException {
         return from(route, startTime, endTime, id, null);
     }
+
+	/**
+	 * @return the route_
+	 */
+	public Route<LINK> route() {
+		return route_;
+	}
+
+	/**
+	 * @return the startTime_
+	 */
+	public Time startTime() {
+		return startTime_;
+	}
+
+	/**
+	 * @return the endTime_
+	 */
+	public Time endTime() {
+		return endTime_;
+	}
+
+	/**
+	 * @return the tt_
+	 */
+	public float tt() {
+		return tt_;
+	}
+
+	/**
+	 * @return the id_
+	 */
+	public String id() {
+		return id_;
+	}
+
+	/**
+	 * @return the hired_
+	 */
+	public Boolean hired() {
+		return hired_;
+	}
 
     // public RouteTT(Route<LINK> route, Time startTime, Time endTime, String
     // id)

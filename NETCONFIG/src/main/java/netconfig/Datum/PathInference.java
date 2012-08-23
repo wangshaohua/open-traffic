@@ -32,18 +32,18 @@ public class PathInference<LINK extends Link> implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /** Driver ID, cannot be null. */
-    public final String id;
+    private final String id_;
     /** Start time, cannot be null. */
-    public final Time startTime;
+    private final Time startTime_;
     /** End time, cannot be null. */
-    public final Time endTime;
+    private final Time endTime_;
     /**
      * The array of route (same length as the probabilities. The path inference
      * filter has no way to know the exact subtype of this and only operates on
      * the Link superclass, so this whole class may need to be casted to the
      * right thing.
      */
-    public final ImmutableList<Route<LINK>> routes;
+    private final ImmutableList<Route<LINK>> routes_;
     /**
      * Probability of each route.
      * <p/>
@@ -53,19 +53,19 @@ public class PathInference<LINK extends Link> implements Serializable {
      * Use {@link #hasValidProbabilities(double)} to see if it contains a valid
      * distribution.
      */
-    public final ImmutableTensor1 probabilities;
+    private final ImmutableTensor1 probabilities_;
     /** Hired status. null for N/A or unknown. */
-    public final Boolean hired;
+    private final Boolean hired_;
 
     private PathInference(String id, Time startTime, Time endTime,
             ImmutableList<Route<LINK>> routes, ImmutableTensor1 probabilities,
             Boolean hired) {
-        this.probabilities = probabilities;
-        this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.routes = routes;
-        this.hired = hired;
+        this.probabilities_ = probabilities;
+        this.id_ = id;
+        this.startTime_ = startTime;
+        this.endTime_ = endTime;
+        this.routes_ = routes;
+        this.hired_ = hired;
     }
 
     /**
@@ -82,11 +82,11 @@ public class PathInference<LINK extends Link> implements Serializable {
         double lastMax = Double.NEGATIVE_INFINITY;
         Integer ret = null;
         // Won't loop at all if length == 0
-        for (int i = 0; i < this.routes.size(); i++) {
+        for (int i = 0; i < this.routes().size(); i++) {
             // Use compare() b/c the operators don't handle some edge cases,
             // namely NaN, +/- Inf, and -0.0.
-            if (0 < Double.compare(this.probabilities.get(i), lastMax)) {
-                lastMax = this.probabilities.get(i);
+            if (0 < Double.compare(this.probabilities().get(i), lastMax)) {
+                lastMax = this.probabilities().get(i);
                 ret = i;
             }
         }
@@ -108,23 +108,23 @@ public class PathInference<LINK extends Link> implements Serializable {
     public <LINK2 extends Link> PathInference<LINK2> clone(
             ImmutableList<Route<LINK2>> new_routes,
             ImmutableTensor1 new_probabilities) {
-        return new PathInference<LINK2>(id, startTime, endTime, new_routes,
-                new_probabilities, hired);
+        return new PathInference<LINK2>(id(), startTime(), endTime(), new_routes,
+                new_probabilities, hired());
     }
 
     public <LINK2 extends Link> PathInference<LINK2> clone(
             ImmutableList<Route<LINK2>> new_routes, double[] new_probabilities)
             throws NetconfigException {
         ImmutableTensor1 new_probs = buildProbabilities(new_probabilities);
-        return new PathInference<LINK2>(id, startTime, endTime, new_routes,
-                new_probs, hired);
+        return new PathInference<LINK2>(id(), startTime(), endTime(), new_routes,
+                new_probs, hired());
     }
 
     public PathInference<LINK> clone(double[] new_probabilities)
             throws NetconfigException {
         ImmutableTensor1 new_probs = buildProbabilities(new_probabilities);
-        return new PathInference<LINK>(id, startTime, endTime, routes,
-                new_probs, hired);
+        return new PathInference<LINK>(id(), startTime(), endTime(), routes(),
+                new_probs, hired());
     }
 
     /** Creates a duplicate of this object (not implemented). */
@@ -151,24 +151,24 @@ public class PathInference<LINK extends Link> implements Serializable {
     public RouteTT<LINK> getMostProbableRouteTT() throws NetconfigException {
         Route<LINK> ret = null;
         double lastMax = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < this.routes.size(); i++) {
+        for (int i = 0; i < this.routes().size(); i++) {
             // Use compare() b/c the operators don't handle some edge cases.
-            if (0 < Double.compare(this.probabilities.get(i), lastMax)) {
-                lastMax = this.probabilities.get(i);
-                ret = this.routes.get(i);
+            if (0 < Double.compare(this.probabilities().get(i), lastMax)) {
+                lastMax = this.probabilities().get(i);
+                ret = this.routes().get(i);
             }
         }
         if (null == ret) {
             return null;
         } else {
-            return RouteTT.from(ret, this.startTime, this.endTime, this.id,
-                    this.hired);
+            return RouteTT.from(ret, this.startTime(), this.endTime(), this.id(),
+                    this.hired());
         }
     }
 
     /** Convenience function, returns the TT. */
     public float getTT() {
-        return this.endTime.secondsSince(this.startTime);
+        return this.endTime().secondsSince(this.startTime());
     }
 
     /**
@@ -180,11 +180,11 @@ public class PathInference<LINK extends Link> implements Serializable {
      *             if this object does not have a single, non-null path.
      */
     public RouteTT<LINK> toRouteTT() throws NetconfigException {
-        if (this.routes.size() != 1 || this.routes.get(0) == null) {
+        if (this.routes().size() != 1 || this.routes().get(0) == null) {
             throw new NetconfigException(null, "Cannot convert to route TT");
         }
-        return RouteTT.from(this.routes.get(0), this.startTime, this.endTime,
-                this.id, this.hired);
+        return RouteTT.from(this.routes().get(0), this.startTime(), this.endTime(),
+                this.id(), this.hired());
     }
 
     /**
@@ -193,11 +193,11 @@ public class PathInference<LINK extends Link> implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s from %s to %s .get(\n", this.id,
-                this.startTime.toString(), this.endTime.toString()));
-        for (int i = 0; i < this.routes.size(); i++) {
-            sb.append(String.format("\t\t%f\t%s\n)", this.probabilities.get(i),
-                    this.routes.get(i).toString()));
+        sb.append(String.format("%s from %s to %s .get(\n", this.id(),
+                this.startTime().toString(), this.endTime().toString()));
+        for (int i = 0; i < this.routes().size(); i++) {
+            sb.append(String.format("\t\t%f\t%s\n)", this.probabilities().get(i),
+                    this.routes().get(i).toString()));
         }
         return sb.toString();
     } // toString.
@@ -391,5 +391,47 @@ public class PathInference<LINK extends Link> implements Serializable {
             return false;
         }
     }
+
+	/**
+	 * @return the id_
+	 */
+	public String id() {
+		return id_;
+	}
+
+	/**
+	 * @return the startTime_
+	 */
+	public Time startTime() {
+		return startTime_;
+	}
+
+	/**
+	 * @return the endTime_
+	 */
+	public Time endTime() {
+		return endTime_;
+	}
+
+	/**
+	 * @return the routes_
+	 */
+	public ImmutableList<Route<LINK>> routes() {
+		return routes_;
+	}
+
+	/**
+	 * @return the probabilities_
+	 */
+	public ImmutableTensor1 probabilities() {
+		return probabilities_;
+	}
+
+	/**
+	 * @return the hired_
+	 */
+	public Boolean hired() {
+		return hired_;
+	}
 
 } // PathInference
