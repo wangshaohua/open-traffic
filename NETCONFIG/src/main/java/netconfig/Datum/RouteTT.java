@@ -76,13 +76,15 @@ public class RouteTT<LINK extends Link> {
      */
     public PathInference<LINK> toPathInference() throws NetconfigException {
         ImmutableList<Route<LINK>> routes = ImmutableList.of(route());
-        return PathInference.from(id(), startTime(), endTime(), routes, null, null);
+        return PathInference.from(id(), startTime(), endTime(), routes, null,
+                null);
     }
 
     public String toString() {
         return String.format(
                 "RouteTT[id = %s, start time = %s, end time = %s, route = %s]",
-                id(), startTime().toString(), endTime().toString(), route().toString());
+                id(), startTime().toString(), endTime().toString(), route()
+                        .toString());
     }
 
     // ************** PUBLIC CONSTRUCTORS ***************
@@ -110,47 +112,47 @@ public class RouteTT<LINK extends Link> {
         return from(route, startTime, endTime, id, null);
     }
 
-	/**
-	 * @return the route_
-	 */
-	public Route<LINK> route() {
-		return route_;
-	}
+    /**
+     * @return the route_
+     */
+    public Route<LINK> route() {
+        return route_;
+    }
 
-	/**
-	 * @return the startTime_
-	 */
-	public Time startTime() {
-		return startTime_;
-	}
+    /**
+     * @return the startTime_
+     */
+    public Time startTime() {
+        return startTime_;
+    }
 
-	/**
-	 * @return the endTime_
-	 */
-	public Time endTime() {
-		return endTime_;
-	}
+    /**
+     * @return the endTime_
+     */
+    public Time endTime() {
+        return endTime_;
+    }
 
-	/**
-	 * @return the tt_
-	 */
-	public float tt() {
-		return tt_;
-	}
+    /**
+     * @return the tt_
+     */
+    public float tt() {
+        return tt_;
+    }
 
-	/**
-	 * @return the id_
-	 */
-	public String id() {
-		return id_;
-	}
+    /**
+     * @return the id_
+     */
+    public String id() {
+        return id_;
+    }
 
-	/**
-	 * @return the hired_
-	 */
-	public Boolean hired() {
-		return hired_;
-	}
+    /**
+     * @return the hired_
+     */
+    public Boolean hired() {
+        return hired_;
+    }
 
     // public RouteTT(Route<LINK> route, Time startTime, Time endTime, String
     // id)

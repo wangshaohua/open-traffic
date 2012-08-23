@@ -71,11 +71,10 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
     public static final int SRID_CARTESIAN = 0;
     public static final int SRID_WGS84 = 4326;
     /**
-     * TODO(?) detail what an SRID is.
-     * These three are final because if they need to be modified, then a
-     * complicated conversion needs to be done (if you don't think so, then you
-     * are almost certainly not doing something right). If that is still what
-     * you want, then create a new instance.
+     * TODO(?) detail what an SRID is. These three are final because if they
+     * need to be modified, then a complicated conversion needs to be done (if
+     * you don't think so, then you are almost certainly not doing something
+     * right). If that is still what you want, then create a new instance.
      * <p/>
      * <code>y</code> in planar systems (like UTM).
      */
@@ -148,11 +147,11 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
     }
 
     /**
-     * Computes the "direction" of travel between two coordinates.
-     * If the starting latitude is less than the ending latitude then
-     * the direction is "true" and if greater than, the direction is "false". If
-     * the latitudes are exactly equal then the direction is true if the
-     * starting longitude is less than the ending longitude
+     * Computes the "direction" of travel between two coordinates. If the
+     * starting latitude is less than the ending latitude then the direction is
+     * "true" and if greater than, the direction is "false". If the latitudes
+     * are exactly equal then the direction is true if the starting longitude is
+     * less than the ending longitude
      * 
      * @param other
      *            The "end" point, using this object as the starting point to
@@ -262,6 +261,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * @throws ClassCastException
      *             if otherCoord is null
      */
+    @Override
     public int compareTo(Coordinate otherCoord) {
         // Unlikely (very) to have two refs to the same instance,
         // so no need for the optimization of this == otherCoord.
@@ -290,8 +290,9 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // to .equalsSRID().
 
         // Need to use Double.compare() to deal with edge values (NaN and Inf).
-        int cmpi = Double.compare(this.lat(), otherCoord.lat()); // otherCoord can't
-                                                             // be null.
+        int cmpi = Double.compare(this.lat(), otherCoord.lat()); // otherCoord
+                                                                 // can't
+        // be null.
 
         if (0 < cmpi) {
             return 1;
@@ -341,8 +342,8 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      */
     @Override
     public String toString() {
-        return String
-                .format("[%d](%3.8f,%3.8f)", this.srid(), this.lat(), this.lon());
+        return String.format("[%d](%3.8f,%3.8f)", this.srid(), this.lat(),
+                this.lon());
     }
 
     /**
@@ -676,9 +677,10 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // CHECKSTYLE:ON
     } // distanceVincentyInMeters()
 
-    
     /**
-     * Concatenates two lists of coordinates, by minimizing the distance between the end coordinates.
+     * Concatenates two lists of coordinates, by minimizing the distance between
+     * the end coordinates.
+     * 
      * @param l1
      * @param l2
      * @return
@@ -692,39 +694,35 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         final int n1 = l1.size();
         final int n2 = l2.size();
         Coordinate l1_first = l1.get(0);
-        Coordinate l1_last = l1.get(n1-1);
+        Coordinate l1_last = l1.get(n1 - 1);
         Coordinate l2_first = l2.get(0);
-        Coordinate l2_last = l2.get(n2-1);
+        Coordinate l2_last = l2.get(n2 - 1);
 
         double best = Double.POSITIVE_INFINITY;
         boolean r1 = true;
         boolean r2 = true;
-        double d = l1_last.distanceDefaultMethodInMeters(
-                l2_first);
+        double d = l1_last.distanceDefaultMethodInMeters(l2_first);
         if (d < best) {
             r1 = false;
             r2 = false;
             best = d;
         }
 
-        d = l1_last.distanceDefaultMethodInMeters(
-                l2_last);
+        d = l1_last.distanceDefaultMethodInMeters(l2_last);
         if (d < best) {
             r1 = false;
             r2 = true;
             best = d;
         }
 
-        d = l1_first.distanceDefaultMethodInMeters(
-                l2_first);
+        d = l1_first.distanceDefaultMethodInMeters(l2_first);
         if (d < best) {
             r1 = true;
             r2 = false;
             best = d;
         }
 
-        d = l1_first.distanceDefaultMethodInMeters(
-                l2_last);
+        d = l1_first.distanceDefaultMethodInMeters(l2_last);
         if (d < best) {
             r1 = true;
             r2 = true;
@@ -740,25 +738,25 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         return ll;
     }
 
-	/**
-	 * @return the srid_
-	 */
-	public Integer srid() {
-		return srid_;
-	}
+    /**
+     * @return the srid_
+     */
+    public Integer srid() {
+        return srid_;
+    }
 
-	/**
-	 * @return the lat_
-	 */
-	public double lat() {
-		return lat_;
-	}
+    /**
+     * @return the lat_
+     */
+    public double lat() {
+        return lat_;
+    }
 
-	/**
-	 * @return the lon_
-	 */
-	public double lon() {
-		return lon_;
-	}
+    /**
+     * @return the lon_
+     */
+    public double lon() {
+        return lon_;
+    }
 
 } // end class

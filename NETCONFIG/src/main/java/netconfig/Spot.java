@@ -26,6 +26,7 @@ import core.Coordinate;
 
 /**
  * This is the base class for encoding locations on a network link.
+ * 
  * @param <LINK>
  *            A subclass of Link, used in this instance.
  * @author samitha
@@ -97,7 +98,8 @@ public class Spot<LINK extends Link> implements Serializable {
         @SuppressWarnings("unchecked")
         Spot<LINK> that = (Spot<LINK>) o;
 
-        if ((this.link().equals(that.link())) && (this.offset() == that.offset())
+        if ((this.link().equals(that.link()))
+                && (this.offset() == that.offset())
                 && (this.lane() == that.lane())) {
             return true;
         } else {
@@ -174,20 +176,20 @@ public class Spot<LINK extends Link> implements Serializable {
      * A lane value of 0 means the lane information is unknown.<br>
      * A lane value of -1 means all lanes.
      */
-	public short lane() {
-		return lane_;
-	}
+    public short lane() {
+        return lane_;
+    }
 
     /**
      * Offset from the start of said Link (in meters). The offset is such that:
      * 0 <= offset <= length of the link
      */
-	public double offset() {
-		return offset_;
-	}
+    public double offset() {
+        return offset_;
+    }
 
     /** Link this spot is on. */
-	public LINK link() {
-		return link_;
-	}
+    public LINK link() {
+        return link_;
+    }
 }

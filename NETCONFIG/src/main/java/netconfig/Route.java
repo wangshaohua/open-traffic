@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 public class Route<LINK extends Link> implements Serializable {
 
     public static final long serialVersionUID = 2L;
-    
+
     /** The list of spots that defines this route. */
     private final ImmutableList<Spot<LINK>> spots_;
     /** The list of links that defines this route. */
@@ -150,31 +150,32 @@ public class Route<LINK extends Link> implements Serializable {
     public GeoMultiLine geoMultiLine() throws NetconfigException {
         // Grrr where is my for all?
         if (all_from_same_link()) {
-            return startSpot().link().geoMultiLine().getPartialGeometry(startOffset(),
-                    endOffset());
+            return startSpot().link().geoMultiLine()
+                    .getPartialGeometry(startOffset(), endOffset());
         }
         List<Coordinate> start_cs = new ArrayList<Coordinate>();
-        for (Coordinate c:startSpot().link().geoMultiLine().getPartialGeometry(startOffset(),
-                    startSpot().link().length()).getCoordinates()) {
-        	start_cs.add(c);
+        for (Coordinate c : startSpot().link().geoMultiLine()
+                .getPartialGeometry(startOffset(), startSpot().link().length())
+                .getCoordinates()) {
+            start_cs.add(c);
         }
         List<Coordinate> cs = start_cs;
         for (int i = 1; i < links().size() - 1; ++i) {
             final LINK l = links().get(i);
             List<Coordinate> link_cs = new ArrayList<Coordinate>();
-            for (Coordinate c: l.geoMultiLine().getCoordinates()) {
-            	link_cs.add(c);
+            for (Coordinate c : l.geoMultiLine().getCoordinates()) {
+                link_cs.add(c);
             }
             cs = Coordinate.greedyConcatenation(cs, link_cs);
         }
         List<Coordinate> end_cs = new ArrayList<Coordinate>();
         GeoMultiLine end_gmm = endSpot().link().geoMultiLine();
         for (Coordinate c : end_gmm.getPartialGeometry(0.0, endOffset())
-        		.getCoordinates()) {
-        	end_cs.add(c);
+                .getCoordinates()) {
+            end_cs.add(c);
         }
         cs = Coordinate.greedyConcatenation(cs, end_cs);
-        
+
         return new GeoMultiLine(cs);
     }
 
@@ -326,8 +327,9 @@ public class Route<LINK extends Link> implements Serializable {
         if (links.size() == 1) {
             spots0 = ImmutableList.of(startSpot, endSpot);
         } else {
-            ImmutableList.Builder<Spot<LINK>> spotsBuilder = 
-                new ImmutableList.Builder<Spot<LINK>>();
+            // Stupid way to break a line.
+            ImmutableList.Builder<Spot<LINK>> spotsBuilder = null;
+            spotsBuilder = new ImmutableList.Builder<Spot<LINK>>();
             spotsBuilder.add(startSpot);
             for (int i = 1; i < links0.size() - 1; i++) {
                 spotsBuilder.add(Spot.from(links0.get(i), 0.5 * links0.get(i)
@@ -417,18 +419,18 @@ public class Route<LINK extends Link> implements Serializable {
         return from(links, startOffset, endOffset);
     }
 
-	/**
-	 * @return the spots_
-	 */
-	public ImmutableList<Spot<LINK>> spots() {
-		return spots_;
-	}
+    /**
+     * @return the spots_
+     */
+    public ImmutableList<Spot<LINK>> spots() {
+        return spots_;
+    }
 
-	/**
-	 * @return the links_
-	 */
-	public ImmutableList<LINK> links() {
-		return links_;
-	}
+    /**
+     * @return the links_
+     */
+    public ImmutableList<LINK> links() {
+        return links_;
+    }
 
 }

@@ -43,12 +43,12 @@ public class TSpot<LINK extends Link> implements Serializable {
     public TSpot(Spot<LINK> spot, String id, Time time, Boolean hired,
             Float speed) throws NetconfigException {
         if (spot == null) {
-            throw new NetconfigException(
-                    new IllegalArgumentException("spot is null"), null);
+            throw new NetconfigException(new IllegalArgumentException(
+                    "spot is null"), null);
         }
         if (time == null) {
-            throw new NetconfigException(
-                    new IllegalArgumentException("time is null"), null);
+            throw new NetconfigException(new IllegalArgumentException(
+                    "time is null"), null);
         }
         this.spot_ = spot;
         this.id_ = id;
@@ -67,13 +67,8 @@ public class TSpot<LINK extends Link> implements Serializable {
     public ProbeCoordinate<LINK> toProbeCoordinate() throws NetconfigException {
         Spot[] spots = { spot() };
         double[] probs = { 1.0 };
-        return ProbeCoordinate.from(
-                id(),
-                time(),
-                spot().toCoordinate(), 
-                spots,
-                probs,
-                null, // speed
+        return ProbeCoordinate.from(id(), time(), spot().toCoordinate(), spots,
+                probs, null, // speed
                 null, // heading
                 hired(), null); // hdop
     }
@@ -83,42 +78,43 @@ public class TSpot<LINK extends Link> implements Serializable {
         return "TSpot[" + spot() + ", " + id() + ", " + time() + "]";
     }
 
-    public <LINK2 extends Link> TSpot<LINK2> clone(Spot<LINK2> other) throws NetconfigException {
+    public <LINK2 extends Link> TSpot<LINK2> clone(Spot<LINK2> other)
+            throws NetconfigException {
         return new TSpot<LINK2>(other, id(), time(), hired(), speed());
     }
 
-	/**
-	 * @return the spot_
-	 */
-	public Spot<LINK> spot() {
-		return spot_;
-	}
+    /**
+     * @return the spot_
+     */
+    public Spot<LINK> spot() {
+        return spot_;
+    }
 
-	/**
-	 * @return the id_
-	 */
-	public String id() {
-		return id_;
-	}
+    /**
+     * @return the id_
+     */
+    public String id() {
+        return id_;
+    }
 
-	/**
-	 * @return the time_
-	 */
-	public Time time() {
-		return time_;
-	}
+    /**
+     * @return the time_
+     */
+    public Time time() {
+        return time_;
+    }
 
-	/**
-	 * @return the hired_
-	 */
-	public Boolean hired() {
-		return hired_;
-	}
+    /**
+     * @return the hired_
+     */
+    public Boolean hired() {
+        return hired_;
+    }
 
-	/**
-	 * @return the speed_
-	 */
-	public Float speed() {
-		return speed_;
-	}
+    /**
+     * @return the speed_
+     */
+    public Float speed() {
+        return speed_;
+    }
 }
