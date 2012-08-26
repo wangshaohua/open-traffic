@@ -18,59 +18,35 @@ import core.Time;
  */
 public class TSpot<LINK extends Link> implements Serializable {
 
-    public static final long serialVersionUID = 0L;
-    /**
-     * The spot at the origin of the observation. (Non-null)
-     */
-    public final Spot<LINK> spot_;
+    public static final long serialVersionUID = 1L;
+    
+    private final Spot<LINK> spot_;
     /**
      * ID of the vehicle (can be null)
      */
-    public final String id_;
+    private final String id_;
     /**
      * The time originating the observation. (Non null)
      */
-    public final Time time_;
+    private final Time time_;
     /**
      * Hiring status (can be null if unavailable).
      */
-    public final Boolean hired_;
+    private final Boolean hired_;
     /**
      * Recorded speed at this spot. (Null if not available).
      */
-    public final Float speed_;
-    
-    
-    /**
-     * The spot at the origin of the observation. (Non-null)
-     */
-    public Spot<LINK> spot() { return spot_; }
-    /**
-     * ID of the vehicle (can be null)
-     */
-    public String id() { return id_; }
-    /**
-     * The time originating the observation. (Non null)
-     */
-    public Time time() { return time_; }
-    /**
-     * Hiring status (can be null if unavailable).
-     */
-    public Boolean hired() { return hired_; }
-    /**
-     * Recorded speed at this spot. (Null if not available).
-     */
-    public Float speed() { return speed_; }
-    
+    private final Float speed_;
+
     public TSpot(Spot<LINK> spot, String id, Time time, Boolean hired,
             Float speed) throws NetconfigException {
         if (spot == null) {
-            throw new NetconfigException(
-                    new IllegalArgumentException("spot is null"), null);
+            throw new NetconfigException(new IllegalArgumentException(
+                    "spot is null"), null);
         }
         if (time == null) {
-            throw new NetconfigException(
-                    new IllegalArgumentException("time is null"), null);
+            throw new NetconfigException(new IllegalArgumentException(
+                    "time is null"), null);
         }
         this.spot_ = spot;
         this.id_ = id;
@@ -89,13 +65,8 @@ public class TSpot<LINK extends Link> implements Serializable {
     public ProbeCoordinate<LINK> toProbeCoordinate() throws NetconfigException {
         Spot[] spots = { spot() };
         double[] probs = { 1.0 };
-        return ProbeCoordinate.from(
-                id(),
-                time(),
-                spot().toCoordinate(), 
-                spots,
-                probs,
-                null, // speed
+        return ProbeCoordinate.from(id(), time(), spot().toCoordinate(), spots,
+                probs, null, // speed
                 null, // heading
                 hired(), null); // hdop
     }
@@ -105,7 +76,43 @@ public class TSpot<LINK extends Link> implements Serializable {
         return "TSpot[" + spot() + ", " + id() + ", " + time() + "]";
     }
 
-    public <LINK2 extends Link> TSpot<LINK2> clone(Spot<LINK2> other) throws NetconfigException {
+    public <LINK2 extends Link> TSpot<LINK2> clone(Spot<LINK2> other)
+            throws NetconfigException {
         return new TSpot<LINK2>(other, id(), time(), hired(), speed());
+    }
+
+    /**
+     * @return the spot_
+     */
+    public Spot<LINK> spot() {
+        return spot_;
+    }
+
+    /**
+     * @return the id_
+     */
+    public String id() {
+        return id_;
+    }
+
+    /**
+     * @return the time_
+     */
+    public Time time() {
+        return time_;
+    }
+
+    /**
+     * @return the hired_
+     */
+    public Boolean hired() {
+        return hired_;
+    }
+
+    /**
+     * @return the speed_
+     */
+    public Float speed() {
+        return speed_;
     }
 }

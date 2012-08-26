@@ -44,8 +44,6 @@ public final class GeoMultiLine implements Serializable {
      */
     private final double[] cumulative_lengths; // should be private!
     private final int srid_;
-    
-    public Integer srid() { return srid_; }
 
     public GeoMultiLine(List<Coordinate> wps) {
         this(wps.toArray(new Coordinate[0]));
@@ -63,7 +61,7 @@ public final class GeoMultiLine implements Serializable {
             double l = waypoints[i]
                     .distanceDefaultMethodInMeters(waypoints[i - 1]);
             cumulative_lengths[i] = cumulative_lengths[i - 1] + l;
-            assert this.srid_ == wps[i].srid();
+            assert this.srid() == wps[i].srid();
         }
     }
 
@@ -159,14 +157,14 @@ public final class GeoMultiLine implements Serializable {
             double end_offset) {
         // TODO(tjh) remove asserts and use exceptions instead
         // We allow singular offsets.
-    	assert (start_offset <= end_offset);
+        assert (start_offset <= end_offset);
         assert (start_offset <= this.getLength());
         assert (start_offset >= 0);
         assert (end_offset <= this.getLength());
         assert (end_offset >= 0);
         int start_idx = indexBeforeOffset(start_offset);
         int end_idx = indexBeforeOffset(end_offset);
-        
+
         if (start_offset == end_offset) {
             ArrayList<Coordinate> points = new ArrayList<Coordinate>();
             points.add(getCoordinate(start_offset));
@@ -254,7 +252,7 @@ public final class GeoMultiLine implements Serializable {
 
         return new GeoMultiLine(ll);
     }
-    
+
     /**
      * Conversion to array of doubles.
      * 
@@ -338,8 +336,10 @@ public final class GeoMultiLine implements Serializable {
         // All the local coordinates.
         local[0] = new Coordinate(Coordinate.SRID_CARTESIAN, 0.0, 0.0);
         for (int i = 1; i < local.length; ++i) {
-            double local_x = dlat * (this.waypoints[i].lat() - local_center.lat());
-            double local_y = dlon * (this.waypoints[i].lon() - local_center.lon());
+            double local_x = dlat
+                    * (this.waypoints[i].lat() - local_center.lat());
+            double local_y = dlon
+                    * (this.waypoints[i].lon() - local_center.lon());
             local[i] = new Coordinate(Coordinate.SRID_CARTESIAN, local_x,
                     local_y);
             // System.out.println("Local: "+local[i]);
@@ -419,6 +419,13 @@ public final class GeoMultiLine implements Serializable {
         }
         newWaypoints[numPoints] = this.waypoints[0];
         return new GeoMultiLine(newWaypoints);
+    }
+
+    /**
+     * @return the srid_
+     */
+    public int srid() {
+        return srid_;
     }
 
 } // class
