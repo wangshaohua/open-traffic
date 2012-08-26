@@ -48,10 +48,6 @@ public class Route<LINK extends Link> implements Serializable {
     private final ImmutableList<Spot<LINK>> spots_;
     /** The list of links that defines this route. */
     private final ImmutableList<LINK> links_;
-
-    public ImmutableList<Spot<LINK>> spots() { return spots_; }
-    
-    public ImmutableList<LINK> links() { return links_; }
     
     // /**
     // * Provides a mapping between each link and the route offset of the

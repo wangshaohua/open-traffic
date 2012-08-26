@@ -71,12 +71,6 @@ public class Spot<LINK extends Link> implements Serializable {
         this.lane_ = lane;
     }
     
-    public LINK link() { return link_; }
-    
-    public double offset() { return offset_; }
-    
-    public short lane() { return lane_; }
-
     /*
      * Returns the coordinate corresponding to this spot on the network, or null
      * if the conversion could not be done.

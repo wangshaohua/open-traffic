@@ -114,12 +114,6 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         this.lat_ = lat;
         this.lon_ = lon;
     }
-    
-    public Integer srid() { return srid_; }
-    
-    public double lat() { return lat_; }
-    
-    public double lon() { return lon_; }
 
     /**
      * This function is here just because this comparison has to be done, a lot,
