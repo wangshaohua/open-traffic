@@ -36,18 +36,18 @@ import core.Coordinate;
 public class Spot<LINK extends Link> implements Serializable {
 
     /** Link this spot is on. */
-    public final LINK link;
+    public final LINK link_;
     /**
      * Offset from the start of said Link (in meters). The offset is such that:
      * 0 <= offset <= length of the link
      */
-    public final double offset;
+    public final double offset_;
     /**
      * Lane, from right-most (slow-lane) to the left-most, starting at 1.<br>
      * A lane value of 0 means the lane information is unknown.<br>
      * A lane value of -1 means all lanes.
      */
-    public final short lane;
+    public final short lane_;
 
     /**
      * This is the only constructor. This means that once a spot is created its
@@ -59,23 +59,29 @@ public class Spot<LINK extends Link> implements Serializable {
      * @param offset
      *            offset of the Spot in meters from the start of the link.
      * @param lane
-     *            lane number for which the spot belongs to, see {@link #lane}.
+     *            lane number for which the spot belongs to, see {@link #lane_}.
      * @throws NetconfigException
      *             on any error.
      * @see Link#getNumLanesAtOffset(double)
      */
     private Spot(LINK link, double offset, short lane) {
-        this.link = link;
-        this.offset = offset;
-        this.lane = lane;
+        this.link_ = link;
+        this.offset_ = offset;
+        this.lane_ = lane;
     }
+    
+    public LINK link() { return link_; }
+    
+    public double offset() { return offset_; }
+    
+    public short lane() { return lane_; }
 
     /*
      * Returns the coordinate corresponding to this spot on the network, or null
      * if the conversion could not be done.
      */
     public Coordinate toCoordinate() throws NetconfigException {
-        return link.geoMultiLine().getCoordinate(offset);
+        return link_.geoMultiLine().getCoordinate(offset_);
     }
 
     /**
@@ -90,15 +96,15 @@ public class Spot<LINK extends Link> implements Serializable {
     @Override
     public boolean equals(Object o) {
         if ((null == o) || (this.getClass() != o.getClass())
-                || (this.link.getClass() != ((Spot) o).link.getClass())) {
+                || (this.link_.getClass() != ((Spot) o).link_.getClass())) {
             return false;
         }
 
         @SuppressWarnings("unchecked")
         Spot<LINK> that = (Spot<LINK>) o;
 
-        if ((this.link.equals(that.link)) && (this.offset == that.offset)
-                && (this.lane == that.lane)) {
+        if ((this.link_.equals(that.link_)) && (this.offset_ == that.offset_)
+                && (this.lane_ == that.lane_)) {
             return true;
         } else {
             return false;
@@ -108,9 +114,9 @@ public class Spot<LINK extends Link> implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.link != null ? this.link.hashCode() : 0);
+        hash = 97 * hash + (this.link_ != null ? this.link_.hashCode() : 0);
         // hash = 97 * hash + Double.doubleToIntBits(this.offset);
-        hash = 97 * hash + this.lane;
+        hash = 97 * hash + this.lane_;
         return hash;
     }
 
@@ -127,8 +133,8 @@ public class Spot<LINK extends Link> implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("Spot(%s, %f, %d)", this.link.toString(),
-                this.offset, this.lane);
+        return String.format("Spot(%s, %f, %d)", this.link_.toString(),
+                this.offset_, this.lane_);
     }
 
     /** Rid us of a warning. */

@@ -42,13 +42,13 @@ import netconfig.io.DataSinks
  * Imports a file containing probe data into the proper JSON structures and directories.
  *
  * --nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb \
- --start-time "2012-04-29 16:30:00" --end-time "2012-04-29 17:30:00" --use-geo-filter true
+ * --start-time "2012-04-29 16:30:00" --end-time "2012-04-29 17:30:00" --use-geo-filter true
  *
  * mvn install
  * MAVEN_OPTS="-Xmx1g -verbose:gc -Dmm.data.dir=/windows/D/arterial_data" mvn exec:java -pl NETCONFIG \
- -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file \
- /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" \
-  --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
+ * -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file \
+ * /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" \
+ * --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
  */
 object ImportProbeData extends MMLogging {
   type ParseFun = String => Option[ProbeCoordinateRepr]
@@ -82,6 +82,32 @@ object ImportProbeData extends MMLogging {
     }
   }
 
+  /**
+   * Parses output of the database
+   * yyyy-mm-DD HH:MM:SS,DRIVER_ID,PG_GEOM,HIRED_STATUS,some date
+   */
+  def formatCSVPG(line: String): Option[ProbeCoordinateRepr] = {
+    val elts = line.split(",")
+    if (elts.length >= 6) {
+      val t_opt = TimeRepr.berkeleyFromString(elts(0))
+      val id = elts(1)
+      val geom = CoordinateRepresentation.fromPGGeometry(elts(2))
+      val hired = if (elts(3) == "f") false else true
+      for (
+        time <- t_opt;
+        c <- geom
+      ) {
+        return Some(ProbeCoordinateRepr(id, time, CoordinateRepresentation.toRepr(c), hired = Some(hired)))
+      }
+      logWarning("Failed to parse line: %s" format line)
+      return None
+
+    } else {
+      logWarning("Failed to parse line (not enough tokens): %s" format line)
+      None
+    }
+  }
+
   def main(args: Array[String]) = {
     import Dates._
     var network_id: Int = 0
@@ -98,9 +124,9 @@ object ImportProbeData extends MMLogging {
       opt("format", "The format of the file (formats currently supported:paulb)", format = _)
       booleanOpt("use-geo-filter", "Use the bounding box of the network to discard points outside the network area", geo_filter = _)
       opt("start-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format",
-          s => start_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
+        s => start_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
       opt("end-time", "(optional) start time filter in YYYY-MM-DD HH:MM:SS format",
-          s => end_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
+        s => end_time = Time.newTimeFromStringLikeBerkeleyDB("%s.000" format s))
     }
     parser.parse(args)
 
@@ -109,7 +135,8 @@ object ImportProbeData extends MMLogging {
 
     val parsing_fun: ParseFun = format match {
       case "csv1" => formatCSV1 _
-      case x => assert(false); null
+      case "csv-pg" => formatCSVPG _
+      case x => logError("Unknown format %s".format(x)) ; assert(false); null
     }
     val geo_filter_fun: ProbeCoordinateRepr => Option[ProbeCoordinateRepr] = {
       val f = (x: ProbeCoordinateRepr) => Some(x)

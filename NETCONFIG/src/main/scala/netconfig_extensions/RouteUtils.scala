@@ -70,13 +70,13 @@ object RouteUtils extends MMLogging {
     var i1 = 0
     val l1 = r1.links.length
     val l2 = r2.links.length
-    while (i1 < l1 && i1 < l2 && r1.links(i1) == r2.links(i1))
+    while (i1 < l1 && i1 < l2 && r1.links.get(i1) == r2.links.get(i1))
       i1 += 1
     var i2 = l1 - 1
-    while (i2 >= 0 && i2 >= (l1 - l2) && r1.links(i2) == r2.links(i2 + l2 - l1))
+    while (i2 >= 0 && i2 >= (l1 - l2) && r1.links.get(i2) == r2.links.get(i2 + l2 - l1))
       i2 -= 1
-    val d1 = (i1 to i2).map(r1.links(_).length).sum.toDouble
-    val d2 = (i1 to i2 + (l2 - l1)).map(r2.links(_).length).sum.toDouble
+    val d1 = (i1 to i2).map(r1.links.get(_).length).sum.toDouble
+    val d2 = (i1 to i2 + (l2 - l1)).map(r2.links.get(_).length).sum.toDouble
     return math.max(d1, d2)
   }
 

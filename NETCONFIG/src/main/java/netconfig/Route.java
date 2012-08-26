@@ -50,10 +50,14 @@ public class Route<LINK extends Link> implements Serializable {
 
     public static final long serialVersionUID = 2L;
     /** The list of spots that defines this route. */
-    public final ImmutableList<Spot<LINK>> spots;
+    public final ImmutableList<Spot<LINK>> spots_;
     /** The list of links that defines this route. */
-    public final ImmutableList<LINK> links;
+    public final ImmutableList<LINK> links_;
 
+    public ImmutableList<Spot<LINK>> spots() { return spots_; }
+    
+    public ImmutableList<LINK> links() { return links_; }
+    
     // /**
     // * Provides a mapping between each link and the route offset of the
     // * beginning of that link
@@ -68,8 +72,8 @@ public class Route<LINK extends Link> implements Serializable {
     // LINK>();
 
     private Route(ImmutableList<Spot<LINK>> spots, ImmutableList<LINK> links) {
-        this.spots = spots;
-        this.links = links;
+        this.spots_ = spots;
+        this.links_ = links;
     }
 
     /**
@@ -78,7 +82,7 @@ public class Route<LINK extends Link> implements Serializable {
      * @return the offset of the first spot (equivalently link) of the route
      */
     public double startOffset() {
-        return spots.get(0).offset;
+        return spots_.get(0).offset_;
     }
 
     /**
@@ -87,7 +91,7 @@ public class Route<LINK extends Link> implements Serializable {
      * @return the offset of the last spot (equivalently link) of the route
      */
     public double endOffset() {
-        return spots.get(this.spots.size() - 1).offset;
+        return spots_.get(this.spots_.size() - 1).offset_;
     }
 
     /**
@@ -96,23 +100,23 @@ public class Route<LINK extends Link> implements Serializable {
      * @return returns the length of the route (meters)
      */
     public double length() {
-        if (this.links.size() == 1) {
+        if (this.links_.size() == 1) {
             return this.endOffset() - this.startOffset();
         }
-        double res = this.links.get(0).length() - this.startOffset();
-        for (int i = 1; i < (this.links.size() - 1); i++) {
-            res += this.links.get(i).length();
+        double res = this.links_.get(0).length() - this.startOffset();
+        for (int i = 1; i < (this.links_.size() - 1); i++) {
+            res += this.links_.get(i).length();
         }
         res += this.endOffset();
         return res;
     }
 
     public Spot<LINK> startSpot() {
-        return spots.get(0);
+        return spots_.get(0);
     }
 
     public Spot<LINK> endSpot() {
-        return spots.get(spots.size() - 1);
+        return spots_.get(spots_.size() - 1);
     }
 
     @Override
@@ -124,9 +128,9 @@ public class Route<LINK extends Link> implements Serializable {
     public String toString() {
         StringBuilder ret = new StringBuilder();
         ret.append("Route with ");
-        ret.append(this.spots.size());
+        ret.append(this.spots_.size());
         ret.append(" spots:");
-        for (Spot<LINK> spot : this.spots) {
+        for (Spot<LINK> spot : this.spots_) {
             ret.append("\t");
             ret.append(spot.toString());
         }
@@ -134,8 +138,8 @@ public class Route<LINK extends Link> implements Serializable {
     }
 
     private boolean all_from_same_link() {
-        for (int i = 1; i < this.spots.size(); ++i) {
-            if (spots.get(i).link != spots.get(0).link) {
+        for (int i = 1; i < this.spots_.size(); ++i) {
+            if (spots_.get(i).link_ != spots_.get(0).link_) {
                 return false;
             }
         }
@@ -149,17 +153,17 @@ public class Route<LINK extends Link> implements Serializable {
     public GeoMultiLine geoMultiLine() throws NetconfigException {
         // Grrr where is my for all?
         if (all_from_same_link()) {
-            return startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
+            return startSpot().link_.geoMultiLine().getPartialGeometry(startOffset(),
                     endOffset());
         }
         List<Coordinate> start_cs = new ArrayList<Coordinate>();
-        for (Coordinate c:startSpot().link.geoMultiLine().getPartialGeometry(startOffset(),
-                    startSpot().link.length()).getCoordinates()) {
+        for (Coordinate c:startSpot().link_.geoMultiLine().getPartialGeometry(startOffset(),
+                    startSpot().link_.length()).getCoordinates()) {
         	start_cs.add(c);
         }
         List<Coordinate> cs = start_cs;
-        for (int i = 1; i < links.size() - 1; ++i) {
-            final LINK l = links.get(i);
+        for (int i = 1; i < links_.size() - 1; ++i) {
+            final LINK l = links_.get(i);
             List<Coordinate> link_cs = new ArrayList<Coordinate>();
             for (Coordinate c: l.geoMultiLine().getCoordinates()) {
             	link_cs.add(c);
@@ -167,7 +171,7 @@ public class Route<LINK extends Link> implements Serializable {
             cs = Coordinate.greedyConcatenation(cs, link_cs);
         }
         List<Coordinate> end_cs = new ArrayList<Coordinate>();
-        GeoMultiLine end_gmm = endSpot().link.geoMultiLine();
+        GeoMultiLine end_gmm = endSpot().link_.geoMultiLine();
         for (Coordinate c : end_gmm.getPartialGeometry(0.0, endOffset())
         		.getCoordinates()) {
         	end_cs.add(c);
@@ -209,7 +213,7 @@ public class Route<LINK extends Link> implements Serializable {
      * assumed that one could "drive in a straight line" between each spot and
      * that would give the correct route.
      * 
-     * @param spots
+     * @param spots_
      *            The road locations that define the route.
      * @throws netconfig.NetconfigException
      */
@@ -228,10 +232,10 @@ public class Route<LINK extends Link> implements Serializable {
 
         LINK lastLink = null;
         for (Spot<LINK> spot : spots) {
-            if (spot.link != lastLink) {
-                noRepeatedLinks.add(spot.link);
+            if (spot.link_ != lastLink) {
+                noRepeatedLinks.add(spot.link_);
             }
-            lastLink = spot.link;
+            lastLink = spot.link_;
         }
         ImmutableList<LINK> links = noRepeatedLinks.build();
 
@@ -378,8 +382,8 @@ public class Route<LINK extends Link> implements Serializable {
             throws NetconfigException {
         // Going backward
         for (int i = 1; i < spots.size(); ++i) {
-            if (spots.get(i - 1).link == spots.get(i).link
-                    && spots.get(i - 1).offset > spots.get(i).offset) {
+            if (spots.get(i - 1).link_ == spots.get(i).link_
+                    && spots.get(i - 1).offset_ > spots.get(i).offset_) {
                 throw new NetconfigException(null, "Bad spots in route "
                         + spots + "," + links);
             }

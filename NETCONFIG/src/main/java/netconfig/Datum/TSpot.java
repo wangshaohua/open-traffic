@@ -22,24 +22,46 @@ public class TSpot<LINK extends Link> implements Serializable {
     /**
      * The spot at the origin of the observation. (Non-null)
      */
-    public final Spot<LINK> spot;
+    public final Spot<LINK> spot_;
     /**
      * ID of the vehicle (can be null)
      */
-    public final String id;
+    public final String id_;
     /**
      * The time originating the observation. (Non null)
      */
-    public final Time time;
+    public final Time time_;
     /**
      * Hiring status (can be null if unavailable).
      */
-    public final Boolean hired;
+    public final Boolean hired_;
     /**
      * Recorded speed at this spot. (Null if not available).
      */
-    public final Float speed;
-
+    public final Float speed_;
+    
+    
+    /**
+     * The spot at the origin of the observation. (Non-null)
+     */
+    public Spot<LINK> spot() { return spot_; }
+    /**
+     * ID of the vehicle (can be null)
+     */
+    public String id() { return id_; }
+    /**
+     * The time originating the observation. (Non null)
+     */
+    public Time time() { return time_; }
+    /**
+     * Hiring status (can be null if unavailable).
+     */
+    public Boolean hired() { return hired_; }
+    /**
+     * Recorded speed at this spot. (Null if not available).
+     */
+    public Float speed() { return speed_; }
+    
     public TSpot(Spot<LINK> spot, String id, Time time, Boolean hired,
             Float speed) throws NetconfigException {
         if (spot == null) {
@@ -50,11 +72,11 @@ public class TSpot<LINK extends Link> implements Serializable {
             throw new NetconfigException(
                     new IllegalArgumentException("time is null"), null);
         }
-        this.spot = spot;
-        this.id = id;
-        this.time = time;
-        this.hired = hired;
-        this.speed = speed;
+        this.spot_ = spot;
+        this.id_ = id;
+        this.time_ = time;
+        this.hired_ = hired;
+        this.speed_ = speed;
     }
 
     /**
@@ -65,25 +87,25 @@ public class TSpot<LINK extends Link> implements Serializable {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ProbeCoordinate<LINK> toProbeCoordinate() throws NetconfigException {
-        Spot[] spots = { spot };
+        Spot[] spots = { spot() };
         double[] probs = { 1.0 };
         return ProbeCoordinate.from(
-                id,
-                time,
-                spot.toCoordinate(), 
+                id(),
+                time(),
+                spot().toCoordinate(), 
                 spots,
                 probs,
                 null, // speed
                 null, // heading
-                hired, null); // hdop
+                hired(), null); // hdop
     }
 
     @Override
     public String toString() {
-        return "TSpot[" + spot + ", " + id + ", " + time + "]";
+        return "TSpot[" + spot() + ", " + id() + ", " + time() + "]";
     }
 
     public <LINK2 extends Link> TSpot<LINK2> clone(Spot<LINK2> other) throws NetconfigException {
-        return new TSpot<LINK2>(other, id, time, hired, speed);
+        return new TSpot<LINK2>(other, id(), time(), hired(), speed());
     }
 }
