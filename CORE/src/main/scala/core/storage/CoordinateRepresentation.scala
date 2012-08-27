@@ -50,7 +50,8 @@ object CoordinateRepresentation {
     val geom = try { PGgeometry.geomFromString(s) } catch { case _ => println("Could not convert string ") ; return None ; null }
     geom match {
       case p:Point => {
-        Some(new Coordinate(p.getSrid, p.getX,p.getY))
+        // Watch out!! Y<->lat X<->lon...
+        Some(new Coordinate(p.getSrid, p.getY,p.getX))
       }
       case _ => println("geom is not a point:%s" format geom) ; None
     }

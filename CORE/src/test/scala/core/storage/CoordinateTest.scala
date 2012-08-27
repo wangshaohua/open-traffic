@@ -46,7 +46,7 @@ class CoordinateTest {
   
   @Test def testPG(): Unit = {
     val s = "0101000020E6100000000000C0029B5EC0000000C0E0E54240"
-    val res = new Coordinate(4326, -122.42204284667969, 37.795921325683594)
+    val res = new Coordinate(4326, 37.795921325683594, -122.42204284667969)
     val c2 = CoordinateRepresentation.fromPGGeometry(s)
     assert(c2!=None)
     assertEqual(c2.get, res)
