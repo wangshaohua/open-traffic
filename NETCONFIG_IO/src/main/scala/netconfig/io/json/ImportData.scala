@@ -88,10 +88,18 @@ object ImportProbeData extends MMLogging {
    */
   def formatCSVPG(line: String): Option[ProbeCoordinateRepr] = {
     val elts = line.split(",")
-    if (elts.length >= 6) {
+    if (elts.length >= 4) {
       val t_opt = TimeRepr.berkeleyFromString(elts(0))
+      if (t_opt == None) {
+        logWarning("Could not parse time field ~%s~" format elts(0))
+        return None
+      }
       val id = elts(1)
       val geom = CoordinateRepresentation.fromPGGeometry(elts(2))
+      if (t_opt == None) {
+        logWarning("Could not parse geometry field ~%s~" format elts(2))
+        return None
+      }
       val hired = if (elts(3) == "f") false else true
       for (
         time <- t_opt;

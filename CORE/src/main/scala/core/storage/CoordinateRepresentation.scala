@@ -47,14 +47,12 @@ object CoordinateRepresentation {
    * Parses a PostGres geometry object
    */
   def fromPGGeometry(s:String): Option[Coordinate] = {
-    val geom = PGgeometry.geomFromString(s)
-    println(geom)
+    val geom = try { PGgeometry.geomFromString(s) } catch { case _ => println("Could not convert string ") ; return None ; null }
     geom match {
       case p:Point => {
-        println
         Some(new Coordinate(p.getSrid, p.getX,p.getY))
       }
-      case _ => None
+      case _ => println("geom is not a point:%s" format geom) ; None
     }
   }
 }
