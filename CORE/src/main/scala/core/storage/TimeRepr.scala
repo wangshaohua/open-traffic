@@ -54,7 +54,7 @@ object TimeRepr extends MMLogging {
    * Format is YYYY-MM-DD [HH:[MM:[SS[.SSS]]]]
    */
   def berkeleyFromString(s: String): Option[TimeRepr] = {
-    val r1 = """([0-9]+)\-([0-9]*[1-9]+)\-([0-9]*[1-9]+)(.*)""".r
+    val r1 = """([0-9]+)\-([0-9]+)\-([0-9]+)(.*)""".r
     s match {
       case r1(y, m, d, o) => {
         val year = y.toInt
