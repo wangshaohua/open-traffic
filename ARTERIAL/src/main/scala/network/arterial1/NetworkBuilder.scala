@@ -40,7 +40,7 @@ object NetworkBuilder {
     val end_feature = LinkFeature.decode(lr.endFeature.get) match {
       case Some(x) => x
       case None => {
-        throw new NetconfigException(null, "Could not parse endFeature: "+lr)
+        throw new NetconfigException(null, "Could not parse endFeature: "+lr.endFeature.get+" in "+lr)
       }
     }
     

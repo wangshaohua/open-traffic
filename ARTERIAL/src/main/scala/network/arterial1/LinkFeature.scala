@@ -12,7 +12,7 @@ object Stop extends LinkFeature {
 }
 
 object Light extends LinkFeature {
-  def string = "light"
+  def string = "signal"
 }
 
 object PedestrianCross extends LinkFeature {
@@ -26,7 +26,7 @@ object NoFeature extends LinkFeature {
 object LinkFeature {
   def decode(s:String):Option[LinkFeature] = s match {
     case "stop" => Some(Stop)
-    case "light" => Some(Light)
+    case "signal" => Some(Light)
     case "cross" => Some(PedestrianCross)
     case "nothing" => Some(NoFeature)
     case _ => None
