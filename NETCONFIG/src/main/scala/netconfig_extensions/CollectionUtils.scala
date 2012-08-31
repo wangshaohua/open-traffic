@@ -19,6 +19,11 @@ package netconfig_extensions
 import collection.JavaConversions
 import com.google.common.collect.ImmutableList
 
+/**
+ * Provides some implicit conversions between scala Seq's and java (guava) ImmutableList's.
+ * 
+ * TODO(tjh) This is so central is would deserve to move to CORE?
+ */
 object CollectionUtils {
     import JavaConversions._
     implicit def asImmutableList1[T](xs:Seq[T]):ImmutableList[T] = {
