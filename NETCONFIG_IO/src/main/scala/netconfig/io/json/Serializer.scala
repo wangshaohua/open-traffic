@@ -47,6 +47,26 @@ import network.gen.GenericLinkRepresentation
 import netconfig.io.storage.ConnectionRepr
 
 /**
+ * Represents a file as a sequence of lines.
+ * 
+ * TODO(?) replace with scala-io at some point.
+ */
+object FileReading {
+  def readFlow(fname: String): Iterable[String] = {
+    def istream_gen() = {
+      if (fname.endsWith(".gz")) {
+        val fileStream = new FileInputStream(fname);
+        val gzipStream = new GZIPInputStream(fileStream);
+        new InputStreamReader(gzipStream, "UTF-8");
+      } else {
+        new FileReader(fname)
+      }
+    }
+    StringSource.strings(istream_gen)
+  }
+}
+
+/**
  * New implementation for serializing data.
  * Offers improved speed and more features (like lazy loading of the collection)
  *
@@ -83,27 +103,14 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   /*********** Reading functions *************/
 
-  def readFlow(fname: String): Iterable[String] = {
-    def istream_gen() = {
-      if (fname.endsWith(".gz")) {
-        val fileStream = new FileInputStream(fname);
-        val gzipStream = new GZIPInputStream(fileStream);
-        new InputStreamReader(gzipStream, "UTF-8");
-      } else {
-        new FileReader(fname)
-      }
-    }
-    StringSource.strings(istream_gen)
-  }
-
   def readTrack(fname: String): Iterable[TrackPiece[L]] =
-    readFlow(fname).map(s => fromRepr(parse[TrackPieceRepr](s)))
+    FileReading.readFlow(fname).map(s => fromRepr(parse[TrackPieceRepr](s)))
 
   def readProbeCoordinates(fname: String): Iterable[ProbeCoordinate[L]] =
-    readFlow(fname).map(s => probeCoordinateFromRepr(parse[ProbeCoordinateRepr](s)))
+    FileReading.readFlow(fname).map(s => probeCoordinateFromRepr(parse[ProbeCoordinateRepr](s)))
 
   def readPathInferences(fname: String): Iterable[PathInference[L]] =
-    readFlow(fname).map(s => pathInferenceFromRepr(parse[PathInferenceRepr](s)))
+    FileReading.readFlow(fname).map(s => pathInferenceFromRepr(parse[PathInferenceRepr](s)))
 
   // TODO(?) add other accessors for the other basic types in netconfig.
 
