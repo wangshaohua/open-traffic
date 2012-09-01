@@ -44,7 +44,7 @@ import netconfig.Route
 import network.gen.GenericLink
 import network.gen.GenericLinkRepr
 import network.gen.GenericLinkRepresentation
-import network.gen.GenericLinkRepresentation
+import netconfig.io.storage.ConnectionRepr
 
 /**
  * New implementation for serializing data.
@@ -59,8 +59,8 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
   // TODO(?) These functions should be moved to netconfig.Datum.Codec
 
   def toRepr(tp: TrackPiece[L], extended_representation: Boolean): TrackPieceRepr = {
-    val first = tp.firstConnections.map(c => (c.from, c.to))
-    val second = tp.firstConnections.map(c => (c.from, c.to))
+    val first = tp.firstConnections.map(ConnectionRepr.toRepr _)
+    val second = tp.secondConnections.map(ConnectionRepr.toRepr _)
     new TrackPieceRepr(
       first,
       tp.routes.map(r=>(toRepr(r, extended_representation))),
@@ -69,8 +69,8 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
   }
 
   def fromRepr(tpr: TrackPieceRepr): TrackPiece[L] = {
-    val first: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
-    val second: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
+    val first: ImmutableList[Connection] = tpr.firstConnections.map(ConnectionRepr.fromRepr _)
+    val second: ImmutableList[Connection] = tpr.secondConnections.map(ConnectionRepr.fromRepr _)
     val p = probeCoordinateFromRepr(tpr.point)
     val routes_ : ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
     new TrackPiece[L] {
