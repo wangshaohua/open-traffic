@@ -46,4 +46,17 @@ object StringDataSink extends MMLogging {
     val ostream = new GZIPOutputStream(new FileOutputStream(fname))
     new StringDataSink(ostream)
   }
+
+  def writeableFile(fname: String): StringDataSink = {
+    // Create the necessary directories.
+    val dir_name = fname.split("/").dropRight(1).mkString("/")
+    val f = new File(dir_name)
+    if (!f.exists()) {
+      logInfo("Creating new directory: " + dir_name)
+      f.mkdirs()
+    }
+    val ostream = new FileOutputStream(fname)
+    new StringDataSink(ostream)
+  }
+
 }
