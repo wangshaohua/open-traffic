@@ -15,6 +15,9 @@
  */
 package core_extensions
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * Trait that encapsulates the logging messages you want to send from scala
  * in a convenient interface.
@@ -23,18 +26,34 @@ package core_extensions
  *
  * This is useful when working in a distributed environment as it can properly
  * encapsulate the messages.
+ * 
+ * Uses LOG4J as a backend.
  */
 trait MMLogging {
+
+  @transient
+  lazy val log: Logger = {
+    val name = {  
+    val className = this.getClass().getName()
+      // Ignore trailing $'s in the class names for Scala objects
+      if (className.endsWith("$")) {
+        className.substring(0, className.length - 1)
+      } else className
+    }
+//     println("Creating logger for class "+name)
+    LoggerFactory.getLogger(name)
+  }
+
   def logInfo(msg: => String): Unit = {
-    MMLogging.info(msg)
+    if (log.isInfoEnabled) log.info(msg)
   }
 
   def logWarning(msg: => String): Unit = {
-    MMLogging.info(msg)
+    if (log.isWarnEnabled) log.warn(msg)
   }
 
   def logError(msg: => String): Unit = {
-    MMLogging.err(msg)
+    if (log.isErrorEnabled) log.error(msg)
   }
 
   def checkAssert(assertion: => Boolean, msg: => String): Unit = {
@@ -46,21 +65,19 @@ trait MMLogging {
   }
 
   def logWarning(msg: => String, e: Throwable): Unit = {
-    MMLogging.info(msg)
-    MMLogging.info(e)
+    if (log.isWarnEnabled) log.warn(msg)
   }
 
   def logError(msg: => String, e: Throwable): Unit = {
-    MMLogging.err(msg)
-    MMLogging.err(e)
+    if (log.isErrorEnabled) log.error(msg, e)
   }
 
 }
 
-object MMLogging {
-  // scalastyle:off
-  def err(x: Any) = { java.lang.System.err.println(x) }
-  def out(x: Any) = { java.lang.System.out.println(x) }
-  def info(x: Any) = { java.lang.System.out.println(x) }
-  // scalastyle:on
-}
+// object MMLogging {
+//   // scalastyle:off
+//   def err(x: Any) = { java.lang.System.err.println(x) }
+//   def out(x: Any) = { java.lang.System.out.println(x) }
+//   def info(x: Any) = { java.lang.System.out.println(x) }
+//   // scalastyle:on
+// }

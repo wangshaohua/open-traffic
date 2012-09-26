@@ -79,7 +79,7 @@ object RunPif extends MMLogging {
     parser.parse(args)
 
     // DEBUG
-    val parameters = pifParameters()
+    val parameters = pifParameters2()
 
     logInfo("Loading links...")
     var links: Seq[Link] = NetworkUtils.getLinks(network_id, net_type)
@@ -135,7 +135,7 @@ object RunPif extends MMLogging {
   
   def pifParameters2() = {
     val params = new PathInferenceParameters2()
-    params.fillDefaultForHighFreqOnline
+    params.fillDefaultForHighFreqOnlineFast
     params.setReturnPoints(true)
     params.setReturnRoutes(true)
     params.setShuffleProbeCoordinateSpots(true)

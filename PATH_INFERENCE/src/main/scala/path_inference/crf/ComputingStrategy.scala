@@ -35,6 +35,8 @@ object ComputingStrategy extends Enumeration {
   val LookAhead2 = Value("LookAhead2")
 
   val LookAhead3 = Value("LookAhead3")
+  
+  val LookAhead10 = Value("LookAhead10")
 
   val Window8 = Value("Window8")
 

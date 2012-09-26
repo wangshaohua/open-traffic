@@ -59,6 +59,9 @@ class HighFreqTest extends MMLogging {
     val out_pcs = filter.getProbeCoordinates
     val out_pis = filter.getPathInferences
     logInfo("PCS:"+out_pcs.mkString("\n"))
-    logInfo("PIS:"+out_pcs.mkString("\n"))
+    logInfo("PIS:"+out_pis.mkString("\n"))
+    assertEquals(out_pcs.size,points.size)
+    assertEquals(out_pis.size,points.size-1)
+    // TODO: add more checks to make sure it is mapped on the right side of the road.
   }
 }

@@ -16,7 +16,8 @@
 
 package path_inference.crf
 
-import math.{ log, exp }
+import math.{ exp }
+import scala.{math=>m}
 import core_extensions.MMLogging
 
 object LogMath extends MMLogging {
@@ -147,7 +148,7 @@ object LogMath extends MMLogging {
     return out
   }
 
-  val log2 = log(2.0)
+  val log2 = m.log(2.0)
 
   def logSumExp(x1: Double, x2: Double): Double = {
     assert(x1 != Double.NaN)
@@ -159,7 +160,7 @@ object LogMath extends MMLogging {
       if (x1 > x2 + 20)
         x1
       else {
-        val res = x1 + log(1.0 + exp(x2 - x1))
+        val res = x1 + m.log(1.0 + exp(x2 - x1))
         assert(res != Double.NaN)
         res
       }
@@ -167,7 +168,7 @@ object LogMath extends MMLogging {
       if (x2 > x1 + 20)
         x2
       else {
-        val res = x2 + log(1.0 + exp(x1 - x2))
+        val res = x2 + m.log(1.0 + exp(x1 - x2))
         assert(res != Double.NaN)
         res
       }

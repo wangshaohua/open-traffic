@@ -233,21 +233,35 @@ class PathInferenceParameters2 extends Serializable {
   }
 
   def fillDefaultForHighFreqOnline {
-    computingStrategy = ComputingStrategy.LookAhead2;
+    computingStrategy = ComputingStrategy.LookAhead10;
     maxSearchDepth = 3;
     pathLengthThresholdRatio = 2;
     filterTimeoutWindow = 60 * 30;
     vehicleTimeout = 120;
     minTravelOffset = -20;
     pathOffsetMinLength = 400;
-    maxPaths = 10;
-//    projectionGridStep = 2.0
-//    maxProjectionReturns = 1000
+    maxPaths = 1000;
+    projectionGridStep = 2.0
+    maxProjectionReturns = 200
     shuffleProbeCoordinateSpots = true
-    minPathProbability = 1e-2
-    minProjectionProbability = 1e-2
+    minPathProbability = 1e-3
+    minProjectionProbability = 1e-3
   }
 
+  def fillDefaultForHighFreqOnlineFast {
+    computingStrategy = ComputingStrategy.LookAhead10;
+    maxSearchDepth = 3;
+    pathLengthThresholdRatio = 2;
+    filterTimeoutWindow = 60 * 30;
+    vehicleTimeout = 120;
+    minTravelOffset = -20;
+    pathOffsetMinLength = 400;
+    maxPaths = 1000;
+    maxProjectionReturns = 100
+    shuffleProbeCoordinateSpots = true
+    minPathProbability = 1e-3
+    minProjectionProbability = 1e-3
+  }
   /**
    * Use this if:
    * - you run the filter offline

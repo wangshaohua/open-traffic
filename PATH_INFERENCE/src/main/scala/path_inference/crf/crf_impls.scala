@@ -58,6 +58,7 @@ class OnlineHMM(obs_model: ObservationModel,
 class LookAheadHMM(obs_model: ObservationModel,
   trans_model: TransitionModel, window_size: Int)
   extends AbstractCRF(obs_model, trans_model) {
+  
   def perform_computations {
     assert(length <= window_size + 1) // we should only receive one record at a time
     if (length > window_size) {

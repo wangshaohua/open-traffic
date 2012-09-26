@@ -39,7 +39,8 @@ object PathInferenceOuput extends MMLogging {
 
   def processDelta(
     delta: Delta,
-    minPathProbability: Double): Option[PathInference[Link]] = {
+    minPathProbability: Double,
+    sortByProbability:Boolean=true): Option[PathInference[Link]] = {
     // A delta should contain at least one path
     logInfo("Processing delta")
     assert(delta.paths.length > 0)
@@ -79,9 +80,14 @@ object PathInferenceOuput extends MMLogging {
           logWarning("Sum prob is zero!")
           None
         } else {
+          val output_path_pairs = if(sortByProbability) {
+            path_pairs.sortBy(-_._2)
+          } else {
+            path_pairs
+          }
           Some(delta.toPathInference.clone(
-            path_pairs.map(z => z._1.toRoute),
-            path_pairs.map(z => z._2 / sum_prob).toArray))
+            output_path_pairs.map(z => z._1.toRoute),
+            output_path_pairs.map(z => z._2 / sum_prob).toArray))
         }
       } else {
         logWarning(" Minimum length is negative: " + min_length)
