@@ -65,6 +65,7 @@ object RunPif extends MMLogging {
     var driver_id: String = ""
     var net_type: String = ""
     var num_threads: Int = 1
+    var extended_info: Boolean = false
     val parser = new OptionParser("test") {
       intOpt("nid", "the net id", network_id = _)
       intOpt("num-threads", "the number of threads (the program will use one thread per day)", num_threads = _)
@@ -73,9 +74,11 @@ object RunPif extends MMLogging {
       opt("feed", "data feed", feed = _)
       opt("net-type", "The network type", net_type = _)
       opt("driver_id", "Runs the filter on the selected driver id", driver_id = _)
+      booleanOpt("extended-info", "Adds additional (redundant) information in the output file. Useful for python.", extended_info = _)
     }
     parser.parse(args)
 
+    // DEBUG
     val parameters = pifParameters()
 
     logInfo("Loading links...")
@@ -108,7 +111,7 @@ object RunPif extends MMLogging {
     logInfo("Using %d thread(s)" format num_threads)
 
     val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
-      future { runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist) }
+      future { runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist, extended_info) }
     }
 
     for (task <- tasks) {
@@ -129,8 +132,18 @@ object RunPif extends MMLogging {
     params
   }
 
+  
+  def pifParameters2() = {
+    val params = new PathInferenceParameters2()
+    params.fillDefaultForHighFreqOnline
+    params.setReturnPoints(true)
+    params.setReturnRoutes(true)
+    params.setShuffleProbeCoordinateSpots(true)
+    params
+  }
+  
   def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link], net_type: String,
-    parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String]): Unit = {
+    parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String], extended_info:Boolean): Unit = {
     val fname_in = RawProbe.fileName(file_index)
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = file_index.feed,
       nid = file_index.nid,
@@ -146,8 +159,8 @@ object RunPif extends MMLogging {
 
     assert((new File(fname_in)).exists())
 
-    val writer_pi = serializer.writerPathInference(fname_pis, false)
-    val writer_pc = serializer.writerProbeCoordinate(fname_pcs, false)
+    val writer_pi = serializer.writerPathInference(fname_pis, extended_info)
+    val writer_pc = serializer.writerProbeCoordinate(fname_pcs, extended_info)
     logInfo("Opening data source: %s" format fname_in)
     val data = serializer.readProbeCoordinates(fname_in)
     val pif = PathInferenceFilter.createManager(parameters, projector)

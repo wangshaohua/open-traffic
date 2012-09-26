@@ -240,9 +240,12 @@ class PathInferenceParameters2 extends Serializable {
     vehicleTimeout = 120;
     minTravelOffset = -20;
     pathOffsetMinLength = 400;
-    maxPaths = 50;
-    projectionGridStep = 2.0
-    maxProjectionReturns = 1000
+    maxPaths = 10;
+//    projectionGridStep = 2.0
+//    maxProjectionReturns = 1000
+    shuffleProbeCoordinateSpots = true
+    minPathProbability = 1e-2
+    minProjectionProbability = 1e-2
   }
 
   /**
