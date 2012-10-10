@@ -40,7 +40,7 @@ trait MMLogging {
         className.substring(0, className.length - 1)
       } else className
     }
-    println("Creating logger for class "+name)
+//     println("Creating logger for class "+name)
     LoggerFactory.getLogger(name)
   }
 
