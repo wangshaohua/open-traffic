@@ -20,7 +20,7 @@ object NetworkBuilder {
    * 
    * If the geometry is provided but not the length, will use the length of the geometry instead.
    */
-  def materializeLink(lr: GenericLinkRepresentation, start_node: ArterialNode, end_node: ArterialNode): ArterialLink = {
+  private def materializeLink(lr: GenericLinkRepresentation, start_node: ArterialNode, end_node: ArterialNode): ArterialLink = {
     val g: GeoMultiLine = lr.geom match {
       case None => null
       case Some(gr) => GeoMultiLineRepr.fromRepr(gr)
@@ -58,7 +58,7 @@ object NetworkBuilder {
     link
   }
 
-  def materializeNode(nid: NodeIDRepr, incomingLinks: Seq[ArterialLink], outgoingLinks: Seq[ArterialLink]): ArterialNode = {
+  private def materializeNode(nid: NodeIDRepr, incomingLinks: Seq[ArterialLink], outgoingLinks: Seq[ArterialLink]): ArterialNode = {
     new ArterialNode(nid, incomingLinks, outgoingLinks)
   }
   
