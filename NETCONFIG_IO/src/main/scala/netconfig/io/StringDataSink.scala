@@ -19,6 +19,7 @@ import core_extensions.MMLogging
 import java.io.File
 import java.util.zip.GZIPOutputStream
 import java.io.FileOutputStream
+import java.io.BufferedOutputStream
 
 class StringDataSink(
   ostream: OutputStream,
@@ -35,6 +36,8 @@ class StringDataSink(
 }
 
 object StringDataSink extends MMLogging {
+  val buffer_size = 4000000 // Approx 4MB buffer
+//   logInfo("Buffer size: "+buffer_size)
   def writeableZippedFile(fname: String): StringDataSink = {
     // Create the necessary directories.
     val dir_name = fname.split("/").dropRight(1).mkString("/")
@@ -43,7 +46,7 @@ object StringDataSink extends MMLogging {
       logInfo("Creating new directory: " + dir_name)
       f.mkdirs()
     }
-    val ostream = new GZIPOutputStream(new FileOutputStream(fname))
+    val ostream = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(fname), buffer_size))
     new StringDataSink(ostream)
   }
 

@@ -22,6 +22,8 @@ import netconfig.Datum.ProbeCoordinate
 import netconfig.Datum.PathInference
 import core.Coordinate
 import com.google.common.collect.ImmutableList
+import org.joda.time.Duration
+import core.Time
 
 class Connection(val from: Int, val to: Int)
 
