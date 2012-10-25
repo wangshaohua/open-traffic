@@ -14,12 +14,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>CORE_${scala.version}</artifactId>
+			<artifactId>core_${scala.version}</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>NETCONFIG</artifactId>
+			<artifactId>netconfig_${scala.version}</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -30,7 +30,7 @@
 		<!-- Separate later arterial from arterial-io -->
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>NETCONFIG_IO</artifactId>
+			<artifactId>netconfig-io_${scala.version}</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

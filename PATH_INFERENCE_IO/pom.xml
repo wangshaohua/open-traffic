@@ -3,7 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
     http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>PATH_INFERENCE_IO</artifactId>
+	
+	<artifactId>path-inference-io_${scala.version}</artifactId>
+	
 	<parent>
 		<groupId>edu.berkeley.path</groupId>
 		<artifactId>bots</artifactId>
@@ -14,17 +16,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>NETCONFIG_IO</artifactId>
+			<artifactId>netconfig-io_${scala.version}</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
     <dependency>
       <groupId>edu.berkeley.path</groupId>
-      <artifactId>PATH_INFERENCE</artifactId>
+      <artifactId>path-inference_${scala.version}</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>edu.berkeley.path</groupId>
-      <artifactId>NETCONFIG</artifactId>
+      <artifactId>netconfig_${scala.version}</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
 		<dependency>
