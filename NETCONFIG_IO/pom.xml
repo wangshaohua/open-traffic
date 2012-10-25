@@ -12,15 +12,6 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-  <repositories>
-    <!-- We cannot publish to maven central as long as we have external repositories. -->
-    <!-- Would be nice to find a workaround. -->
-    <repository>
-      <id>repo.codahale.com</id>
-      <url>http://repo.codahale.com</url>
-    </repository>
-  </repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>

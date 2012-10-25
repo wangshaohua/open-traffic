@@ -25,7 +25,7 @@ class TimeReprTest extends MMLogging {
     val x1 = "2012-03-05 10:11:12.120"
     val t1 = new TimeRepr("berkeley", 2012, 3, 5, 10, 11, 12, 120)
     val t2 = TimeRepr.berkeleyFromString(x1)
-    logInfo("t2 = "+t2)
+    logInfo("t2 = " + t2)
     assertEquals(Some(t1), t2)
   }
 
