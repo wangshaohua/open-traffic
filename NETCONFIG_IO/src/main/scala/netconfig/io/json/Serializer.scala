@@ -20,23 +20,29 @@ import java.io.FileInputStream
 import java.io.FileReader
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
-import java.util.{ Collection => JCollection }
-import scala.collection.JavaConversions._
-import com.codahale.jerkson.Json._
+import java.util.{Collection => JCollection}
+
+import scala.collection.JavaConversions.asJavaCollection
+import scala.collection.JavaConversions.asScalaBuffer
+
+import com.codahale.jerkson.Json.generate
+import com.codahale.jerkson.Json.parse
 import com.google.common.collect.ImmutableList
+
 import netconfig.Datum.storage.Codec
 import netconfig.Datum.storage.PathInferenceRepr
 import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.Datum.PathInference
 import netconfig.Datum.ProbeCoordinate
+import netconfig.io.storage.ConnectionRepr
 import netconfig.io.storage.TrackPieceRepr
+import netconfig.io.TrackPiece
 import netconfig.io.Connection
 import netconfig.io.DataSink
 import netconfig.io.DataSinks
 import netconfig.io.Serializer
 import netconfig.io.StringDataSink
 import netconfig.io.StringSource
-import netconfig.io.TrackPiece
 import netconfig.storage.LinkIDRepr
 import netconfig_extensions.CollectionUtils.asImmutableList1
 import netconfig.Link
@@ -44,11 +50,10 @@ import netconfig.Route
 import network.gen.GenericLink
 import network.gen.GenericLinkRepr
 import network.gen.GenericLinkRepresentation
-import netconfig.io.storage.ConnectionRepr
 
 /**
  * Represents a file as a sequence of lines.
- * 
+ *
  * TODO(?) replace with scala-io at some point.
  */
 object FileReading {
@@ -83,7 +88,7 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
     val second = tp.secondConnections.map(ConnectionRepr.toRepr _)
     new TrackPieceRepr(
       first,
-      tp.routes.map(r=>(toRepr(r, extended_representation))),
+      tp.routes.map(r => (toRepr(r, extended_representation))),
       second,
       toRepr(tp.point, extended_representation))
   }
@@ -116,17 +121,17 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   //******** WRITER FUNCTIONS *********/
 
-  def writerProbeCoordinate(fname: String, extended_representation:Boolean): DataSink[ProbeCoordinate[L]] = {
+  def writerProbeCoordinate(fname: String, extended_representation: Boolean): DataSink[ProbeCoordinate[L]] = {
     def f(pc: ProbeCoordinate[L]): String = generate(toRepr(pc, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerPathInference(fname: String, extended_representation:Boolean): DataSink[PathInference[L]] = {
+  def writerPathInference(fname: String, extended_representation: Boolean): DataSink[PathInference[L]] = {
     def f(pi: PathInference[L]): String = generate(toRepr(pi, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerTrack(fname: String, extended_representation:Boolean): DataSink[TrackPiece[L]] = {
+  def writerTrack(fname: String, extended_representation: Boolean): DataSink[TrackPiece[L]] = {
     def f(tp: TrackPiece[L]): String = generate(toRepr(tp, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }

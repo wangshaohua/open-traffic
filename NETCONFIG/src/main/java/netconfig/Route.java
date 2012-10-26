@@ -30,7 +30,6 @@ import core.Coordinate;
 import core.GeoMultiLine;
 import core.Monitor;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
 
 /**
  * This class represents a route object. A route is defined a possible way of

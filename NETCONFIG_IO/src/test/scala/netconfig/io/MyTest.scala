@@ -30,15 +30,15 @@ class MyTest extends JUnitSuite with Checkers {
   val numLinks = 5
   lazy val net = SimpleGen.line(5)
   implicit def routes = Arbitrary(RouteGen.genSmallRoutes(net, numLinks))
-  
+
   @Test
   def testConcat() {
     check((a: List[Int], b: List[Int]) => a.size + b.size == (a ::: b).size)
   }
-  
+
   @Test
   def testRoutes() {
-    check((r:Route[Link]) => {
+    check((r: Route[Link]) => {
       r.length() >= 0
     })
   }

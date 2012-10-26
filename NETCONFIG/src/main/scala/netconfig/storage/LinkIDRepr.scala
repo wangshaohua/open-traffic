@@ -23,7 +23,7 @@ import scala.math.Ordering.LongOrdering
  *
  * It is assumed that any link of any road network can be uniquely identified
  * by a pair of a long integer and of an integer.
- * 
+ *
  * An ordering is defined on the linkID representations. import netconfig.storage._
  */
 case class LinkIDRepr(
@@ -32,18 +32,11 @@ case class LinkIDRepr(
 }
 
 object LinkIDReprOrdering extends Ordering[LinkIDRepr] {
-  def compare(a:LinkIDRepr, b:LinkIDRepr) =  {
+
+  def compare(a: LinkIDRepr, b: LinkIDRepr) = {
     val n = math.signum(a.primary - b.primary).toInt
     if (n == 0) {
       a.secondary - b.secondary
     } else n
   }
-
-//  def compare(a:LinkIDRepr, b:LinkIDRepr) =  {
-//    val n = compare(a.primary, b.primary)
-//    if (n == 0) {
-//      compare(a.secondary, b.secondary)
-//    } else n
-//  }
-
 }

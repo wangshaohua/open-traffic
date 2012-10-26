@@ -1,4 +1,21 @@
+/**
+ * Copyright 2012. The Regents of the University of California (Regents).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package network.arterial1
+
 import network.gen.GenericLinkRepresentation
 import core.GeoMultiLine
 import core.storage.GeoMultiLineRepr
@@ -6,18 +23,18 @@ import netconfig.NetconfigException
 import netconfig.storage.NodeIDRepr
 import netconfig.storage.LinkIDRepr
 import scala.collection.mutable.ArrayBuffer
-import collection.mutable.{Map => MMap}
+import collection.mutable.{ Map => MMap }
 
 /**
  * Builder for an arterial network.
- * 
+ *
  * Uses the serialized representation encoded with GenericLinkRepresentation
- * to materialize an arterial network. 
+ * to materialize an arterial network.
  */
 object NetworkBuilder {
   /**
    * Creates a link for a start node, an end node and a representation.
-   * 
+   *
    * If the geometry is provided but not the length, will use the length of the geometry instead.
    */
   private def materializeLink(lr: GenericLinkRepresentation, start_node: ArterialNode, end_node: ArterialNode): ArterialLink = {
@@ -35,25 +52,25 @@ object NetworkBuilder {
     }
     val key = lr.id
     if (lr.endFeature == None) {
-      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks endFeature: "+lr)
+      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks endFeature: " + lr)
     }
     val end_feature = LinkFeature.decode(lr.endFeature.get) match {
       case Some(x) => x
       case None => {
-        throw new NetconfigException(null, "Could not parse endFeature: "+lr.endFeature.get+" in "+lr)
+        throw new NetconfigException(null, "Could not parse endFeature: " + lr.endFeature.get + " in " + lr)
       }
     }
-    
+
     if (lr.numLanes == None) {
-      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks numLanes: "+lr)
+      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks numLanes: " + lr)
     }
     val num_lanes = lr.numLanes.get.toShort
-    
+
     if (lr.speedLimit == None) {
-      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks speedLimit: "+lr)
+      throw new NetconfigException(null, "Trying to materialize an arterial link that lacks speedLimit: " + lr)
     }
     val speed_limit = lr.speedLimit.get
-    
+
     val link = new ArterialLink(key, start_node, end_node, g, end_feature, speed_limit, num_lanes)
     link
   }
@@ -61,8 +78,7 @@ object NetworkBuilder {
   private def materializeNode(nid: NodeIDRepr, incomingLinks: Seq[ArterialLink], outgoingLinks: Seq[ArterialLink]): ArterialNode = {
     new ArterialNode(nid, incomingLinks, outgoingLinks)
   }
-  
-  
+
   def build(glrs: Iterable[GenericLinkRepresentation]): Seq[ArterialLink] = {
     val links = MMap.empty[LinkIDRepr, ArterialLink]
     val nodes = MMap.empty[NodeIDRepr, ArterialNode]
