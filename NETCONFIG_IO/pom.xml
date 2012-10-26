@@ -16,12 +16,12 @@
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
 			<artifactId>netconfig_${scala.version.release}</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
 			<artifactId>core_${scala.version.release}</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.codahale</groupId>

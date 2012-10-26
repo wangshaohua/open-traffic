@@ -135,7 +135,7 @@ object RunPif extends MMLogging {
     params
   }
 
-  
+
   def pifParameters2() = {
     val params = new PathInferenceParameters2()
     params.fillDefaultForHighFreqOnlineFast
@@ -144,7 +144,7 @@ object RunPif extends MMLogging {
     params.setShuffleProbeCoordinateSpots(true)
     params
   }
-  
+
   def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link], net_type: String,
     parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String], extended_info:Boolean, sort_time:Boolean): Unit = {
     val fname_in = RawProbe.fileName(file_index)
