@@ -23,6 +23,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  * This should be the way that MM programs refer to time in the world.
@@ -775,5 +777,19 @@ public class Time extends GregorianCalendar {
         Time t = (Time) this.clone();
         t.add(interval);
         return t;
+    }
+    
+    /**
+     * @return the equivalent time representation in Joda-time class.
+     */
+    public DateTime toDateTime() {
+        return new DateTime(getYear(),
+                getMonth(),
+                getDayOfMonth(),
+                getHour(), 
+                getMinute(),
+                getSecond(),
+                getMillisecond(),
+                DateTimeZone.forID("America/Los_Angeles"));
     }
 } // end class

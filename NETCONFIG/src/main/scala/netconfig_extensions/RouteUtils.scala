@@ -175,8 +175,7 @@ object RouteUtils extends MMLogging {
   /**
    * Takes a route and segments it into a sequence of NT link / start offset / end offset
    */
-  def convertRouteToSegments[L <: Link](r: Route[L]): Seq[(L, Double, Double)] =
-    {
+  def convertRouteToSegments[L <: Link](r: Route[L]): Seq[(L, Double, Double)] = {
       // Conversion to a vector to use the (cleaner) collection syntax
       val links: Vector[L] = Vector.empty[L] ++ r.links
       if (links.length == 1)

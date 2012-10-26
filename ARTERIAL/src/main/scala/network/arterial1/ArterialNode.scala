@@ -13,23 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package netconfig.io
 
-import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.PathInference
-import core.Coordinate
+package network.arterial1
+
+import netconfig.storage.NodeIDRepr
+import netconfig.Node
 import com.google.common.collect.ImmutableList
-import org.joda.time.Duration
-import core.Time
+import collection.JavaConversions._
+import netconfig_extensions.CollectionUtils._
 
-case class Connection(val from: Int, val to: Int)
+class ArterialNode(id_ : NodeIDRepr,
+  incoming: Seq[ArterialLink],
+  outgoing: Seq[ArterialLink]) extends Node {
 
-trait TrackPiece[L <: Link] {
-  def firstConnections: ImmutableList[Connection]
-  def routes: ImmutableList[Route[L]]
-  def secondConnections: ImmutableList[Connection]
-  def point: ProbeCoordinate[L]
+  lazy val incomingLinks: ImmutableList[ArterialLink] = incoming
+
+  lazy val outgoingLinks: ImmutableList[ArterialLink] = outgoing
+
+  override def toString = "ArterialNode[%s,%s]" format (id.primary.toString, id.secondary.toString)
+
+  def id = id_
 }

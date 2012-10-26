@@ -91,19 +91,4 @@ public interface Link extends Serializable {
      * @throws NetconfigException if not defined for this link.
      */
     public GeoMultiLine geoMultiLine() throws NetconfigException;
-
-//    /**
-//     * Return the partial geometry of the link between two offsets.
-//     * 
-//     * @param start_offset
-//     *            the beginning offset along the link (meters)
-//     * @param end_offset
-//     *            the ending offset along the link (meters)
-//     * @return the partial geometry of the link between the two specified
-//     *         offsets
-//     * @throws NetconfigException if no geometry is defined for this link.
-//     */
-//    public GeoMultiLine partialGeoMultiLine(double start_offset,
-//            double end_offset) throws NetconfigException;
-
 } // class

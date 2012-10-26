@@ -13,18 +13,38 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-import core.Time
-import org.joda.time.Duration
-import core_extensions.MMLogging
 
-package object core_extensions {
+package network.arterial1
 
-  implicit object TimeOrdering extends Ordering[Time] {
-
-    def compare(t1: Time, t2: Time) =
-      t1.getTimeInMillis.compare(t2.getTimeInMillis)
-
-  }
+/**
+ * Encodes a specific feature at the end of the link.
+ */
+sealed trait LinkFeature {
+  def string: String
 }
 
+object Stop extends LinkFeature {
+  def string = "stop"
+}
 
+object Light extends LinkFeature {
+  def string = "signal"
+}
+
+object PedestrianCross extends LinkFeature {
+  def string = "cross"
+}
+
+object NoFeature extends LinkFeature {
+  def string = "nothing"
+}
+
+object LinkFeature {
+  def decode(s: String): Option[LinkFeature] = s match {
+    case "stop" => Some(Stop)
+    case "signal" => Some(Light)
+    case "cross" => Some(PedestrianCross)
+    case "nothing" => Some(NoFeature)
+    case _ => None
+  }
+}

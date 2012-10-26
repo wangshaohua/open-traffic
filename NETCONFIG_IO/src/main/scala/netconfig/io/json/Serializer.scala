@@ -20,23 +20,29 @@ import java.io.FileInputStream
 import java.io.FileReader
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
-import java.util.{ Collection => JCollection }
-import scala.collection.JavaConversions._
-import com.codahale.jerkson.Json._
+import java.util.{Collection => JCollection}
+
+import scala.collection.JavaConversions.asJavaCollection
+import scala.collection.JavaConversions.asScalaBuffer
+
+import com.codahale.jerkson.Json.generate
+import com.codahale.jerkson.Json.parse
 import com.google.common.collect.ImmutableList
+
 import netconfig.Datum.storage.Codec
 import netconfig.Datum.storage.PathInferenceRepr
 import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.Datum.PathInference
 import netconfig.Datum.ProbeCoordinate
+import netconfig.io.storage.ConnectionRepr
 import netconfig.io.storage.TrackPieceRepr
+import netconfig.io.TrackPiece
 import netconfig.io.Connection
 import netconfig.io.DataSink
 import netconfig.io.DataSinks
 import netconfig.io.Serializer
 import netconfig.io.StringDataSink
 import netconfig.io.StringSource
-import netconfig.io.TrackPiece
 import netconfig.storage.LinkIDRepr
 import netconfig_extensions.CollectionUtils.asImmutableList1
 import netconfig.Link
@@ -44,7 +50,26 @@ import netconfig.Route
 import network.gen.GenericLink
 import network.gen.GenericLinkRepr
 import network.gen.GenericLinkRepresentation
-import network.gen.GenericLinkRepresentation
+
+/**
+ * Represents a file as a sequence of lines.
+ *
+ * TODO(?) replace with scala-io at some point.
+ */
+object FileReading {
+  def readFlow(fname: String): Iterable[String] = {
+    def istream_gen() = {
+      if (fname.endsWith(".gz")) {
+        val fileStream = new FileInputStream(fname);
+        val gzipStream = new GZIPInputStream(fileStream);
+        new InputStreamReader(gzipStream, "UTF-8");
+      } else {
+        new FileReader(fname)
+      }
+    }
+    StringSource.strings(istream_gen)
+  }
+}
 
 /**
  * New implementation for serializing data.
@@ -59,18 +84,18 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
   // TODO(?) These functions should be moved to netconfig.Datum.Codec
 
   def toRepr(tp: TrackPiece[L], extended_representation: Boolean): TrackPieceRepr = {
-    val first = tp.firstConnections.map(c => (c.from, c.to))
-    val second = tp.firstConnections.map(c => (c.from, c.to))
+    val first = tp.firstConnections.map(ConnectionRepr.toRepr _)
+    val second = tp.secondConnections.map(ConnectionRepr.toRepr _)
     new TrackPieceRepr(
       first,
-      tp.routes.map(r=>(toRepr(r, extended_representation))),
+      tp.routes.map(r => (toRepr(r, extended_representation))),
       second,
       toRepr(tp.point, extended_representation))
   }
 
   def fromRepr(tpr: TrackPieceRepr): TrackPiece[L] = {
-    val first: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
-    val second: ImmutableList[Connection] = tpr.firstConnections.map(z => new Connection(z._1, z._2))
+    val first: ImmutableList[Connection] = tpr.firstConnections.map(ConnectionRepr.fromRepr _)
+    val second: ImmutableList[Connection] = tpr.secondConnections.map(ConnectionRepr.fromRepr _)
     val p = probeCoordinateFromRepr(tpr.point)
     val routes_ : ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
     new TrackPiece[L] {
@@ -83,43 +108,30 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
 
   /*********** Reading functions *************/
 
-  def readFlow(fname: String): Iterable[String] = {
-    def istream_gen() = {
-      if (fname.endsWith(".gz")) {
-        val fileStream = new FileInputStream(fname);
-        val gzipStream = new GZIPInputStream(fileStream);
-        new InputStreamReader(gzipStream, "UTF-8");
-      } else {
-        new FileReader(fname)
-      }
-    }
-    StringSource.strings(istream_gen)
-  }
-
   def readTrack(fname: String): Iterable[TrackPiece[L]] =
-    readFlow(fname).map(s => fromRepr(parse[TrackPieceRepr](s)))
+    FileReading.readFlow(fname).map(s => fromRepr(parse[TrackPieceRepr](s)))
 
   def readProbeCoordinates(fname: String): Iterable[ProbeCoordinate[L]] =
-    readFlow(fname).map(s => probeCoordinateFromRepr(parse[ProbeCoordinateRepr](s)))
+    FileReading.readFlow(fname).map(s => probeCoordinateFromRepr(parse[ProbeCoordinateRepr](s)))
 
   def readPathInferences(fname: String): Iterable[PathInference[L]] =
-    readFlow(fname).map(s => pathInferenceFromRepr(parse[PathInferenceRepr](s)))
+    FileReading.readFlow(fname).map(s => pathInferenceFromRepr(parse[PathInferenceRepr](s)))
 
   // TODO(?) add other accessors for the other basic types in netconfig.
 
   //******** WRITER FUNCTIONS *********/
 
-  def writerProbeCoordinate(fname: String, extended_representation:Boolean): DataSink[ProbeCoordinate[L]] = {
+  def writerProbeCoordinate(fname: String, extended_representation: Boolean): DataSink[ProbeCoordinate[L]] = {
     def f(pc: ProbeCoordinate[L]): String = generate(toRepr(pc, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerPathInference(fname: String, extended_representation:Boolean): DataSink[PathInference[L]] = {
+  def writerPathInference(fname: String, extended_representation: Boolean): DataSink[PathInference[L]] = {
     def f(pi: PathInference[L]): String = generate(toRepr(pi, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }
 
-  def writerTrack(fname: String, extended_representation:Boolean): DataSink[TrackPiece[L]] = {
+  def writerTrack(fname: String, extended_representation: Boolean): DataSink[TrackPiece[L]] = {
     def f(tp: TrackPiece[L]): String = generate(toRepr(tp, extended_representation))
     DataSinks.map(StringDataSink.writeableZippedFile(fname), f _)
   }

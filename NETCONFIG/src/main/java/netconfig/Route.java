@@ -48,19 +48,6 @@ public class Route<LINK extends Link> implements Serializable {
     private final ImmutableList<Spot<LINK>> spots_;
     /** The list of links that defines this route. */
     private final ImmutableList<LINK> links_;
-    
-    // /**
-    // * Provides a mapping between each link and the route offset of the
-    // * beginning of that link
-    // */
-    // private final HashMap<LINK, Float> offsetMap = new HashMap<LINK,
-    // Float>();
-    // /**
-    // * Provides an inverse mapping between a route offset and the link that
-    // * begins at that offset
-    // */
-    // private final TreeMap<Float, LINK> reverseOffsetMap = new TreeMap<Float,
-    // LINK>();
 
     private Route(ImmutableList<Spot<LINK>> spots, ImmutableList<LINK> links) {
         this.spots_ = spots;
@@ -173,6 +160,45 @@ public class Route<LINK extends Link> implements Serializable {
         return new GeoMultiLine(cs);
     }
 
+    /**
+     * @return the spots_
+     */
+    public ImmutableList<Spot<LINK>> spots() {
+        return spots_;
+    }
+
+    /**
+     * @return the links_
+     */
+    public ImmutableList<LINK> links() {
+        return links_;
+    }
+    
+//     /**
+//      * Returns the concatenation of a route with another one.
+//      * @param other
+//      * @return
+//      * @throws NetconfigException if the first spot of other is different from
+//      * the last spot of the other route.
+//      */
+//     public Route<LINK> concatenate(Route<LINK> other) throws NetconfigException {
+//         int n = this.spots().size();
+//         if (!other.spots().get(0).equals(this.spots().get(n-1))) {
+//             throw new NetconfigException(null, "Routes are not joined");
+//         }
+//         int num_links = other.links().size();
+//         ImmutableList.Builder<LINK> link_builder = new ImmutableList.Builder<LINK>();
+//         for (LINK l:this.links()) {
+//             link_builder.add(l);
+//         }
+//         UnmodifiableIterator<LINK> it = other.links().iterator();
+//         it.next();
+//         while(it.hasNext()) {
+//             //FINISH
+//         }
+// 
+//     }
+    
     /********** Static factory methods **************/
     // These should be the only methods avaialable to the user to create a Route
     // object.
@@ -412,19 +438,4 @@ public class Route<LINK extends Link> implements Serializable {
             double startOffset, double endOffset) throws NetconfigException {
         return from(links, startOffset, endOffset);
     }
-
-    /**
-     * @return the spots_
-     */
-    public ImmutableList<Spot<LINK>> spots() {
-        return spots_;
-    }
-
-    /**
-     * @return the links_
-     */
-    public ImmutableList<LINK> links() {
-        return links_;
-    }
-
 }

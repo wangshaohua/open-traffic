@@ -16,13 +16,17 @@
 
 package netconfig.io.files
 import scala.sys.SystemProperties
+import core_extensions.MMLogging
 
-object Files {
+object Files extends MMLogging {
   def dataDir() = {
     val s = new SystemProperties
     s.get("mm.data.dir") match {
       case Some(s) => s
-      case _ => "/tmp/"
+      case _ => s.get("MM_DATA_DIR") match {
+        case Some(s) => logWarning("Using environment variable ") ; s
+        case None => logError("Could not find data dir") ; "/tmp/"
+      }
     }
   }
 

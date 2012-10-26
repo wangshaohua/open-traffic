@@ -15,6 +15,7 @@
  */
 
 package core.storage
+import core_extensions.MMLogging
 import core.Coordinate
 import org.postgis.PGgeometry
 import org.postgis.Point
@@ -25,7 +26,7 @@ case class CoordinateRepresentation(
   var lon: Double) {
 }
 
-object CoordinateRepresentation {
+object CoordinateRepresentation extends MMLogging {
   def toRepr(c: Coordinate) = {
     val srid = if (c.srid == null) {
       None
@@ -42,18 +43,18 @@ object CoordinateRepresentation {
     }
     new Coordinate(srid, cr.lat, cr.lon)
   }
-  
+
   /**
    * Parses a PostGres geometry object
    */
-  def fromPGGeometry(s:String): Option[Coordinate] = {
-    val geom = try { PGgeometry.geomFromString(s) } catch { case _ => println("Could not convert string ") ; return None ; null }
+  def fromPGGeometry(s: String): Option[Coordinate] = {
+    val geom = try { PGgeometry.geomFromString(s) } catch { case _ => logError("Could not convert string "); return None; null }
     geom match {
-      case p:Point => {
+      case p: Point => {
         // Watch out!! Y<->lat X<->lon...
-        Some(new Coordinate(p.getSrid, p.getY,p.getX))
+        Some(new Coordinate(p.getSrid, p.getY, p.getX))
       }
-      case _ => println("geom is not a point:%s" format geom) ; None
+      case _ => logError("geom is not a point:%s" format geom); None
     }
   }
 }

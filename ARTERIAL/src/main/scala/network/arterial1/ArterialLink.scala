@@ -13,23 +13,31 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package netconfig.io
+
+package network.arterial1
 
 import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.PathInference
-import core.Coordinate
-import com.google.common.collect.ImmutableList
-import org.joda.time.Duration
-import core.Time
+import netconfig.storage.LinkIDRepr
+import core.GeoMultiLine
 
-case class Connection(val from: Int, val to: Int)
+class ArterialLink(
+  key: LinkIDRepr,
+  val startNode: ArterialNode,
+  val endNode: ArterialNode,
+  val geoMultiLine: GeoMultiLine,
+  val endFeature: LinkFeature,
+  val speedLimit: Double,
+  num_lanes: Short) extends Link {
 
-trait TrackPiece[L <: Link] {
-  def firstConnections: ImmutableList[Connection]
-  def routes: ImmutableList[Route[L]]
-  def secondConnections: ImmutableList[Connection]
-  def point: ProbeCoordinate[L]
+  def inLinks = startNode.incomingLinks
+
+  def outLinks = endNode.outgoingLinks
+
+  def numLanesAtOffset(off: Double) = num_lanes
+
+  lazy val length = geoMultiLine.getLength()
+
+  override def toString = "ArterialLink[%s,%s]" format (key.primary.toString, key.secondary.toString)
+
+  def id = key
 }
