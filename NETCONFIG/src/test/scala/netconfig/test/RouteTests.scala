@@ -34,7 +34,7 @@ trait RouteTests extends Checkers {
   val route_gen: Gen[Route[Link]]
 
   // Creates contiguous pairs of routes by splitting a route.
-  val route_pairs_gen = {
+  lazy val route_pairs_gen = {
     for {
       route <- route_gen
       split_index <- Gen.choose(0, route.links().size() - 1)
@@ -110,7 +110,7 @@ trait RouteTests extends Checkers {
 
 class Route1Test extends JUnitSuite with RouteTests {
   val numLinks = 5
-  lazy val net = SimpleGen.line(5)
+  val net = SimpleGen.line(5)
 
   val route_gen = RouteGen.genSmallRoutes(net, numLinks)
 
