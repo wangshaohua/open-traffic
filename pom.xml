@@ -6,7 +6,7 @@
 	<groupId>edu.berkeley.path</groupId>
 	<artifactId>bots</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 
 	<name>Mobile Millennium</name>
 
