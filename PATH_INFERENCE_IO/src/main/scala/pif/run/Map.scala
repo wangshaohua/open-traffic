@@ -15,33 +15,35 @@
  */
 
 package pif.run
-import core_extensions.MMLogging
-import netconfig.io.Dates
+import java.io.File
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.Queue
+import com.google.common.collect.ImmutableList
 import org.joda.time.LocalDate
 import scopt.OptionParser
-import netconfig.io.files.ProbeCoordinateViterbi
-import netconfig.Link
-import netconfig.io.DataSink
-import netconfig.io.TrackPiece
-import scala.collection.mutable.Queue
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.PathInference
+import core_extensions.MMLogging
 import core.Time
-import netconfig.Route
-import netconfig.io.Serializer
+import netconfig.Datum.PathInference
+import netconfig.Datum.ProbeCoordinate
+import netconfig.io.Dates.parseDate
+import netconfig.io.Dates.parseRange
 import netconfig.io.files.PathInferenceViterbi
-import java.io.File
+import netconfig.io.files.ProbeCoordinateViterbi
+import netconfig.io.files.RouteTTViterbi
+import netconfig.io.files.TSpotViterbi
 import netconfig.io.files.TrajectoryViterbif
-import collection.mutable.{ Map => MMap }
-import collection.JavaConversions._
+import netconfig.io.json.NetworkUtils
+import netconfig.io.Connection
+import netconfig.io.TrackPiece
+import netconfig.io.DataSink
+import netconfig.io.Serializer
+import netconfig_extensions.CollectionUtils.asImmutableList2
 import netconfig_extensions.PathInferenceUtils
 import netconfig_extensions.ProbeCoordinateUtils
-import netconfig.io.json.NetworkUtils
-import netconfig.io.files.TSpotViterbi
-import netconfig.io.files.RouteTTViterbi
-import netconfig_extensions.CollectionUtils._
-import com.google.common.collect.ImmutableList
-import netconfig.io.Connection
+import netconfig.Link
+import netconfig.Route
+import netconfig.io.Dates
 
 /**
  * A stateful object that merges streams of ProbeCoordinate and PathInference objects belonging
@@ -184,6 +186,9 @@ class Merger[L <: Link](
   }
 }
 
+/**
+ * TODO(tjh) move to netconfig-io
+ */
 object MapDataGeneric extends MMLogging {
 
   val longHelp = """ Generic data mapper.

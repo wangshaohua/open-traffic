@@ -16,8 +16,7 @@
 
 package path_inference.crf
 
-import math.{ exp }
-import scala.{math=>m}
+import scala.{math => m}
 import core_extensions.MMLogging
 
 object LogMath extends MMLogging {
@@ -45,7 +44,7 @@ object LogMath extends MMLogging {
     i = n - 1
     var sum = 0.0
     while (i >= 0) {
-      v(i) = math.exp(v(i) - max_val)
+      v(i) = m.exp(v(i) - max_val)
       assert(v(i) != Double.NaN)
       sum += v(i)
       i -= 1
@@ -88,7 +87,7 @@ object LogMath extends MMLogging {
     i = n - 1
     var sum = 0.0
     while (i >= 0) {
-      out(i) = math.exp(in(i) - max_val)
+      out(i) = m.exp(in(i) - max_val)
       assert(!out(i).isNaN)
       sum += out(i)
       i -= 1
@@ -126,25 +125,25 @@ object LogMath extends MMLogging {
    */
   def logSumExp(v: Array[Double]): Double = {
     assert(v.length > 0)
-    val m = v.max
-    assert(m != Double.NaN)
+    val ma = v.max
+    assert(ma != Double.NaN)
 
-    if (m == Double.NegativeInfinity)
+    if (ma == Double.NegativeInfinity)
       return Double.NegativeInfinity
 
-    if (m == Double.PositiveInfinity)
+    if (ma == Double.PositiveInfinity)
       return Double.PositiveInfinity
 
     var i = v.length - 1
     var res = 0.0
     while (i >= 0) {
-      res += math.exp(v(i) - m)
+      res += m.exp(v(i) - ma)
       assert(res != Double.NaN)
       i -= 1
     }
     assert(res != Double.NaN)
-    val out = m + math.log(res)
-    assert(out != Double.NaN, (m, res))
+    val out = ma + m.log(res)
+    assert(out != Double.NaN, (ma, res))
     return out
   }
 
@@ -160,7 +159,7 @@ object LogMath extends MMLogging {
       if (x1 > x2 + 20)
         x1
       else {
-        val res = x1 + m.log(1.0 + exp(x2 - x1))
+        val res = x1 + m.log(1.0 + m.exp(x2 - x1))
         assert(res != Double.NaN)
         res
       }
@@ -168,7 +167,7 @@ object LogMath extends MMLogging {
       if (x2 > x1 + 20)
         x2
       else {
-        val res = x2 + m.log(1.0 + exp(x1 - x2))
+        val res = x2 + m.log(1.0 + m.exp(x1 - x2))
         assert(res != Double.NaN)
         res
       }

@@ -19,6 +19,7 @@ package pif.run
 import java.io.File
 import org.joda.time.LocalDate
 import core_extensions.MMLogging
+import core_extensions.TimeOrdering
 import netconfig.Datum.ProbeCoordinate
 import netconfig.io.Dates.parseDate
 import netconfig.io.Dates.parseRange
@@ -66,6 +67,7 @@ object RunPif extends MMLogging {
     var net_type: String = ""
     var num_threads: Int = 1
     var extended_info: Boolean = false
+    var sort_time: Boolean = false
     val parser = new OptionParser("test") {
       intOpt("nid", "the net id", network_id = _)
       intOpt("num-threads", "the number of threads (the program will use one thread per day)", num_threads = _)
@@ -75,6 +77,7 @@ object RunPif extends MMLogging {
       opt("net-type", "The network type", net_type = _)
       opt("driver_id", "Runs the filter on the selected driver id", driver_id = _)
       booleanOpt("extended-info", "Adds additional (redundant) information in the output file. Useful for python.", extended_info = _)
+      booleanOpt("resort-data", "sort the data by timestamp before sending it to the PIF", sort_time = _)
     }
     parser.parse(args)
 
@@ -105,13 +108,13 @@ object RunPif extends MMLogging {
 
     assert(!date_range.isEmpty, "You must provide a date or a range of date")
 
-    logInfo("Selected dates: %s" format date_range.toString)
+    logInfo("Number of selected dates: %s" format date_range.size)
     logInfo("Feed:" + feed)
     logInfo("Driver whitelist: %s" format drivers_whitelist.toString)
-    logInfo("Using %d thread(s)" format num_threads)
+    logInfo("Presorting data: %s" format sort_time)
 
     val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
-      future { runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist, extended_info) }
+      future { runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist, extended_info, sort_time) }
     }
 
     for (task <- tasks) {
@@ -143,7 +146,7 @@ object RunPif extends MMLogging {
   }
   
   def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link], net_type: String,
-    parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String], extended_info:Boolean): Unit = {
+    parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String], extended_info:Boolean, sort_time:Boolean): Unit = {
     val fname_in = RawProbe.fileName(file_index)
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = file_index.feed,
       nid = file_index.nid,
@@ -162,7 +165,14 @@ object RunPif extends MMLogging {
     val writer_pi = serializer.writerPathInference(fname_pis, extended_info)
     val writer_pc = serializer.writerProbeCoordinate(fname_pcs, extended_info)
     logInfo("Opening data source: %s" format fname_in)
-    val data = serializer.readProbeCoordinates(fname_in)
+    val data = {
+      val x = serializer.readProbeCoordinates(fname_in)
+      if (sort_time) {
+        x.toArray.sortBy(_.time).toIterable
+      } else {
+        x.toIterable
+      }
+    }
     val pif = PathInferenceFilter.createManager(parameters, projector)
     for (raw <- data) {
       val pc = raw
@@ -185,5 +195,6 @@ object RunPif extends MMLogging {
     }
     writer_pc.close()
     writer_pi.close()
+    logInfo("Close data source: %s" format fname_in)
   }
 }

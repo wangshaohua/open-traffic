@@ -26,21 +26,19 @@ import org.slf4j.LoggerFactory
  *
  * This is useful when working in a distributed environment as it can properly
  * encapsulate the messages.
- * 
  * Uses LOG4J as a backend.
  */
 trait MMLogging {
 
   @transient
   lazy val log: Logger = {
-    val name = {  
-    val className = this.getClass().getName()
+    val name = {
+      val className = this.getClass().getName()
       // Ignore trailing $'s in the class names for Scala objects
       if (className.endsWith("$")) {
         className.substring(0, className.length - 1)
       } else className
     }
-//     println("Creating logger for class "+name)
     LoggerFactory.getLogger(name)
   }
 
@@ -73,11 +71,3 @@ trait MMLogging {
   }
 
 }
-
-// object MMLogging {
-//   // scalastyle:off
-//   def err(x: Any) = { java.lang.System.err.println(x) }
-//   def out(x: Any) = { java.lang.System.out.println(x) }
-//   def info(x: Any) = { java.lang.System.out.println(x) }
-//   // scalastyle:on
-// }

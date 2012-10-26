@@ -34,7 +34,10 @@ case class GenericLinkRepresentation(
   var startNodeId: NodeIDRepr,
   var endNodeId: NodeIDRepr,
   var geom: Option[GeoMultiLineRepr] = None,
-  var length: Option[Double] = None) {
+  var length: Option[Double] = None,
+  var endFeature: Option[String] = None,
+  var speedLimit: Option[Double] = None,
+  var numLanes: Option[Int] = None) {
   // Add a few more options here...
 }
 

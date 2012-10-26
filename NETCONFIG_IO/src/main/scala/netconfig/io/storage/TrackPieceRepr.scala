@@ -15,12 +15,32 @@
  */
 
 package netconfig.io.storage
+
 import netconfig.storage.RouteRepr
 import netconfig.Datum.storage.ProbeCoordinateRepr
+import netconfig.io.Connection
 
+/**
+ * Connection representation, since jerkson does not support tuples right now.
+ */
+case class ConnectionRepr(
+  var from: Int,
+  var to: Int)
+
+/**
+ * TODO(tjh) this is an important structure to represent trajectories.
+ * Should be moved to NETCONFIG instead?
+ */
 case class TrackPieceRepr(
-  var firstConnections: Seq[(Int, Int)],
+  var firstConnections: Seq[ConnectionRepr],
   var routes: Seq[RouteRepr],
-  var secondConnections: Seq[(Int, Int)],
+  var secondConnections: Seq[ConnectionRepr],
   var point: ProbeCoordinateRepr) {
+}
+
+object ConnectionRepr {
+
+  def fromRepr(r: ConnectionRepr): Connection = new Connection(r.from, r.to)
+
+  def toRepr(c: Connection): ConnectionRepr = ConnectionRepr(c.from, c.to)
 }

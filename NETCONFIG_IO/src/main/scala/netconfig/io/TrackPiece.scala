@@ -22,8 +22,10 @@ import netconfig.Datum.ProbeCoordinate
 import netconfig.Datum.PathInference
 import core.Coordinate
 import com.google.common.collect.ImmutableList
+import org.joda.time.Duration
+import core.Time
 
-class Connection(val from: Int, val to: Int)
+case class Connection(val from: Int, val to: Int)
 
 trait TrackPiece[L <: Link] {
   def firstConnections: ImmutableList[Connection]

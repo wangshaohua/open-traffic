@@ -19,12 +19,17 @@ package netconfig_extensions
 import collection.JavaConversions
 import com.google.common.collect.ImmutableList
 
+/**
+ * Provides some implicit conversions between scala Seq's and java (guava) ImmutableList's.
+ *
+ * TODO(tjh) This is so central is would deserve to move to CORE?
+ */
 object CollectionUtils {
-    import JavaConversions._
-    implicit def asImmutableList1[T](xs:Seq[T]):ImmutableList[T] = {
-      ImmutableList.copyOf(JavaConversions.asJavaIterable(xs))
-    }
-    implicit def asImmutableList2[T:Manifest](xs:Array[T]):ImmutableList[T] = {
-      ImmutableList.copyOf(JavaConversions.asJavaIterable(xs.toSeq))
-    }
+  import JavaConversions._
+  implicit def asImmutableList1[T](xs: Seq[T]): ImmutableList[T] = {
+    ImmutableList.copyOf(JavaConversions.asJavaIterable(xs))
+  }
+  implicit def asImmutableList2[T: Manifest](xs: Array[T]): ImmutableList[T] = {
+    ImmutableList.copyOf(JavaConversions.asJavaIterable(xs.toSeq))
+  }
 }

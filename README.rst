@@ -42,6 +42,11 @@ can be extracted using javadoc and scaladoc::
   mvn javadoc:javadoc
   mvn scala:doc 
 
+Cheatsheet::
+  
+  mvn versions:set -DnewVersion=0.X-SNAPSHOT
+  mvn scalastyle:check
+
 License
 --------
 

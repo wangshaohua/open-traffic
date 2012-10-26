@@ -6,22 +6,27 @@
 	<parent>
 		<groupId>edu.berkeley.path</groupId>
 		<artifactId>bots</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>NETCONFIG</artifactId>
+	<artifactId>netconfig_${scala.version}</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>CORE</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<artifactId>core_${scala.version}</artifactId>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-			<version>1.6.2</version>
+			<version>2.1</version>
 		</dependency>
+    <dependency>
+      <groupId>org.joda</groupId>
+      <artifactId>joda-convert</artifactId>
+      <version>1.2</version>
+    </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -33,7 +38,7 @@
 			<version>1.1.0</version>
 		</dependency>
 		<!-- TODO(?) Remove dependencies to I/O libraries. -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-lgpl</artifactId>
 			<version>1.9.4</version>
@@ -42,7 +47,7 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
 			<version>1.9.4</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.github.scopt</groupId>
 			<artifactId>scopt_${scala.version}</artifactId>

@@ -19,12 +19,12 @@ import core.storage.CoordinateRepresentation
 
 /**
  * The storage representation of a spot.
- * 
+ *
  * @param coordinate is the geographical location encoded by the spot
  * 	(optional, for the convenience of more limited languages like matlab or python)
  */
 case class SpotRepr(
   var linkId: LinkIDRepr,
   var offset: Double,
-  var coordinate:Option[CoordinateRepresentation] = None) {
+  var coordinate: Option[CoordinateRepresentation] = None) {
 }
