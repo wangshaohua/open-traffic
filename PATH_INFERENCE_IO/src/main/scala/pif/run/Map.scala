@@ -17,7 +17,7 @@
 package pif.run
 import java.io.File
 import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{ Map => MMap }
 import scala.collection.mutable.Queue
 import com.google.common.collect.ImmutableList
 import org.joda.time.LocalDate
@@ -34,8 +34,8 @@ import netconfig.io.files.RouteTTViterbi
 import netconfig.io.files.TSpotViterbi
 import netconfig.io.files.TrajectoryViterbif
 import netconfig.io.json.NetworkUtils
-import netconfig.io.Connection
-import netconfig.io.TrackPiece
+import netconfig.Datum.TrackPiece
+import netconfig.Datum.TrackPiece.TrackPieceConnection
 import netconfig.io.DataSink
 import netconfig.io.Serializer
 import netconfig_extensions.CollectionUtils.asImmutableList2
@@ -119,12 +119,11 @@ class Merger[L <: Link](
             // We know this PC is not orphan since there is
             // a PI right behind it.
             closeSink()
-            val tp = new {
-              val firstConnections: ImmutableList[Connection] = Array.empty[Connection]
-              val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
-              val secondConnections: ImmutableList[Connection] = Array.empty[Connection]
-              val point = pc
-            } with TrackPiece[L]
+            val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+            val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
+            val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+            val point = pc
+            val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
             sink().put(tp)
             pcs.dequeue()
             //              logInfo("Dequeuing start point:\n%s" format pc.toString())
@@ -142,12 +141,11 @@ class Merger[L <: Link](
                 // but easier to reason with).
                 assert(pc.spots.size == 1)
                 assert(pi.routes.size == 1)
-                val tp = new {
-                  val firstConnections = ImmutableList.of(new Connection(0, 0))
-                  val routes = ImmutableList.of(pi.routes.head)
-                  val secondConnections = ImmutableList.of(new Connection(0, 0))
-                  val point = pc
-                } with TrackPiece[L]
+                val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+                val routes = ImmutableList.of(pi.routes.head)
+                val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+                val point = pc
+                val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
                 sink.put(tp)
                 pcs.dequeue()
                 pis.dequeue()

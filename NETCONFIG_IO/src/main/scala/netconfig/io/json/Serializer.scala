@@ -34,10 +34,10 @@ import netconfig.Datum.storage.PathInferenceRepr
 import netconfig.Datum.storage.ProbeCoordinateRepr
 import netconfig.Datum.PathInference
 import netconfig.Datum.ProbeCoordinate
-import netconfig.io.storage.ConnectionRepr
-import netconfig.io.storage.TrackPieceRepr
-import netconfig.io.TrackPiece
-import netconfig.io.Connection
+import netconfig.Datum.storage.ConnectionRepr
+import netconfig.Datum.storage.TrackPieceRepr
+import netconfig.Datum.TrackPiece
+import netconfig.Datum.TrackPiece.TrackPieceConnection
 import netconfig.io.DataSink
 import netconfig.io.DataSinks
 import netconfig.io.Serializer
@@ -94,15 +94,15 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
   }
 
   def fromRepr(tpr: TrackPieceRepr): TrackPiece[L] = {
-    val first: ImmutableList[Connection] = tpr.firstConnections.map(ConnectionRepr.fromRepr _)
-    val second: ImmutableList[Connection] = tpr.secondConnections.map(ConnectionRepr.fromRepr _)
+    val first: ImmutableList[TrackPieceConnection] = tpr.firstConnections.map(ConnectionRepr.fromRepr _)
+    val second: ImmutableList[TrackPieceConnection] = tpr.secondConnections.map(ConnectionRepr.fromRepr _)
     val p = probeCoordinateFromRepr(tpr.point)
     val routes_ : ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
-    new TrackPiece[L](
-      firstConnections = first,
-      routes = routes_,
-      secondConnections = second,
-      point = p)
+    TrackPiece.from(
+      first,
+      routes_,
+      second,
+      p)
   }
 
   /*********** Reading functions *************/

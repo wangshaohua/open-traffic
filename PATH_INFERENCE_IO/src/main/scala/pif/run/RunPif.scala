@@ -19,7 +19,7 @@ package pif.run
 import java.io.File
 import org.joda.time.LocalDate
 import core_extensions.MMLogging
-import core_extensions.TimeOrdering
+import core.TimeUtils.TimeOrdering
 import netconfig.Datum.ProbeCoordinate
 import netconfig.io.Dates.parseDate
 import netconfig.io.Dates.parseRange
