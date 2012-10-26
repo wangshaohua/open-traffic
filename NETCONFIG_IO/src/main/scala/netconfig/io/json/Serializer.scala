@@ -20,7 +20,7 @@ import java.io.FileInputStream
 import java.io.FileReader
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
-import java.util.{Collection => JCollection}
+import java.util.{ Collection => JCollection }
 
 import scala.collection.JavaConversions.asJavaCollection
 import scala.collection.JavaConversions.asScalaBuffer
@@ -98,12 +98,11 @@ trait JsonSerializer[L <: Link] extends Serializer[L] with Codec[L] {
     val second: ImmutableList[Connection] = tpr.secondConnections.map(ConnectionRepr.fromRepr _)
     val p = probeCoordinateFromRepr(tpr.point)
     val routes_ : ImmutableList[Route[L]] = tpr.routes.map(fromRepr _)
-    new TrackPiece[L] {
-      def firstConnections = first
-      def routes = routes_
-      def secondConnections = second
-      def point = p
-    }
+    new TrackPiece[L](
+      firstConnections = first,
+      routes = routes_,
+      secondConnections = second,
+      point = p)
   }
 
   /*********** Reading functions *************/

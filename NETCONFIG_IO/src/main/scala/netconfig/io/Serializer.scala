@@ -19,8 +19,8 @@ import netconfig.Link
 import netconfig.Spot
 import netconfig.Route
 import netconfig.Datum.ProbeCoordinate
+import netconfig.Datum.TrackPiece
 import netconfig.Datum.PathInference
-import netconfig.io.storage.ConnectionRepr
 import core.Coordinate
 import core.Time
 import java.io.FileReader
