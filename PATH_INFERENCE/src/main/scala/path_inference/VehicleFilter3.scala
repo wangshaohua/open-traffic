@@ -282,6 +282,10 @@ object VehicleFilter {
         // Multiplying the window by 2 since there are two frames per added
         // point
         new LookAheadHMM(obs_model, trans_model, 6)
+      case ComputingStrategy.LookAhead10 =>
+        // Multiplying the window by 2 since there are two frames per added
+        // point
+        new LookAheadHMM(obs_model, trans_model, 20)
       case ComputingStrategy.Window8 =>
         new WindowHMM(obs_model, trans_model, 16)
       case ComputingStrategy.Viterbi =>

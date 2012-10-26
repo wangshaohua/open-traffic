@@ -116,6 +116,29 @@ object SyntheticNetworks {
     }
     builder.getNetwork
   }
+
+  /**
+   * 2 lines running concurrently from (0,0) to (100,0) and from (100,0) to (0,0)
+   * The two lines are not connected.
+   */
+  def concurrentLines: SimpleNetwork = {
+    val builder = new SimpleNetworkBuilder
+    val c1 = new Coordinate(Coordinate.SRID_CARTESIAN, 0, 0)
+    val c2 = new Coordinate(Coordinate.SRID_CARTESIAN, 100, 0)
+
+    {
+      val n1 = builder.addNode(c1)
+      val n2 = builder.addNode(c2)
+      builder.addLink(n1, n2)
+    }
+    {
+      val n1 = builder.addNode(c1)
+      val n2 = builder.addNode(c2)
+      builder.addLink(n2, n1)
+    }
+    builder.getNetwork
+
+  }
 }
 
 class SimpleNetworkTest_ {

@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory
  *
  * This is useful when working in a distributed environment as it can properly
  * encapsulate the messages.
- *
  * Uses LOG4J as a backend.
  */
 trait MMLogging {

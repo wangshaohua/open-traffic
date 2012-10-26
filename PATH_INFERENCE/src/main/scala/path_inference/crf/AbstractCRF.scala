@@ -73,6 +73,7 @@ abstract class AbstractCRF(
   protected val init_empty_value = -1e200
 
   def +=(point: ProbeCoordinate[Link]) {
+    logInfo("Adding point: " + point)
     val nspots = point.spots.size
     val payload = point
     val obs_log = obs_model.logObs(point)
@@ -107,6 +108,9 @@ abstract class AbstractCRF(
   }
 
   def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
+    logInfo("Adding delta and point")
+    logInfo("Delta:\n" + delta)
+    logInfo("Point:\n" + point)
     // Should never be called with an empty queue, a point should
     // always have been added first.
     assert(!queue.isEmpty)
@@ -173,7 +177,9 @@ abstract class AbstractCRF(
         // it. Otherwise, it was a path and a point will follow.
         last_payload match {
           // Is there a better way to do it due to type erasure?
-          case pc: ProbeCoordinate[_] => this += pc.asInstanceOf[ProbeCoordinate[Link]]
+          case pc: ProbeCoordinate[_] => {
+            this += pc.asInstanceOf[ProbeCoordinate[Link]]
+          }
           case _ => // Do nothing
         }
         num_forward = 0
@@ -428,7 +434,8 @@ abstract class AbstractCRF(
     if (frame.posterior.data.exists(_.isNaN)) {
       logWarning(" Found a NaN in push_out, this should not happen")
     } else {
-      //      logInfo("Pushing frame out")
+      logInfo("Pushing frame out")
+      logInfo("Frame payload:\n" + frame.payload)
       out_queue += frame
     }
   }
@@ -441,7 +448,8 @@ abstract class AbstractCRF(
       if (frame.posterior.data.exists(_.isNaN)) {
         logWarning(" Found a NaN in push_out_last, this should not happen")
       } else {
-//         logInfo("Pushing frame out")
+        logInfo("Pushing last frame out")
+        logInfo("Last frame payload:\n" + frame.payload)
         out_queue += frame
       }
     }

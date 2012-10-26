@@ -55,7 +55,7 @@ object ImportProbeData extends MMLogging {
 
   /**
    * Takes lines of a CSV file of the form:
-   * Time[YYY-MM-DD HH:MM:SS],id[String],lat[Double],lon[Double],speed[Float],heading[Short],...
+   * Time[YYY-MM-DD HH:MM:SS],id[String],lat[Double],lon[Double],[speed[Float]],[heading[Short]]
    */
   def formatCSV1(line: String): Option[ProbeCoordinateRepr] = {
     val elts = line.split(",")
