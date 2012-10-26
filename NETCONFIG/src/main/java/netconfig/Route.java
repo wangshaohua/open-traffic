@@ -30,6 +30,7 @@ import core.Coordinate;
 import core.GeoMultiLine;
 import core.Monitor;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.UnmodifiableIterator;
 
 /**
  * This class represents a route object. A route is defined a possible way of
@@ -174,30 +175,33 @@ public class Route<LINK extends Link> implements Serializable {
         return links_;
     }
     
-//     /**
-//      * Returns the concatenation of a route with another one.
-//      * @param other
-//      * @return
-//      * @throws NetconfigException if the first spot of other is different from
-//      * the last spot of the other route.
-//      */
-//     public Route<LINK> concatenate(Route<LINK> other) throws NetconfigException {
-//         int n = this.spots().size();
-//         if (!other.spots().get(0).equals(this.spots().get(n-1))) {
-//             throw new NetconfigException(null, "Routes are not joined");
-//         }
+     /**
+      * Returns the concatenation of a route with another one.
+      * @param other
+      * @return
+      * @throws NetconfigException if the first spot of other is different from
+      * the last spot of the other route.
+      */
+     public Route<LINK> concatenate(Route<LINK> other) throws NetconfigException {
+         int n = this.spots().size();
+         if (!other.spots().get(0).equals(this.spots().get(n-1))) {
+             throw new NetconfigException(null, "Routes are not joined");
+         }
 //         int num_links = other.links().size();
-//         ImmutableList.Builder<LINK> link_builder = new ImmutableList.Builder<LINK>();
-//         for (LINK l:this.links()) {
-//             link_builder.add(l);
-//         }
-//         UnmodifiableIterator<LINK> it = other.links().iterator();
-//         it.next();
-//         while(it.hasNext()) {
-//             //FINISH
-//         }
-// 
-//     }
+         ImmutableList.Builder<LINK> link_builder = new ImmutableList.Builder<LINK>();
+         for (LINK l:this.links()) {
+             link_builder.add(l);
+         }
+         UnmodifiableIterator<LINK> it = other.links().iterator();
+         // Skip the first link, it should be the same as the last link of the previous route.
+         it.next();
+         while(it.hasNext()) {
+             link_builder.add(it.next());
+         }
+         // Taking a shortcut for now
+         // TODO(?) build a list of spots the same way.
+         return Route.from(link_builder.build(), this.startOffset(), other.endOffset());
+     }
     
     /********** Static factory methods **************/
     // These should be the only methods avaialable to the user to create a Route

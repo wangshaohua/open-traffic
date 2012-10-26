@@ -26,10 +26,43 @@ import netconfig.Link
 import org.scalatest.junit.JUnitSuite
 import network.gen.test.SimpleGen
 import collection.JavaConversions._
+import org.scalacheck.Gen
 
 trait RouteTests extends Checkers {
 
-  implicit def routes: Arbitrary[Route[Link]]
+  // Base generator of routes
+  val route_gen: Gen[Route[Link]]
+
+  // Creates contiguous pairs of routes by splitting a route.
+  val route_pairs_gen = {
+    for {
+      route <- route_gen
+      split_index <- Gen.choose(0, route.links().size() - 1)
+      offset <- {
+        val num_links = route.links().size()
+        val start_offset = if (split_index == 0) {
+          route.startOffset()
+        } else {
+          0.0
+        }
+        val end_offset = if (split_index == num_links - 1) {
+          route.endOffset()
+        } else {
+          route.links().get(split_index).length()
+        }
+        Gen.choose(start_offset, end_offset)
+      }
+    } yield {
+      val links1 = route.links.take(split_index + 1)
+      val route1 = Route.from(links1, route.startOffset(), offset)
+      val links2 = route.links.drop(split_index)
+      val route2 = Route.from(links2, offset, route.endOffset())
+      (route1, route2)
+    }
+  }
+
+  implicit def routes = Arbitrary(route_gen)
+  implicit def route_pairs = Arbitrary(route_pairs_gen)
 
   @Test
   def testBasic() {
@@ -60,12 +93,26 @@ trait RouteTests extends Checkers {
       geom.getLength() >= 0
     })
   }
+
+  @Test
+  def testMerge() {
+    check((p: (Route[Link], Route[Link])) => {
+      val (r1, r2) = p
+      val r = r1.concatenate(r2)
+
+      val l1 = r1.length()
+      val l2 = r2.length()
+      val l = r.length()
+      math.abs(l - (l1 + l2)) <= Link.LENGTH_PRECISION
+    })
+  }
 }
 
 class Route1Test extends JUnitSuite with RouteTests {
   val numLinks = 5
   lazy val net = SimpleGen.line(5)
-  def routes = Arbitrary(RouteGen.genSmallRoutes(net, numLinks))
+
+  val route_gen = RouteGen.genSmallRoutes(net, numLinks)
 
   // Somehow, this dummy test seems necessary in eclipse??
   @Test
