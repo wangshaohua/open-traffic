@@ -412,7 +412,7 @@ abstract class AbstractCRF(
 
   protected def push_all_out: Unit = {
     for (frame <- queue) {
-      logInfo("Pushing frame out")
+//       logInfo("Pushing frame out")
       if (frame.posterior.data.exists(_.isNaN)) {
         logWarning(" Found a NaN in push_ll_out, this should not happen")
       } else {
@@ -441,7 +441,7 @@ abstract class AbstractCRF(
       if (frame.posterior.data.exists(_.isNaN)) {
         logWarning(" Found a NaN in push_out_last, this should not happen")
       } else {
-        logInfo("Pushing frame out")
+//         logInfo("Pushing frame out")
         out_queue += frame
       }
     }

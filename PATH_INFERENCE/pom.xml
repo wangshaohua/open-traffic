@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>CORE</artifactId>
+			<artifactId>CORE_${scala.version}</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>

@@ -71,15 +71,14 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
     public static final int SRID_CARTESIAN = 0;
     public static final int SRID_WGS84 = 4326;
     /**
-     * TODO(?) detail what an SRID is.
-     * These three are final because if they need to be modified, then a
-     * complicated conversion needs to be done (if you don't think so, then you
-     * are almost certainly not doing something right). If that is still what
-     * you want, then create a new instance.
+     * TODO(?) detail what an SRID is. These three are final because if they
+     * need to be modified, then a complicated conversion needs to be done (if
+     * you don't think so, then you are almost certainly not doing something
+     * right). If that is still what you want, then create a new instance.
      * <p/>
      * <code>y</code> in planar systems (like UTM).
      */
-    public final Integer srid;
+    private final Integer srid_;
     /**
      * These three are final because if they need to be modified, then a
      * complicated conversion needs to be done (if you don't think so, then you
@@ -88,7 +87,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * <p/>
      * <code>y</code> in planar systems (like UTM).
      */
-    public final double lat;
+    private final double lat_;
     /**
      * These three are final because if they need to be modified, then a
      * complicated conversion needs to be done (if you don't think so, then you
@@ -97,7 +96,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * <p/>
      * <code>x</code> in planar systems (like UTM).
      */
-    public final double lon;
+    private final double lon_;
 
     /**
      * Basic constructor, everything is immutable.
@@ -111,9 +110,9 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      *            longitude (or <code>x</code> in planar systems).
      */
     public Coordinate(Integer srid, double lat, double lon) {
-        this.srid = srid;
-        this.lat = lat;
-        this.lon = lon;
+        this.srid_ = srid;
+        this.lat_ = lat;
+        this.lon_ = lon;
     }
 
     /**
@@ -133,26 +132,26 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         }
         // Now we know that this and otherCoord are objects with SRID fields.
         // If both SRID~s are null or both refer to the same object, then true.
-        if (this.srid == otherCoord.srid) {
+        if (this.srid() == otherCoord.srid()) {
             return true;
         }
         // At least one of the SRID~s are not null (b/c we would have returned
         // if both are null), but one could still be null.
-        if (null == this.srid) {
+        if (null == this.srid()) {
             return false;
         }
         // OK so this.srid is not null and therefore has an .equals() method.
         // Finally the real compare (why does Java make this so hard?).
         // Method .equals() returns false if otherCoord.srid is null.
-        return this.srid.equals(otherCoord.srid);
+        return this.srid().equals(otherCoord.srid());
     }
 
     /**
-     * Computes the "direction" of travel between two coordinates.
-     * If the starting latitude is less than the ending latitude then
-     * the direction is "true" and if greater than, the direction is "false". If
-     * the latitudes are exactly equal then the direction is true if the
-     * starting longitude is less than the ending longitude
+     * Computes the "direction" of travel between two coordinates. If the
+     * starting latitude is less than the ending latitude then the direction is
+     * "true" and if greater than, the direction is "false". If the latitudes
+     * are exactly equal then the direction is true if the starting longitude is
+     * less than the ending longitude
      * 
      * @param other
      *            The "end" point, using this object as the starting point to
@@ -160,13 +159,13 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * @return The direction of travel between the two coordinates
      */
     public boolean isFromRefNodeComparedToOtherCoordinate(Coordinate other) {
-        if (this.lat < other.lat) {
+        if (this.lat() < other.lat()) {
             return true;
         }
-        if (this.lat > other.lat) {
+        if (this.lat() > other.lat()) {
             return false;
         }
-        if (this.lon <= other.lon) {
+        if (this.lon() <= other.lon()) {
             return true;
         }
         return false;
@@ -195,8 +194,8 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         Coordinate that = (Coordinate) o;
 
         // .equalsSRID returns false if that is null or not both SRID~s are.
-        if (this.equalsSRID(that) && this.lat == that.lat
-                && this.lon == that.lon) {
+        if (this.equalsSRID(that) && this.lat() == that.lat()
+                && this.lon() == that.lon()) {
             return true;
         } else {
             return false;
@@ -262,6 +261,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * @throws ClassCastException
      *             if otherCoord is null
      */
+    @Override
     public int compareTo(Coordinate otherCoord) {
         // Unlikely (very) to have two refs to the same instance,
         // so no need for the optimization of this == otherCoord.
@@ -272,13 +272,13 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
             if (null == otherCoord) {
                 throw new ClassCastException("Arg otherCoord is null.");
             }
-            if (null == this.srid) {
+            if (null == this.srid()) {
                 return 1;
-            } else if (null == otherCoord.srid) {
+            } else if (null == otherCoord.srid()) {
                 return -1;
             }
             // Use .compareTo() in Integer.
-            if (0 < this.srid.compareTo(otherCoord.srid)) {
+            if (0 < this.srid().compareTo(otherCoord.srid())) {
                 return 1;
             } else {
                 return -1;
@@ -290,8 +290,9 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // to .equalsSRID().
 
         // Need to use Double.compare() to deal with edge values (NaN and Inf).
-        int cmpi = Double.compare(this.lat, otherCoord.lat); // otherCoord can't
-                                                             // be null.
+        int cmpi = Double.compare(this.lat(), otherCoord.lat()); // otherCoord
+                                                                 // can't
+        // be null.
 
         if (0 < cmpi) {
             return 1;
@@ -301,7 +302,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         }
 
         // OK, now lat
-        cmpi = Double.compare(this.lon, otherCoord.lon);
+        cmpi = Double.compare(this.lon(), otherCoord.lon());
 
         if (0 < cmpi) {
             return 1;
@@ -322,15 +323,15 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 17 * hash + (null == this.srid ? 0 : this.srid.hashCode());
+        hash = 17 * hash + (null == this.srid() ? 0 : this.srid().hashCode());
         hash = 17
                 * hash
-                + (int) (Double.doubleToLongBits(this.lat) ^ (Double
-                        .doubleToLongBits(this.lat) >>> 32));
+                + (int) (Double.doubleToLongBits(this.lat()) ^ (Double
+                        .doubleToLongBits(this.lat()) >>> 32));
         hash = 17
                 * hash
-                + (int) (Double.doubleToLongBits(this.lon) ^ (Double
-                        .doubleToLongBits(this.lon) >>> 32));
+                + (int) (Double.doubleToLongBits(this.lon()) ^ (Double
+                        .doubleToLongBits(this.lon()) >>> 32));
         return hash;
     }
 
@@ -341,8 +342,8 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      */
     @Override
     public String toString() {
-        return String
-                .format("[%d](%3.8f,%3.8f)", this.srid, this.lat, this.lon);
+        return String.format("[%d](%3.8f,%3.8f)", this.srid(), this.lat(),
+                this.lon());
     }
 
     /**
@@ -362,8 +363,8 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // Has to work if either srid is null or the same object.
         // .equalsSRID returns false if that is null or not both SRID~s are.
         if (this.equalsSRID(otherCoord)) {
-            double diffLat = otherCoord.lat - this.lat;
-            double diffLon = otherCoord.lon - this.lon;
+            double diffLat = otherCoord.lat() - this.lat();
+            double diffLon = otherCoord.lon() - this.lon();
             return Math.sqrt((diffLat * diffLat) + (diffLon * diffLon));
         } else {
             throw new ClassCastException(String.format(
@@ -383,18 +384,18 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // SRID's must match and not be null.
         // This can't be null, duh, and we don't check if otherCoord is, which
         // means the NullPointerException will be thrown.
-        if (null == this.srid || null == otherCoord.srid) {
+        if (null == this.srid() || null == otherCoord.srid()) {
             throw new ClassCastException(
                     "This distance function uses the spheroid distance, but you "
                             + "are using Coordinates with null SRID~s (from a PostgreSQL "
                             + "point?).  This doesn't really make any sense and you "
                             + "probably want to use .distanceCarteasianInSRUnits( other )"
                             + "instead.");
-        } else if (!this.srid.equals(otherCoord.srid)) {
+        } else if (!this.srid().equals(otherCoord.srid())) {
             throw new ClassCastException(
                     "The SRID of otherCoord does't match this one.");
         }
-        if (0 != this.srid || 0 != otherCoord.srid) {
+        if (0 != this.srid() || 0 != otherCoord.srid()) {
             throw new ClassCastException(
                     "Only SRID 0 is supported by this function.");
         }
@@ -410,10 +411,10 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      * @return
      */
     public double distanceDefaultMethodInMeters(Coordinate otherCoord) {
-        if (this.srid == SRID_CARTESIAN) {
+        if (this.srid() == SRID_CARTESIAN) {
             return this.distanceCartesianInMeters(otherCoord);
         }
-        if (this.srid == 4326) {
+        if (this.srid() == 4326) {
             // return this.distanceHaversineInMeters(otherCoord);
             return this.distanceVincentyInMeters(otherCoord);
         }
@@ -438,7 +439,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
      */
     public double distanceLessThanOrEqualToSpheroidDistanceInMeters(
             Coordinate otherCoord) {
-        if (4326 != this.srid || 4326 != otherCoord.srid) {
+        if (4326 != this.srid() || 4326 != otherCoord.srid()) {
             throw new ClassCastException("Only SRID 4326 accepted for now.");
         }
         return 2.02117036255978; // Smallest length in dca.streets.
@@ -463,23 +464,23 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // SRID's must match and not be null.
         // This can't be null, duh, and we don't check if otherCoord is, which
         // means the NullPointerException will be thrown.
-        if (null == this.srid || null == otherCoord.srid) {
+        if (null == this.srid() || null == otherCoord.srid()) {
             throw new ClassCastException(
                     "This distance function uses the spheroid distance, but you "
                             + "are using Coordinates with null SRID~s (from a PostgreSQL "
                             + "point?).  This doesn't really make any sense and you "
                             + "probably want to use .distanceCarteasianInSRUnits( other )"
                             + "instead.");
-        } else if (!this.srid.equals(otherCoord.srid)) {
+        } else if (!this.srid().equals(otherCoord.srid())) {
             throw new ClassCastException(
                     "The SRID of otherCoord does't match this one.");
         }
         final double piOver180 = Math.PI / 180.0;
         final double earthRadiusInMeters = 6367000;
-        final double lon1 = piOver180 * this.lon;
-        final double lat1 = piOver180 * this.lat;
-        final double lon2 = piOver180 * otherCoord.lon;
-        final double lat2 = piOver180 * otherCoord.lat;
+        final double lon1 = piOver180 * this.lon();
+        final double lat1 = piOver180 * this.lat();
+        final double lon2 = piOver180 * otherCoord.lon();
+        final double lat2 = piOver180 * otherCoord.lat();
         // Haversine formula:
         final double dlon = lon2 - lon1;
         final double dlat = lat2 - lat1;
@@ -514,14 +515,14 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // SRID's must match and not be null.
         // This can't be null, duh, and we don't check if otherCoord is, which
         // means the NullPointerException will be thrown.
-        if (null == this.srid || null == otherCoord.srid) {
+        if (null == this.srid() || null == otherCoord.srid()) {
             throw new ClassCastException(
                     "This distance function uses the spheroid distance, but you "
                             + "are using Coordinates with null SRID~s (from a PostgreSQL "
                             + "point?).  This doesn't really make any sense and you "
                             + "probably want to use .distanceCarteasianInSRUnits( other )"
                             + "instead.");
-        } else if (!this.srid.equals(otherCoord.srid)) {
+        } else if (!this.srid().equals(otherCoord.srid())) {
             throw new ClassCastException(
                     "The SRID of otherCoord does't match this one.");
         }
@@ -531,7 +532,7 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         final double b;
         final double f;
         // Set a, b, and f.
-        switch (this.srid) {
+        switch (this.srid()) {
         case 4326:
             a = 6378137.0;
             b = 6356752.3142;
@@ -562,10 +563,10 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         //
         // get parameters as radians
         final double PiOver180 = Math.PI / 180.0;
-        final double phi1 = PiOver180 * this.lat;
-        final double lambda1 = PiOver180 * this.lon;
-        final double phi2 = PiOver180 * otherCoord.lat;
-        final double lambda2 = PiOver180 * otherCoord.lon;
+        final double phi1 = PiOver180 * this.lat();
+        final double lambda1 = PiOver180 * this.lon();
+        final double phi2 = PiOver180 * otherCoord.lat();
+        final double lambda2 = PiOver180 * otherCoord.lon();
 
         // calculations
         final double a2 = a * a;
@@ -676,9 +677,10 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         // CHECKSTYLE:ON
     } // distanceVincentyInMeters()
 
-    
     /**
-     * Concatenates two lists of coordinates, by minimizing the distance between the end coordinates.
+     * Concatenates two lists of coordinates, by minimizing the distance between
+     * the end coordinates.
+     * 
      * @param l1
      * @param l2
      * @return
@@ -692,39 +694,35 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         final int n1 = l1.size();
         final int n2 = l2.size();
         Coordinate l1_first = l1.get(0);
-        Coordinate l1_last = l1.get(n1-1);
+        Coordinate l1_last = l1.get(n1 - 1);
         Coordinate l2_first = l2.get(0);
-        Coordinate l2_last = l2.get(n2-1);
+        Coordinate l2_last = l2.get(n2 - 1);
 
         double best = Double.POSITIVE_INFINITY;
         boolean r1 = true;
         boolean r2 = true;
-        double d = l1_last.distanceDefaultMethodInMeters(
-                l2_first);
+        double d = l1_last.distanceDefaultMethodInMeters(l2_first);
         if (d < best) {
             r1 = false;
             r2 = false;
             best = d;
         }
 
-        d = l1_last.distanceDefaultMethodInMeters(
-                l2_last);
+        d = l1_last.distanceDefaultMethodInMeters(l2_last);
         if (d < best) {
             r1 = false;
             r2 = true;
             best = d;
         }
 
-        d = l1_first.distanceDefaultMethodInMeters(
-                l2_first);
+        d = l1_first.distanceDefaultMethodInMeters(l2_first);
         if (d < best) {
             r1 = true;
             r2 = false;
             best = d;
         }
 
-        d = l1_first.distanceDefaultMethodInMeters(
-                l2_last);
+        d = l1_first.distanceDefaultMethodInMeters(l2_last);
         if (d < best) {
             r1 = true;
             r2 = true;
@@ -738,6 +736,27 @@ public class Coordinate implements Comparable<Coordinate>, Serializable {
         for (Coordinate c : (r2 ? Lists.reverse(l2) : l2))
             ll.add(c);
         return ll;
+    }
+
+    /**
+     * @return the srid_
+     */
+    public Integer srid() {
+        return srid_;
+    }
+
+    /**
+     * @return the lat_
+     */
+    public double lat() {
+        return lat_;
+    }
+
+    /**
+     * @return the lon_
+     */
+    public double lon() {
+        return lon_;
     }
 
 } // end class

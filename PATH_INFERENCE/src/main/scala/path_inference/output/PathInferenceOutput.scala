@@ -41,7 +41,7 @@ object PathInferenceOuput extends MMLogging {
     delta: Delta,
     minPathProbability: Double): Option[PathInference[Link]] = {
     // A delta should contain at least one path
-    logInfo("Processing delta")
+//     logInfo("Processing delta")
     assert(delta.paths.length > 0)
     // Filter the paths of too low probability and sort them
     val path_pairs = {

@@ -16,6 +16,8 @@
 
 package core.storage
 import core.Coordinate
+import org.postgis.PGgeometry
+import org.postgis.Point
 
 case class CoordinateRepresentation(
   var srid: Option[Int],
@@ -39,5 +41,19 @@ object CoordinateRepresentation {
       case Some(i) => i
     }
     new Coordinate(srid, cr.lat, cr.lon)
+  }
+  
+  /**
+   * Parses a PostGres geometry object
+   */
+  def fromPGGeometry(s:String): Option[Coordinate] = {
+    val geom = try { PGgeometry.geomFromString(s) } catch { case _ => println("Could not convert string ") ; return None ; null }
+    geom match {
+      case p:Point => {
+        // Watch out!! Y<->lat X<->lon...
+        Some(new Coordinate(p.getSrid, p.getY,p.getX))
+      }
+      case _ => println("geom is not a point:%s" format geom) ; None
+    }
   }
 }

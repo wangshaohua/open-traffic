@@ -94,8 +94,8 @@ class VehicleFilter3(
     last_seen_time = point.time
 
     if (point.spots.isEmpty) {
-      logWarning("Point has no projection:")
-      logWarning(point.toString)
+//       logWarning("Point has no projection:")
+//       logWarning(point.toString)
     } else {
       /**
        * Special case for the constructor
@@ -519,8 +519,7 @@ object ShortestPaths extends MMLogging {
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
-    logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
+//     logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
     return best_paths.toArray
   }
-
 }
