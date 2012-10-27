@@ -72,7 +72,6 @@ object TimeUtils extends MMLogging {
       } else {
         inner(Seq(seq.head), seq.tail) match {
           case Some((s, rem)) => {
-            logInfo("")
             Seq(s) ++ main_fun(rem)
           }
           case None => main_fun(seq.tail)

@@ -306,7 +306,7 @@ public class Route<LINK extends Link> implements Serializable {
                     "Argument startOffset negative.  Distance beyond link is "
                             + startOffset + " meters");
         }
-        if (startOffset < 0 || startOffset > links.get(0).length() + 1e-3) {
+        if (startOffset < 0 || startOffset > links.get(0).length() + Link.LENGTH_PRECISION) {
             throw new NetconfigException(null,
                     "Argument startOffset outside of 1st link.  Distance beyond link is "
                             + (startOffset - links.get(0).length()) + " meters");
@@ -322,7 +322,7 @@ public class Route<LINK extends Link> implements Serializable {
                     + " start=" + startOffset + ", end=" + endOffset);
         }
         if (endOffset < 0
-                || endOffset > links.get(links.size() - 1).length() + 1e-3) {
+                || endOffset > links.get(links.size() - 1).length() + Link.LENGTH_PRECISION) {
             throw new NetconfigException(
                     null,
                     "Argument endOffset outside of last link.  Distance beyond link is "
