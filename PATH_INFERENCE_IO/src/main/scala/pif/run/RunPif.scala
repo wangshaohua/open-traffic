@@ -27,7 +27,7 @@ import netconfig.io.files.PathInferenceViterbi
 import netconfig.io.files.ProbeCoordinateViterbi
 import netconfig.io.files.RawProbe
 import netconfig.io.files.SerializedNetwork
-import netconfig.io.files.TrajectoryViterbif
+import netconfig.io.files.TrajectoryViterbi
 import netconfig.io.json.JSonSerializer
 import netconfig.io.Serializer
 import netconfig.storage.LinkIDRepr
@@ -157,8 +157,8 @@ object RunPif extends MMLogging {
       date = file_index.date,
       net_type = net_type)
     val fname_trajs = (vid: String, traj_idx: Int) =>
-      TrajectoryViterbif.fileName(feed = file_index.feed, nid = file_index.nid, date = file_index.date,
-        net_type = net_type, vid, traj_idx)
+      TrajectoryViterbi.fileName(file_index.feed, file_index.nid, file_index.date,
+        net_type, vid, traj_idx)
 
     assert((new File(fname_in)).exists())
 

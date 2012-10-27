@@ -38,7 +38,7 @@ object TrajectoryViterbi {
     val dic_dates = dates.toSet
     val dic_drivers = drivers.toSet
     val dic_tidxs = traj_indexes.toSet
-    val dir_name = "%s/%s/viterbi_pcs_nid%d_%s/".format(Files.dataDir(), feed, nid, net_type)
+    val dir_name = "%s/%s/viterbi_trajs_nid%d_%s/".format(Files.dataDir(), feed, nid, net_type)
     val dir = new File(dir_name)
     if (dir.exists()) {
       val day_regex = """(.*)/(\d\d\d\d-\d\d-\d\d)/""".r
@@ -80,5 +80,10 @@ object TrajectoryViterbi {
     "%s/%s/viterbi_trajs_nid%d_%s/%s/%s_%04d.json.gz"
       .format(Files.dataDir(), feed, nid, net_type, Dates.dateStr(date),
         sanitizeVehicleId(vehicle), traj_idx)
+  }
+
+  def fileName(findex: FileIndex): String = {
+    import findex._
+    fileName(feed, nid, date, netType, vehicle, trajIndex)
   }
 }

@@ -32,7 +32,7 @@ import netconfig.io.files.PathInferenceViterbi
 import netconfig.io.files.ProbeCoordinateViterbi
 import netconfig.io.files.RouteTTViterbi
 import netconfig.io.files.TSpotViterbi
-import netconfig.io.files.TrajectoryViterbif
+import netconfig.io.files.TrajectoryViterbi
 import netconfig.io.json.NetworkUtils
 import netconfig.Datum.TrackPiece
 import netconfig.Datum.TrackPiece.TrackPieceConnection
@@ -347,7 +347,7 @@ This assumes the network uses generic links.
       serializer.readPathInferences(fname_pis).iterator
     }
     def writer_trajs_fun(vehicle: String, traj_idx: Int) = {
-      val fname_trajs_out = TrajectoryViterbif.fileName(feed, nid, date, net_type = net_type, vehicle, traj_idx)
+      val fname_trajs_out = TrajectoryViterbi.fileName(feed, nid, date, net_type, vehicle, traj_idx)
       serializer.writerTrack(fname_trajs_out, extended_information)
     }
 
