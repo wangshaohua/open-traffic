@@ -21,7 +21,7 @@ import org.joda.time.LocalDate
 
 import netconfig.io.Dates
 
-object TrajectoryViterbif {
+object TrajectoryViterbi {
   def sanitizeVehicleId(s: String): String = s.filter(_.isLetterOrDigit)
 
   case class FileIndex(val feed: String,
@@ -81,5 +81,4 @@ object TrajectoryViterbif {
       .format(Files.dataDir(), feed, nid, net_type, Dates.dateStr(date),
         sanitizeVehicleId(vehicle), traj_idx)
   }
-
 }
