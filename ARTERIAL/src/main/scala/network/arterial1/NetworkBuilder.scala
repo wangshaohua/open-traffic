@@ -38,18 +38,10 @@ object NetworkBuilder {
    * If the geometry is provided but not the length, will use the length of the geometry instead.
    */
   private def materializeLink(lr: GenericLinkRepresentation, start_node: ArterialNode, end_node: ArterialNode): ArterialLink = {
-    val g: GeoMultiLine = lr.geom match {
-      case None => null
-      case Some(gr) => GeoMultiLineRepr.fromRepr(gr)
-    }
-    val l: Double = lr.length match {
-      case Some(x) => x
-      case None => if (g == null) {
-        -1.0
-      } else {
-        g.getLength()
-      }
-    }
+    val g: GeoMultiLine = lr.geom.map(GeoMultiLineRepr.fromRepr _).getOrElse(null)
+
+    val l: Double = lr.length.getOrElse(if (g == null) { -1.0 } else { g.getLength() })
+
     val key = lr.id
     if (lr.endFeature == None) {
       throw new NetconfigException(null, "Trying to materialize an arterial link that lacks endFeature: " + lr)
@@ -71,7 +63,7 @@ object NetworkBuilder {
     }
     val speed_limit = lr.speedLimit.get
 
-    val link = new ArterialLink(key, start_node, end_node, g, end_feature, speed_limit, num_lanes)
+    val link = new ArterialLink(key, start_node, end_node, g, end_feature, speed_limit, num_lanes, l)
     link
   }
 

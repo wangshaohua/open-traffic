@@ -129,4 +129,15 @@ class Route1Test extends JUnitSuite with RouteTests {
     val r2 = Route.from(Seq(l), 5.0, 5.0)
     assert(testMergeFun((r1, r2)))
   }
+
+  @Test
+  def testZeroLength2(): Unit = {
+    val l = net.head
+    // This case was encountered.
+    // Not sure if it is a serialization issue or a computation issue.
+    val x = net.head.length()
+    val r1 = Route.from(Seq(l), x - 1e-10, x)
+    val r2 = Route.from(Seq(l), x, x)
+    assert(testMergeFun((r1, r2)))
+  }
 }

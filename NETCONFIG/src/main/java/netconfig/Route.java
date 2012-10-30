@@ -23,7 +23,6 @@ package netconfig;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import core.Coordinate;
 
@@ -219,10 +218,17 @@ public class Route<LINK extends Link> implements Serializable {
             // Due to length imprecision.
             link_builder.add(it.next());
         }
-        // Taking a shortcut for now by dropping the intermediate points.
-        // TODO(?) build a list of spots the same way.
-        return Route.from(link_builder.build(), this.startOffset(),
-                other.endOffset());
+        // If something fails, trying to be informative.
+        try {
+            // Taking a shortcut for now by dropping the intermediate points.
+            // TODO(?) build a list of spots the same way.
+            return Route.from(link_builder.build(), this.startOffset(),
+                    other.endOffset());
+
+        } catch (Throwable e) {
+            throw new NetconfigException(e, "Failed to concatenate: route1 = "
+                    + this + " route2=" + other);
+        }
     }
 
     /********** Static factory methods **************/
