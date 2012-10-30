@@ -435,15 +435,17 @@ public class Route<LINK extends Link> implements Serializable {
                         + spots + "," + links);
             }
         }
+        // The following test is wrong since some vehicles may come back on the
+        // same link.
         // Links are not unique
-        HashSet<LINK> links0 = new HashSet<LINK>();
-        for (LINK l : links) {
-            if (links0.contains(l)) {
-                throw new NetconfigException(null, "Found duplicate link " + l
-                        + " in " + links);
-            }
-            links0.add(l);
-        }
+        // HashSet<LINK> links0 = new HashSet<LINK>();
+        // for (LINK l : links) {
+        // if (links0.contains(l)) {
+        // throw new NetconfigException(null, "Found duplicate link " + l
+        // + " in " + links);
+        // }
+        // links0.add(l);
+        // }
     }
 
     // ********* SCALA CONVENIENCE FUNCTIONS ***********
