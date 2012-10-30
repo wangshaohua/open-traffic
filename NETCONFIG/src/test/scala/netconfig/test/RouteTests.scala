@@ -123,7 +123,7 @@ class Route1Test extends JUnitSuite with RouteTests {
   @Test
   def testZeroLength(): Unit = {
     val l = net.head
-    // This case was encountered. 
+    // This case was encountered.
     // Not sure if it is a serialization issue or a computation issue.
     val r1 = Route.from(Seq(l), 3.0, 5.0 - 1e-10)
     val r2 = Route.from(Seq(l), 5.0, 5.0)
