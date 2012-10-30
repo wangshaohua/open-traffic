@@ -94,17 +94,19 @@ trait RouteTests extends Checkers {
     })
   }
 
+  def testMergeFun(p: (Route[Link], Route[Link])): Boolean = {
+    val (r1, r2) = p
+    val r = r1.concatenate(r2)
+
+    val l1 = r1.length()
+    val l2 = r2.length()
+    val l = r.length()
+    math.abs(l - (l1 + l2)) <= Link.LENGTH_PRECISION
+  }
+
   @Test
   def testMerge() {
-    check((p: (Route[Link], Route[Link])) => {
-      val (r1, r2) = p
-      val r = r1.concatenate(r2)
-
-      val l1 = r1.length()
-      val l2 = r2.length()
-      val l = r.length()
-      math.abs(l - (l1 + l2)) <= Link.LENGTH_PRECISION
-    })
+    check(testMergeFun _)
   }
 }
 
@@ -117,4 +119,14 @@ class Route1Test extends JUnitSuite with RouteTests {
   // Somehow, this dummy test seems necessary in eclipse??
   @Test
   def testBasic0() {}
+
+  @Test
+  def testZeroLength(): Unit = {
+    val l = net.head
+    // This case was encountered. 
+    // Not sure if it is a serialization issue or a computation issue.
+    val r1 = Route.from(Seq(l), 3.0, 5.0 - 1e-10)
+    val r2 = Route.from(Seq(l), 5.0, 5.0)
+    assert(testMergeFun((r1, r2)))
+  }
 }
