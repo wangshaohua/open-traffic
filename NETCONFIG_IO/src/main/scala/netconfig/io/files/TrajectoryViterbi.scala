@@ -52,7 +52,7 @@ object TrajectoryViterbi extends MMLogging {
             else
               None
           }
-          case None => None
+          case _ => None
         }
         case _ => None
       })
