@@ -18,16 +18,12 @@ package path_inference.shortest_path
 
 import netconfig.Link
 
-class DefaultHeuristic extends AStarHeuristic {
+final class DefaultHeuristic extends AStarHeuristic {
 
-  def heuristicCost(path: Seq[Link], target: Link): Double =
-    {
+  def heuristicCost(path: Seq[Link], target: Link): Double = {
       val last = path(path.length - 1)
-      if (last == target)
-        return 0.0
-      //     return target.getGeoMultiLine().getFirstCoordinate().distanceDefaultMethodInMeters(last.getGeoMultiLine().getLastCoordinate())
-      return target.geoMultiLine().getFirstCoordinate().distanceHaversineInMeters(last.geoMultiLine().getLastCoordinate())
+      if (last == target) {
+        0.0
+      } else target.geoMultiLine().getFirstCoordinate().distanceHaversineInMeters(last.geoMultiLine().getLastCoordinate())
     }
-
-  /** Straight geographical distance. */
 }
