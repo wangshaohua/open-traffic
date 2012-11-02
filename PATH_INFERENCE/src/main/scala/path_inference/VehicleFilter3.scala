@@ -103,7 +103,7 @@ private[path_inference] class VehicleFilter3(
       if (lastPoints.isEmpty) {
         lastPoints = lastPoints.enqueue(point)
         reachable_links = Set.empty[Link] ++ point.spots.map(_.link)
-        hmm += point
+        hmm setFirstPoint point
       } else {
         assert(point.id.equals(this.id)) //Tracker works on one vehicle only
         if (lastPoints.last.time > point.time) {
@@ -219,7 +219,7 @@ private[path_inference] class VehicleFilter3(
     // in the filter and we restart from the current point.
     // The paths we just computed are dropped.
     if (new_reachable_links.isEmpty) {
-      logDebug("Logical flow break in track for driver " + id)
+      logInfo("Logical flow break in track for driver " + id)
       hmm.finalizeComputationsAndRestart(current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
@@ -229,7 +229,7 @@ private[path_inference] class VehicleFilter3(
     } else {
       val delta_pcs = queue.take(attempted_so_far + 2).toArray
       val delta = new Delta(delta_pcs, best_paths)
-      hmm += (delta, current_point)
+      hmm addPair (delta, current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
       performComputaitons(new_queue, new_reachable_links, 0, wanted_queue_size)

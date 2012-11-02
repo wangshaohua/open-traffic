@@ -33,7 +33,7 @@ import scalala.operators.Implicits._
  * one of the most complicated of the path inference project.
  * TODO: carefully document what is going on here.
  */
-abstract class AbstractCRF(
+private[path_inference] abstract class AbstractCRF(
   obs_model: ObservationModel,
   trans_model: TransitionModel)
   extends ConditionalRandomField with MMLogging {
@@ -72,7 +72,7 @@ abstract class AbstractCRF(
    */
   protected val init_empty_value = -1e200
 
-  def +=(point: ProbeCoordinate[Link]) {
+  def setFirstPoint(point: ProbeCoordinate[Link]) {
     logDebug("Adding point: " + point)
     val nspots = point.spots.size
     val payload = point
@@ -107,7 +107,7 @@ abstract class AbstractCRF(
     this += frame
   }
 
-  def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
+  def addPair(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
     logDebug("Adding delta and point")
     logDebug("Delta:\n" + delta)
     logDebug("Point:\n" + point)
@@ -154,7 +154,7 @@ abstract class AbstractCRF(
       null)
     this += frame
     // Insert the next point
-    this += point
+    this setFirstPoint point
   }
 
   private def +=(frame: CRFFrame): Unit = {
@@ -178,7 +178,7 @@ abstract class AbstractCRF(
         last_payload match {
           // Is there a better way to do it due to type erasure?
           case pc: ProbeCoordinate[_] => {
-            this += pc.asInstanceOf[ProbeCoordinate[Link]]
+            this setFirstPoint pc.asInstanceOf[ProbeCoordinate[Link]]
           }
           case _ => // Do nothing
         }
@@ -202,7 +202,7 @@ abstract class AbstractCRF(
     finalizeComputations
     logDebug("CRF done finalizing, restarting a new track.")
     //    logDebug("CRF: received " + point)
-    this += point
+    this setFirstPoint point
   }
 
   /**

@@ -22,7 +22,7 @@ import path_inference.Delta
 import netconfig.Datum.ProbeCoordinate
 import netconfig.Link
 
-object CRFUtils {
+private[path_inference] object CRFUtils {
   def findTransitionsDeltaToPC2(delta: Delta, point: ProbeCoordinate[Link]): Array[(Int, Int)] = {
     // This operation needs to happen super fast with when using gridded projection
     // or lots of paths, so the implementation is careful to have close

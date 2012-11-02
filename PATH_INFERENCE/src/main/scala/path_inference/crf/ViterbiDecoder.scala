@@ -32,7 +32,7 @@ import scalala.operators.Implicits._
  * A frame contains all the informations required to build the output,
  * and all the information for performing the computations of an HMM
  */
-class ViterbiFrame(
+private[path_inference] class ViterbiFrame(
   payload: Any,
   time: Time,
   logObservations: DenseVector[Double],
@@ -51,7 +51,8 @@ class ViterbiFrame(
     sp_transition_next) {
 }
 
-class ViterbiDecoder(obs_model: ObservationModel,
+private[path_inference] class ViterbiDecoder(
+  obs_model: ObservationModel,
   trans_model: TransitionModel)
   extends AbstractCRF(obs_model, trans_model)
   with MMLogging {
@@ -63,7 +64,7 @@ class ViterbiDecoder(obs_model: ObservationModel,
   val vqueue: Queue[ViterbiFrame] = new Queue[ViterbiFrame]() //private
 
   // Adding a point
-  override def +=(point: ProbeCoordinate[Link]) {
+  override def setFirstPoint(point: ProbeCoordinate[Link]) {
     val nspots = point.spots.size
     val payload = point
     val obs_log = obs_model.logObs(point)
@@ -97,10 +98,10 @@ class ViterbiDecoder(obs_model: ObservationModel,
       Array.fill(nspots)(0)) // Putting a default value for uniform probas
 
     //    logDebug("Adding point frame "+frame+" : "+point.probabilities)
-    this += frame
+    this addFrame frame
   }
 
-  override def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = //private
+  override def addPair(delta: Delta, point: ProbeCoordinate[Link]): Unit = //private
     {
 
       /*    logDebug("Adding delta-point")
@@ -113,14 +114,14 @@ class ViterbiDecoder(obs_model: ObservationModel,
         //FIXME: this case should not happen
         logDebug("Empty queue, clearing computations")
         finalizeComputations
-        this += point
+        this setFirstPoint point
         return
       }
 
       if (delta.paths.isEmpty) {
         logDebug("End-of-track received, clearing computations")
         finalizeComputations
-        this += point
+        this setFirstPoint point
         return
       }
 
@@ -158,12 +159,12 @@ class ViterbiDecoder(obs_model: ObservationModel,
         null, Array.fill(npaths)(0)) //Putting some default value, in case all probas are uniform
 
       //    logDebug("Adding frame to VHMM: "+frame)
-      this += frame
+      this addFrame frame
       // Insert the next point
-      this += point
+      this setFirstPoint point
     }
 
-  def +=(frame: ViterbiFrame): Unit =
+  def addFrame(frame: ViterbiFrame): Unit =
     {
       vqueue += frame
       try {
@@ -182,7 +183,7 @@ class ViterbiDecoder(obs_model: ObservationModel,
           // it. Otherwise, it was a path and a point will follow.
           last_payload match {
             // Is there a better way to do it due to type erasure?
-            case pc: ProbeCoordinate[_] => this += pc.asInstanceOf[ProbeCoordinate[Link]]
+            case pc: ProbeCoordinate[_] => this setFirstPoint pc.asInstanceOf[ProbeCoordinate[Link]]
             case _ => // Do nothing
           }
           num_forward = 0
