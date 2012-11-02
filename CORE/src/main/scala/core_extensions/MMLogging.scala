@@ -40,7 +40,9 @@ trait MMLogging {
         className.substring(0, className.length - 1)
       } else className
     }
-    LoggerFactory.getLogger(name)
+    synchronized {
+      LoggerFactory.getLogger(name)
+    }
   }
 
   def logDebug(msg: => String): Unit = {
