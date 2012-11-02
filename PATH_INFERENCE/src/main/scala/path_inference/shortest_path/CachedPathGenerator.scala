@@ -39,7 +39,10 @@ trait CachedPathGenerator2 extends PathGenerator2 {
   def getApproximatePathCacheSize: Int
 }
 
-class CachedPathGenerator3(private[this] val path_gen: PathGenerator2, val printMessageValue: Int = 10000) extends PathGenerator2 with MMLogging {
+class CachedPathGenerator3(
+    private[this] val path_gen: PathGenerator2,
+    val printMessageValue: Int = 10000) extends PathGenerator2 with MMLogging {
+  
   private[this] val pathCache: ConcurrentMap[PathKey, Array[Link]] = (new MapMaker()).softValues().makeMap()
   private[this] val pathsCache: ConcurrentMap[PathKey, Array[Array[Link]]] = (new MapMaker()).softValues().makeMap()
 

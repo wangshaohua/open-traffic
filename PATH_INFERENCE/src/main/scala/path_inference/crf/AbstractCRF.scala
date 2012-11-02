@@ -73,7 +73,7 @@ abstract class AbstractCRF(
   protected val init_empty_value = -1e200
 
   def +=(point: ProbeCoordinate[Link]) {
-    logInfo("Adding point: " + point)
+    logDebug("Adding point: " + point)
     val nspots = point.spots.size
     val payload = point
     val obs_log = obs_model.logObs(point)
@@ -108,9 +108,9 @@ abstract class AbstractCRF(
   }
 
   def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
-    logInfo("Adding delta and point")
-    logInfo("Delta:\n" + delta)
-    logInfo("Point:\n" + point)
+    logDebug("Adding delta and point")
+    logDebug("Delta:\n" + delta)
+    logDebug("Point:\n" + point)
     // Should never be called with an empty queue, a point should
     // always have been added first.
     assert(!queue.isEmpty)
@@ -198,10 +198,10 @@ abstract class AbstractCRF(
    * Used to manually finalize the computations in the filter.
    */
   def finalizeComputationsAndRestart(point: ProbeCoordinate[Link]): Unit = {
-    logInfo("CRF " + this + " attempts to hot finalize")
+    logDebug("CRF " + this + " attempts to hot finalize")
     finalizeComputations
-    logInfo("CRF done finalizing, restarting a new track.")
-    //    logInfo("CRF: received " + point)
+    logDebug("CRF done finalizing, restarting a new track.")
+    //    logDebug("CRF: received " + point)
     this += point
   }
 
@@ -210,7 +210,7 @@ abstract class AbstractCRF(
    * If you want to continue to add things, use finalizeComputationsAndRestart.
    */
   def finalizeComputations: Unit = {
-    logInfo("CRF " + this + " in track finalization")
+    logDebug("CRF " + this + " in track finalization")
     try {
       finalize_computations
     } catch {
@@ -227,7 +227,7 @@ abstract class AbstractCRF(
     clearQueue
     num_forward = 0
     num_backward = 0
-    logInfo("CRF done finalizing")
+    logDebug("CRF done finalizing")
   }
 
   /**
@@ -290,7 +290,7 @@ abstract class AbstractCRF(
       next.forward :+= next.logObservations
       // Sanity check if any value is at least real
       if (next.forward.data.max == Double.NegativeInfinity) {
-        logInfo("zero prob in forward")
+        logDebug("zero prob in forward")
         throw new InternalMathException
       }
       if (next.forward.data.exists(_.isNaN)) {
@@ -379,13 +379,13 @@ abstract class AbstractCRF(
     forward
     backward
     for (frame <- queue) {
-      //      logInfo("Processing frame:"+frame)
+      //      logDebug("Processing frame:"+frame)
       assert(!frame.posterior.data.isEmpty, "" + frame.payload)
       frame.posterior := frame.forward
       frame.posterior :+= frame.backward
-      //      logInfo("Frame posterior : "+frame.posterior)
+      //      logDebug("Frame posterior : "+frame.posterior)
       if (frame.posterior.data.max == Double.NegativeInfinity) {
-        logInfo(" zero prob in post normalization " + frame.forward + " \n " + frame.backward)
+        logDebug(" zero prob in post normalization " + frame.forward + " \n " + frame.backward)
         throw new InternalMathException
       }
       if (frame.posterior.data.exists(_.isNaN)) {
@@ -393,8 +393,8 @@ abstract class AbstractCRF(
         throw new InternalMathException
       }
       LogMath.normalizeInPlace(frame.posterior.data)
-      //      logInfo("Frame posterior after normalization : "+frame.posterior)
-      //      logInfo("Frame posterior after normalization : "+frame+" @ "+frame.posterior.data)
+      //      logDebug("Frame posterior after normalization : "+frame.posterior)
+      //      logDebug("Frame posterior after normalization : "+frame+" @ "+frame.posterior.data)
     }
   }
 
@@ -418,7 +418,7 @@ abstract class AbstractCRF(
 
   protected def push_all_out: Unit = {
     for (frame <- queue) {
-//       logInfo("Pushing frame out")
+//       logDebug("Pushing frame out")
       if (frame.posterior.data.exists(_.isNaN)) {
         logWarning(" Found a NaN in push_ll_out, this should not happen")
       } else {
@@ -434,8 +434,8 @@ abstract class AbstractCRF(
     if (frame.posterior.data.exists(_.isNaN)) {
       logWarning(" Found a NaN in push_out, this should not happen")
     } else {
-      logInfo("Pushing frame out")
-      logInfo("Frame payload:\n" + frame.payload)
+      logDebug("Pushing frame out")
+      logDebug("Frame payload:\n" + frame.payload)
       out_queue += frame
     }
   }
@@ -448,8 +448,8 @@ abstract class AbstractCRF(
       if (frame.posterior.data.exists(_.isNaN)) {
         logWarning(" Found a NaN in push_out_last, this should not happen")
       } else {
-        logInfo("Pushing last frame out")
-        logInfo("Last frame payload:\n" + frame.payload)
+        logDebug("Pushing last frame out")
+        logDebug("Last frame payload:\n" + frame.payload)
         out_queue += frame
       }
     }

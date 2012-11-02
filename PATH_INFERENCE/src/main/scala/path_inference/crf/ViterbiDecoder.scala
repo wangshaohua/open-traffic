@@ -96,29 +96,29 @@ class ViterbiDecoder(obs_model: ObservationModel,
       null,
       Array.fill(nspots)(0)) // Putting a default value for uniform probas
 
-    //    logInfo("Adding point frame "+frame+" : "+point.probabilities)
+    //    logDebug("Adding point frame "+frame+" : "+point.probabilities)
     this += frame
   }
 
   override def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = //private
     {
 
-      /*    logInfo("Adding delta-point")
-    logInfo("delta:\n"+delta)
-    logInfo("point\n"+point)*/
+      /*    logDebug("Adding delta-point")
+    logDebug("delta:\n"+delta)
+    logDebug("point\n"+point)*/
       //empty paths => finalize computations and clear everything
       // It may happen also that the filter just got reset because of a model exception
       //
       if (vqueue.isEmpty) {
         //FIXME: this case should not happen
-        logInfo("Empty queue, clearing computations")
+        logDebug("Empty queue, clearing computations")
         finalizeComputations
         this += point
         return
       }
 
       if (delta.paths.isEmpty) {
-        logInfo("End-of-track received, clearing computations")
+        logDebug("End-of-track received, clearing computations")
         finalizeComputations
         this += point
         return
@@ -157,7 +157,7 @@ class ViterbiDecoder(obs_model: ObservationModel,
         wrapper_vec,
         null, Array.fill(npaths)(0)) //Putting some default value, in case all probas are uniform
 
-      //    logInfo("Adding frame to VHMM: "+frame)
+      //    logDebug("Adding frame to VHMM: "+frame)
       this += frame
       // Insert the next point
       this += point
@@ -244,11 +244,11 @@ class ViterbiDecoder(obs_model: ObservationModel,
 
         // Sanity check if any value is at least real
         if (next.forward.data.max == Double.NegativeInfinity) {
-          logInfo("zero prob in forward")
+          logDebug("zero prob in forward")
           throw new InternalMathException
         }
         if (next.forward.data.exists(_.isNaN)) {
-          logInfo("NaN detected in forward") // This case should never happen
+          logDebug("NaN detected in forward") // This case should never happen
           throw new InternalMathException
         }
 
@@ -283,12 +283,12 @@ class ViterbiDecoder(obs_model: ObservationModel,
       // Mark the head of the most likely sequence
       var best_idx = argmax(vqueue.last.forward.data)
 
-      //    logInfo("Best idx = "+best_idx)
+      //    logDebug("Best idx = "+best_idx)
 
       for (idx <- (vqueue.length - 1) to 0 by -1) {
         val frame = vqueue(idx)
         (0 until frame.forward.size).map(frame.posterior(_) = 0)
-        //      logInfo("Frame : idx = %d and best_idx = %d" format(idx,best_idx))
+        //      logDebug("Frame : idx = %d and best_idx = %d" format(idx,best_idx))
         frame.posterior(best_idx) = 1
         if (idx > 0)
           best_idx = frame.most_likely_previous(best_idx)

@@ -58,7 +58,6 @@ class DefaultManager(
         v_filters += id -> filter
       // No need to add the point, it is already included in the constructor.
       case Some(filter) =>
-        //        logInfo("Adding point to tracker\n"+point)
         filter addProbeCoordinate point
       // No need to check the output of the filter
       // It will be automatically sent to the internal storage object.
