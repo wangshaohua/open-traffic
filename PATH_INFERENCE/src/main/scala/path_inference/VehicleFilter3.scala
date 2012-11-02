@@ -35,7 +35,7 @@ import path_inference.manager.ProjectionHookInterface
 import com.google.common.collect.Ordering
 import scala.collection.JavaConversions._
 
-class VehicleFilter3(
+private[path_inference] class VehicleFilter3(
   val hmm: ConditionalRandomField,
   path_gen: PathGenerator2,
   val parameters: PathInferenceParameters2,
@@ -94,8 +94,8 @@ class VehicleFilter3(
     last_seen_time = point.time
 
     if (point.spots.isEmpty) {
-//       logWarning("Point has no projection:")
-//       logWarning(point.toString)
+      //       logWarning("Point has no projection:")
+      //       logWarning(point.toString)
     } else {
       /**
        * Special case for the constructor
@@ -184,7 +184,7 @@ class VehicleFilter3(
       hmm.finalizeComputationsAndRestart(new_first_point)
       // Try again from there to reconnect the points.
       return performComputaitons(res_queue, new_reachable_links,
-          0, wanted_queue_size)
+        0, wanted_queue_size)
     }
     // Check if we can create a set of path between the first point in the
     // queue and the current point that we are considuering.
@@ -237,7 +237,7 @@ class VehicleFilter3(
   }
 }
 
-object VehicleFilter {
+private[path_inference] object VehicleFilter {
 
   def createVehicleFilter(params: PathInferenceParameters2,
     first_point: ProbeCoordinate[Link],
@@ -288,7 +288,7 @@ object VehicleFilter {
 /**
  * This is one ugly mess that better get some explanations...
  */
-object ShortestPaths extends MMLogging {
+private[path_inference] object ShortestPaths extends MMLogging {
 
   // TODO(tjh) explain this data type...
   type RegroupedPathsMap = MMap[(Link, Link), Map[(Double, Double), Array[Path]]]
@@ -450,7 +450,7 @@ object ShortestPaths extends MMLogging {
     previous_paths_regrouped ++= paths_regrouped
 
     val filtered_paths: Seq[Path] = paths_regrouped.values.flatMap(_.values.toSeq.flatten.toSeq).toSeq
-//    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
+    //    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
@@ -507,7 +507,7 @@ object ShortestPaths extends MMLogging {
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
-//     logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
+    //     logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
     return best_paths.toArray
   }
 }
