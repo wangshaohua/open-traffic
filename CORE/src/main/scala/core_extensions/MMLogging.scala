@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory
  */
 trait MMLogging {
 
+   // TODO(?) this construction of a logger may not be thread-safe. To check!
   @transient
   lazy val log: Logger = {
     val name = {
@@ -40,6 +41,10 @@ trait MMLogging {
       } else className
     }
     LoggerFactory.getLogger(name)
+  }
+
+  def logDebug(msg: => String): Unit = {
+    if (log.isDebugEnabled) log.debug(msg)
   }
 
   def logInfo(msg: => String): Unit = {
