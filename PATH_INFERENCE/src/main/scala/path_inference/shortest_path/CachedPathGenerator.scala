@@ -40,9 +40,9 @@ trait CachedPathGenerator2 extends PathGenerator2 {
 }
 
 class CachedPathGenerator3(
-    private[this] val path_gen: PathGenerator2,
-    val printMessageValue: Int = 10000) extends PathGenerator2 with MMLogging {
-  
+  private[this] val path_gen: PathGenerator2,
+  val printMessageValue: Int = 10000) extends PathGenerator2 with MMLogging {
+
   private[this] val pathCache: ConcurrentMap[PathKey, Array[Link]] = (new MapMaker()).softValues().makeMap()
   private[this] val pathsCache: ConcurrentMap[PathKey, Array[Array[Link]]] = (new MapMaker()).softValues().makeMap()
 
@@ -94,9 +94,9 @@ class CachedPathGenerator3(
     if (print_info) {
       // We do not care about being slightly off here.
       logInfo("Single path cache: " + print_total_queries +
-          " queries, " + print_cache_misses + " misses, elements currently in cache: " +
-          getApproximatePathsCacheSize + " , all path computations: " +
-          total_stored_paths)
+        " queries, " + print_cache_misses + " misses, elements currently in cache: " +
+        getApproximatePathsCacheSize + " , all path computations: " +
+        total_stored_paths)
     }
 
     getPathInCache(key) match {
@@ -125,9 +125,9 @@ class CachedPathGenerator3(
     if (print_info) {
       // We do not care about being slightly off here.
       logInfo("Paths cache: " + print_total_queries + " queries, " +
-          print_cache_misses + " misses, elements currently in cache: " +
-          getApproximatePathsCacheSize + " , all path computations: " +
-          total_stored_paths)
+        print_cache_misses + " misses, elements currently in cache: " +
+        getApproximatePathsCacheSize + " , all path computations: " +
+        total_stored_paths)
     }
 
     val key = PathKey(start_link, end_link)
