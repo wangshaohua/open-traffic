@@ -54,7 +54,7 @@ class DefaultManager(
     v_filters.get(id) match {
       case None =>
         logInfo("creating new tracker for id " + id)
-        val filter = VehicleFilter.createVehicleFilter(parameters, point, obs_model, trans_model, internal_storage, projection_hook)
+        val filter = VehicleFilter.createVehicleFilter(parameters, point, obs_model, trans_model, internal_storage, projection_hook, common_path_discovery)
         v_filters += id -> filter
       // No need to add the point, it is already included in the constructor.
       case Some(filter) =>

@@ -46,6 +46,13 @@ object PathInferenceFilter {
     create(params, projector = projector)
   }
 
+  def createManager(
+    params: PathInferenceParameters2,
+    projector: ProjectionHookInterface,
+    path_discovery: PathGenerator2): PathInferenceManager = {
+    create(params, projector = projector, path_discovery = path_discovery)
+  }
+
   def createManager(params: PathInferenceParameters2, links: Array[Link]): PathInferenceManager = {
     create(params, links = links)
   }
@@ -57,6 +64,7 @@ object PathInferenceFilter {
     transition_model: TransitionModel = null,
     observation_model: ObservationModel = null,
     projector: ProjectionHookInterface = null): PathInferenceManager = {
+
     val trans_model = if (transition_model == null) {
       TransitionModel.defaultModel
     } else {

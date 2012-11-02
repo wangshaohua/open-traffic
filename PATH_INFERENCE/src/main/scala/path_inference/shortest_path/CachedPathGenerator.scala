@@ -48,7 +48,7 @@ class CachedPathGenerator3(
 
   private[this] var total_queries = 0
   private[this] var cache_misses = 0
-  private[this] var total_stored_paths = 0
+  private[this] var num_paths_computed = 0
 
   def getPathInCache(key: PathKey): Option[Array[Link]] = {
     val res = pathCache.get(key)
@@ -96,7 +96,7 @@ class CachedPathGenerator3(
       logInfo("Single path cache: " + print_total_queries +
         " queries, " + print_cache_misses + " misses, elements currently in cache: " +
         getApproximatePathsCacheSize + " , all path computations: " +
-        total_stored_paths)
+        num_paths_computed)
     }
 
     getPathInCache(key) match {
@@ -127,7 +127,7 @@ class CachedPathGenerator3(
       logInfo("Paths cache: " + print_total_queries + " queries, " +
         print_cache_misses + " misses, elements currently in cache: " +
         getApproximatePathsCacheSize + " , all path computations: " +
-        total_stored_paths)
+        num_paths_computed)
     }
 
     val key = PathKey(start_link, end_link)
@@ -137,7 +137,7 @@ class CachedPathGenerator3(
         val paths = path_gen.getShortestPaths(start_link, end_link, max_num_paths)
         putPathsInCache(key, paths)
         cache_misses += 1
-        total_stored_paths += paths.length
+        num_paths_computed += paths.length
         paths
       }
     }
@@ -146,18 +146,18 @@ class CachedPathGenerator3(
   override def finalizeOperations(): Unit = path_gen.finalizeOperations()
 }
 
-trait ConcurrentCachedPathGenerator2 extends CachedPathGenerator2 {
-
-  override abstract def getPathInCache(key: PathKey): Option[Array[Link]] =
-    this.synchronized { super.getPathInCache(key) }
-
-  override abstract def putPathInCache(key: PathKey, path: Array[Link]): Unit =
-    this.synchronized { super.putPathInCache(key, path) }
-
-  override abstract def getPathsInCache(key: PathKey): Option[Array[Array[Link]]] =
-    this.synchronized { super.getPathsInCache(key) }
-
-  override abstract def putPathsInCache(key: PathKey, path: Array[Array[Link]]): Unit =
-    this.synchronized { super.putPathsInCache(key, path) }
-
-}
+//trait ConcurrentCachedPathGenerator2 extends CachedPathGenerator2 {
+//
+//  override abstract def getPathInCache(key: PathKey): Option[Array[Link]] =
+//    this.synchronized { super.getPathInCache(key) }
+//
+//  override abstract def putPathInCache(key: PathKey, path: Array[Link]): Unit =
+//    this.synchronized { super.putPathInCache(key, path) }
+//
+//  override abstract def getPathsInCache(key: PathKey): Option[Array[Array[Link]]] =
+//    this.synchronized { super.getPathsInCache(key) }
+//
+//  override abstract def putPathsInCache(key: PathKey, path: Array[Array[Link]]): Unit =
+//    this.synchronized { super.putPathsInCache(key, path) }
+//
+//}

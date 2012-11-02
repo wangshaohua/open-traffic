@@ -36,7 +36,7 @@ import com.google.common.collect.Ordering
 import scala.collection.JavaConversions._
 
 private[path_inference] class VehicleFilter3(
-  val hmm: ConditionalRandomField,
+  val crf: ConditionalRandomField,
   path_gen: PathGenerator2,
   val parameters: PathInferenceParameters2,
   first_point: ProbeCoordinate[Link],
@@ -73,7 +73,7 @@ private[path_inference] class VehicleFilter3(
   // Constructor logic
   // Make sure it is put *after* the declaration of all the variables.
   {
-    assert(hmm != null)
+    assert(crf != null)
     assert(path_gen != null)
     assert(parameters != null)
     assert(first_point != null)
@@ -103,7 +103,7 @@ private[path_inference] class VehicleFilter3(
       if (lastPoints.isEmpty) {
         lastPoints = lastPoints.enqueue(point)
         reachable_links = Set.empty[Link] ++ point.spots.map(_.link)
-        hmm setFirstPoint point
+        crf setFirstPoint point
       } else {
         assert(point.id.equals(this.id)) //Tracker works on one vehicle only
         if (lastPoints.last.time > point.time) {
@@ -130,7 +130,7 @@ private[path_inference] class VehicleFilter3(
     // Flush out everything we can
     performComputaitons(lastPoints, reachable_links, 0, 1)
     // Finish the computations on the CRF side
-    hmm.finalizeComputations
+    crf.finalizeComputations
     //And we see if anything got out
     exportOutput
   }
@@ -142,7 +142,7 @@ private[path_inference] class VehicleFilter3(
   private def exportOutput: Unit = {
     // See if there is some new output to take care of
     // Send it to the output for processing
-    for (frame <- hmm.outputQueue)
+    for (frame <- crf.outputQueue)
       output.addFrame(frame)
   }
 
@@ -181,7 +181,7 @@ private[path_inference] class VehicleFilter3(
       val new_reachable_links = res_queue.head.spots.map(_.link).toSet
       assert(!new_reachable_links.isEmpty)
       val new_first_point = res_queue.head
-      hmm.finalizeComputationsAndRestart(new_first_point)
+      crf.finalizeComputationsAndRestart(new_first_point)
       // Try again from there to reconnect the points.
       return performComputaitons(res_queue, new_reachable_links,
         0, wanted_queue_size)
@@ -220,7 +220,7 @@ private[path_inference] class VehicleFilter3(
     // The paths we just computed are dropped.
     if (new_reachable_links.isEmpty) {
       logInfo("Logical flow break in track for driver " + id)
-      hmm.finalizeComputationsAndRestart(current_point)
+      crf.finalizeComputationsAndRestart(current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
       // Restart the reachable set from the current point.
@@ -229,7 +229,7 @@ private[path_inference] class VehicleFilter3(
     } else {
       val delta_pcs = queue.take(attempted_so_far + 2).toArray
       val delta = new Delta(delta_pcs, best_paths)
-      hmm addPair (delta, current_point)
+      crf addPair (delta, current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
       performComputaitons(new_queue, new_reachable_links, 0, wanted_queue_size)
@@ -243,9 +243,10 @@ private[path_inference] object VehicleFilter {
     first_point: ProbeCoordinate[Link],
     obs_model: ObservationModel,
     trans_model: TransitionModel,
-    output: FilterOutputInterface, projection_hook: ProjectionHookInterface): VehicleFilter3 = {
+    output: FilterOutputInterface,
+    projection_hook: ProjectionHookInterface,
+    path_gen: PathGenerator2): VehicleFilter3 = {
     val crf = createCRF(params, obs_model, trans_model)
-    val path_gen = PathGenerator2.getDefaultPathGenerator(params)
     new VehicleFilter3(crf, path_gen, params, first_point, output, projection_hook)
   }
 

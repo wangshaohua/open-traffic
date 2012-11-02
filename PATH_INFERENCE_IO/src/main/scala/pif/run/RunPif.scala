@@ -43,6 +43,7 @@ import scopt.OptionParser
 import netconfig.io.Dates
 import scala.actors.Futures._
 import netconfig.io.json.NetworkUtils
+import path_inference.shortest_path.PathGenerator2
 
 /**
  * Runs the path inference on some serialized data, using a generic network representation.
@@ -87,10 +88,12 @@ object RunPif extends MMLogging {
     logInfo("Loading links...")
     var links: Seq[Link] = NetworkUtils.getLinks(network_id, net_type)
 
-    val serialier: Serializer[Link] = NetworkUtils.getSerializer(links)
+    val serializer: Serializer[Link] = NetworkUtils.getSerializer(links)
 
     logInfo("Building projector...")
     val projection_hook: ProjectionHookInterface = ProjectionHook.create(links, parameters)
+
+    val path_gen = PathGenerator2.getDefaultPathGenerator(parameters)
 
     val date_range: Seq[LocalDate] = {
       if (date != null) {
@@ -114,7 +117,7 @@ object RunPif extends MMLogging {
     logInfo("Presorting data: %s" format sort_time)
 
     val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
-      future { runPIF(projection_hook, serialier, net_type, parameters, findex, drivers_whitelist, extended_info, sort_time) }
+      future { runPIF(projection_hook, path_gen, serializer, net_type, parameters, findex, drivers_whitelist, extended_info, sort_time) }
     }
 
     for (task <- tasks) {
@@ -135,7 +138,6 @@ object RunPif extends MMLogging {
     params
   }
 
-
   def pifParameters2() = {
     val params = new PathInferenceParameters2()
     params.fillDefaultForHighFreqOnlineFast
@@ -145,8 +147,17 @@ object RunPif extends MMLogging {
     params
   }
 
-  def runPIF(projector: ProjectionHookInterface, serializer: Serializer[Link], net_type: String,
-    parameters: PathInferenceParameters2, file_index: RawProbe.FileIndex, drivers_whitelist: Set[String], extended_info:Boolean, sort_time:Boolean): Unit = {
+  def runPIF(
+    projector: ProjectionHookInterface,
+    path_gen: PathGenerator2,
+    serializer: Serializer[Link],
+    net_type: String,
+    parameters: PathInferenceParameters2,
+    file_index: RawProbe.FileIndex,
+    drivers_whitelist: Set[String],
+    extended_info: Boolean,
+    sort_time: Boolean): Unit = {
+
     val fname_in = RawProbe.fileName(file_index)
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = file_index.feed,
       nid = file_index.nid,
@@ -173,7 +184,7 @@ object RunPif extends MMLogging {
         x.toIterable
       }
     }
-    val pif = PathInferenceFilter.createManager(parameters, projector)
+    val pif = PathInferenceFilter.createManager(parameters, projector, path_gen)
     for (raw <- data) {
       val pc = raw
       if (drivers_whitelist.isEmpty || pc.id == null || drivers_whitelist.contains(pc.id)) {
