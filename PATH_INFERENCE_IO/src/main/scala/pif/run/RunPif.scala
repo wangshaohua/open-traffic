@@ -202,6 +202,7 @@ object RunPif extends MMLogging {
         x.toIterable
       }
     }
+    logInfo("Opened data source: %s" format fname_in)
     val pif = PathInferenceFilter.createManager(parameters, projector, path_gen)
     for (raw <- data) {
       val pc = raw
@@ -224,6 +225,6 @@ object RunPif extends MMLogging {
     }
     writer_pc.close()
     writer_pi.close()
-    logInfo("Close data source: %s" format fname_in)
+    logInfo("Closed data source: %s" format fname_in)
   }
 }
