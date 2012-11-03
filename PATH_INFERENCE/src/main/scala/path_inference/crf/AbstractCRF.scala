@@ -288,7 +288,7 @@ private[path_inference] abstract class AbstractCRF(
           i -= 1
         }
       }
-      
+
       if (hasNaN(next.forward.data)) {
         logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
         logWarning("Next frame payload:" + next.payload)
