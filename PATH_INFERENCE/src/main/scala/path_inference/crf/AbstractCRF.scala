@@ -25,7 +25,6 @@ import path_inference.Delta
 import path_inference.models.ObservationModel
 import path_inference.models.TransitionModel
 import scalala.tensor.dense.DenseVectorCol
-// import scalala.tensor.dense.DenseVector
 import scalala.operators.Implicits._
 
 /**
@@ -275,14 +274,25 @@ private[path_inference] abstract class AbstractCRF(
       next.forward := this.init_empty_value
 
       // Perform the transition evaluation
-      for ((previdx, nextidx) <- prev.sp_transition) {
-        if (hasNaN(next.forward.data)) {
-          logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
-          logWarning("Next frame payload:" + next.payload)
-          logWarning("faulty indexes: " + (previdx, nextidx))
-          throw new InternalMathException
+      // Compact (slower) code:
+//       for ((previdx, nextidx) <- prev.sp_transition) {
+//         next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+//       }
+
+      {
+        var i = prev.sp_transition.size - 1
+        while (i >= 0) {
+          val previdx = prev.sp_transition_from(i)
+          val nextidx = prev.sp_transition_to(i)
+          next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+          i -= 1
         }
-        next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+      }
+      
+      if (hasNaN(next.forward.data)) {
+        logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
+        logWarning("Next frame payload:" + next.payload)
+        throw new InternalMathException
       }
       // Add the observations (already in log domain)
       next.forward :+= next.logObservations
@@ -329,15 +339,26 @@ private[path_inference] abstract class AbstractCRF(
       // Initialize values
       // Sanity checks everywhere.
       prev.backward := this.init_empty_value
+
       // Perform the transition evaluation
-      for ((previdx, nextidx) <- prev.sp_transition) {
-        if (hasNaN(prev.backward.data)) {
-          logWarning("Found a NaN in backward data during matrix multiply:" + prev.backward.data.mkString)
-          logWarning("Prev frame payload:" + prev.payload)
-          logWarning("faulty indexes: " + (previdx, nextidx))
-          throw new InternalMathException
+      // Compact code:
+//       for ((previdx, nextidx) <- prev.sp_transition) {
+//         prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+//       }
+      {
+        var i = prev.sp_transition.size - 1
+        while (i >= 0) {
+          val previdx = prev.sp_transition_from(i)
+          val nextidx = prev.sp_transition_to(i)
+          prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+          i -= 1
         }
-        prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+      }
+
+      if (hasNaN(prev.backward.data)) {
+        logWarning("Found a NaN in backward data during matrix multiply:" + prev.backward.data.mkString)
+        logWarning("Prev frame payload:" + prev.payload)
+        throw new InternalMathException
       }
 
       // Add the observations (already in log domain)

@@ -17,7 +17,6 @@
 package path_inference.crf
 
 import core.Time
-// TODO: replace by array
 import scalala.tensor.dense.DenseVector
 
 /**
@@ -26,11 +25,14 @@ import scalala.tensor.dense.DenseVector
  *
  * @todo doc
  */
-class CRFFrame(val payload: Any,
-  val time: Time,
-  val logObservations: DenseVector[Double],
-  val forward: DenseVector[Double],
-  val backward: DenseVector[Double],
-  val posterior: DenseVector[Double],
+class CRFFrame(
+  final val payload: Any,
+  final val time: Time,
+  final val logObservations: DenseVector[Double],
+  final val forward: DenseVector[Double],
+  final val backward: DenseVector[Double],
+  final val posterior: DenseVector[Double],
   var sp_transition: Array[(Int, Int)]) {
+  lazy val sp_transition_from = sp_transition.map(_._1)
+  lazy val sp_transition_to = sp_transition.map(_._2)
 }
