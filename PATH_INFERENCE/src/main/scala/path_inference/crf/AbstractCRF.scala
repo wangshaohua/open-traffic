@@ -201,7 +201,6 @@ private[path_inference] abstract class AbstractCRF(
     logDebug("CRF " + this + " attempts to hot finalize")
     finalizeComputations
     logDebug("CRF done finalizing, restarting a new track.")
-    //    logDebug("CRF: received " + point)
     this setFirstPoint point
   }
 
@@ -277,7 +276,7 @@ private[path_inference] abstract class AbstractCRF(
 
       // Perform the transition evaluation
       for ((previdx, nextidx) <- prev.sp_transition) {
-        if (next.forward.data.exists(_.isNaN)) {
+        if (hasNaN(next.forward.data)) {
           logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
           logWarning("Next frame payload:" + next.payload)
           logWarning("faulty indexes: " + (previdx, nextidx))
@@ -285,7 +284,6 @@ private[path_inference] abstract class AbstractCRF(
         }
         next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
       }
-      //      prev.sp_transition_next.logDotInPlace(prev.forward.data, next.forward.data)
       // Add the observations (already in log domain)
       next.forward :+= next.logObservations
       // Sanity check if any value is at least real
@@ -293,7 +291,7 @@ private[path_inference] abstract class AbstractCRF(
         logDebug("zero prob in forward")
         throw new InternalMathException
       }
-      if (next.forward.data.exists(_.isNaN)) {
+      if (hasNaN(next.forward.data)) {
         logWarning("Found a NaN in forward data before normalization:" + next.forward.data.mkString)
         logWarning("Next frame payload:" + next.payload)
         throw new InternalMathException
@@ -302,7 +300,7 @@ private[path_inference] abstract class AbstractCRF(
       LogMath.logNormalizeInPlace(next.forward.data)
       // Affect final value so that forward can be used standalone
       LogMath.normalize(next.forward.data, next.posterior.data)
-      if (next.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(next.posterior.data)) {
         logWarning("Found a NaN in posterior data:" + next.posterior.data.mkString)
         logWarning("Forward data:" + next.forward.data.mkString)
         logWarning("Next frame payload:" + next.payload)
@@ -333,7 +331,7 @@ private[path_inference] abstract class AbstractCRF(
       prev.backward := this.init_empty_value
       // Perform the transition evaluation
       for ((previdx, nextidx) <- prev.sp_transition) {
-        if (prev.backward.data.exists(_.isNaN)) {
+        if (hasNaN(prev.backward.data)) {
           logWarning("Found a NaN in backward data during matrix multiply:" + prev.backward.data.mkString)
           logWarning("Prev frame payload:" + prev.payload)
           logWarning("faulty indexes: " + (previdx, nextidx))
@@ -342,7 +340,6 @@ private[path_inference] abstract class AbstractCRF(
         prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
       }
 
-      //      prev.sp_transition_next_t.logDotInPlace(next.backward.data, prev.backward.data)
       // Add the observations (already in log domain)
       prev.backward :+= prev.logObservations
       // Sanity check if any value is at least real
@@ -350,14 +347,14 @@ private[path_inference] abstract class AbstractCRF(
         logWarning("zero prob in backward")
         throw new InternalMathException
       }
-      if (prev.backward.data.exists(_.isNaN)) {
+      if (hasNaN(prev.backward.data)) {
         logWarning("Found a NaN in backward data before normalization:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
         throw new InternalMathException
       }
       // Normalize in log domain to prevent lgo numbers from straying too far
       LogMath.logNormalizeInPlace(prev.backward.data)
-      if (prev.backward.data.exists(_.isNaN)) {
+      if (hasNaN(prev.backward.data)) {
         logWarning("Found a NaN in backward data:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
         throw new InternalMathException
@@ -365,7 +362,7 @@ private[path_inference] abstract class AbstractCRF(
       // Affect final value so that forward can be used standalone
       // All the computations stay in log domain
       LogMath.normalize(prev.backward.data, prev.posterior.data)
-      if (prev.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(prev.posterior.data)) {
         logWarning("Found a NaN in posterior data:" + prev.posterior.data.mkString)
         logWarning("Backward data:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
@@ -379,22 +376,18 @@ private[path_inference] abstract class AbstractCRF(
     forward
     backward
     for (frame <- queue) {
-      //      logDebug("Processing frame:"+frame)
       assert(!frame.posterior.data.isEmpty, "" + frame.payload)
       frame.posterior := frame.forward
       frame.posterior :+= frame.backward
-      //      logDebug("Frame posterior : "+frame.posterior)
       if (frame.posterior.data.max == Double.NegativeInfinity) {
         logDebug(" zero prob in post normalization " + frame.forward + " \n " + frame.backward)
         throw new InternalMathException
       }
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" NaN detected in  post normalization ")
         throw new InternalMathException
       }
       LogMath.normalizeInPlace(frame.posterior.data)
-      //      logDebug("Frame posterior after normalization : "+frame.posterior)
-      //      logDebug("Frame posterior after normalization : "+frame+" @ "+frame.posterior.data)
     }
   }
 
@@ -418,8 +411,7 @@ private[path_inference] abstract class AbstractCRF(
 
   protected def push_all_out: Unit = {
     for (frame <- queue) {
-//       logDebug("Pushing frame out")
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" Found a NaN in push_ll_out, this should not happen")
       } else {
         out_queue += frame
@@ -431,7 +423,7 @@ private[path_inference] abstract class AbstractCRF(
     assert(n >= 0)
     assert(n < queue.length)
     val frame = queue(n)
-    if (frame.posterior.data.exists(_.isNaN)) {
+    if (hasNaN(frame.posterior.data)) {
       logWarning(" Found a NaN in push_out, this should not happen")
     } else {
       logDebug("Pushing frame out")
@@ -445,7 +437,7 @@ private[path_inference] abstract class AbstractCRF(
     assert(n < queue.length)
     val frames = queue.take(n)
     for (frame <- frames) {
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" Found a NaN in push_out_last, this should not happen")
       } else {
         logDebug("Pushing last frame out")
@@ -453,6 +445,19 @@ private[path_inference] abstract class AbstractCRF(
         out_queue += frame
       }
     }
+  }
+
+  private[this] def hasNaN(x: Array[Double]): Boolean = {
+    val n = x.length
+    // Unrolling the loop, this check is done often.
+    var i = n - 1
+    while(i >= 0) {
+      if (x(i) == Double.NaN) {
+        return true
+      }
+      i -= 1
+    }
+    false
   }
 
   def outputQueue = {
