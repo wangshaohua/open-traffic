@@ -82,8 +82,7 @@ object RunPif extends MMLogging {
     }
     parser.parse(args)
 
-    // DEBUG
-    val parameters = pifParameters2()
+    val parameters = pifParameters()
 
     logInfo("Loading links...")
     var links: Seq[Link] = NetworkUtils.getLinks(network_id, net_type)
@@ -118,13 +117,14 @@ object RunPif extends MMLogging {
 
     val batched_indexes = RawProbe.list(feed = feed, nid = network_id, dates = date_range)
       .zipWithIndex
-      .groupBy({ case (x,i) => i % num_threads})
+      .groupBy({ case (x, i) => i % num_threads })
       .values
       .map(_.map(_._1))
       .toSeq
 
     val tasks = for (findexes <- batched_indexes) yield {
-      future { for (findex <- findexes) yield {
+      future {
+        for (findex <- findexes) yield {
           runPIF(projection_hook,
             path_gen,
             serializer,
@@ -153,15 +153,6 @@ object RunPif extends MMLogging {
     params.setMinProjectionProbability(0.1)
     params.setShuffleProbeCoordinateSpots(true)
     params.setComputingStrategy(ComputingStrategy.Viterbi)
-    params
-  }
-
-  def pifParameters2() = {
-    val params = new PathInferenceParameters2()
-    params.fillDefaultForHighFreqOnlineFast
-    params.setReturnPoints(true)
-    params.setReturnRoutes(true)
-    params.setShuffleProbeCoordinateSpots(true)
     params
   }
 
