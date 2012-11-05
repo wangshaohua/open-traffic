@@ -62,13 +62,13 @@ class DefaultManager(
         dt < parameters.filterTimeoutWindow
     })
     v_filters = new_v_filters
-    
+
     // Terminate the old filters
     for (filter <- old_v_filters.values) {
       logInfo("Evicting tracker for id %s due to timeout." format filter.id)
       filter.finalizeTracker
     }
-    
+
     val id = point.id
     v_filters.get(id) match {
       case None =>
