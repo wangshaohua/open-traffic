@@ -38,4 +38,3 @@ trait CachedPathGenerator extends PathGenerator2 {
 
   def getApproximatePathCacheSize: Int
 }
-

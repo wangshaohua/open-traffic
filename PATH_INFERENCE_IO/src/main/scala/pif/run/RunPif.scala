@@ -116,8 +116,26 @@ object RunPif extends MMLogging {
     logInfo("Driver whitelist: %s" format drivers_whitelist.toString)
     logInfo("Presorting data: %s" format sort_time)
 
-    val tasks = for (findex <- RawProbe.list(feed = feed, nid = network_id, dates = date_range)) yield {
-      future { runPIF(projection_hook, path_gen, serializer, net_type, parameters, findex, drivers_whitelist, extended_info, sort_time) }
+    val batched_indexes = RawProbe.list(feed = feed, nid = network_id, dates = date_range)
+      .zipWithIndex
+      .groupBy({ case (x,i) => i % num_threads})
+      .values
+      .map(_.map(_._1))
+      .toSeq
+
+    val tasks = for (findexes <- batched_indexes) yield {
+      future { for (findex <- findexes) yield {
+          runPIF(projection_hook,
+            path_gen,
+            serializer,
+            net_type,
+            parameters,
+            findex,
+            drivers_whitelist,
+            extended_info,
+            sort_time)
+        }
+      }
     }
 
     for (task <- tasks) {
@@ -184,6 +202,7 @@ object RunPif extends MMLogging {
         x.toIterable
       }
     }
+    logInfo("Opened data source: %s" format fname_in)
     val pif = PathInferenceFilter.createManager(parameters, projector, path_gen)
     for (raw <- data) {
       val pc = raw
@@ -206,6 +225,6 @@ object RunPif extends MMLogging {
     }
     writer_pc.close()
     writer_pi.close()
-    logInfo("Close data source: %s" format fname_in)
+    logInfo("Closed data source: %s" format fname_in)
   }
 }
