@@ -53,14 +53,14 @@ class Merger[L <: Link](
   traj_fun: (String, Int) => DataSink[TrackPiece[L]],
   val vehicle: String) extends MMLogging {
 
-  var _traj_idx = -1
-  var _sink: DataSink[TrackPiece[L]] = null
-  val pcs = new Queue[ProbeCoordinate[L]]
-  val pis = new Queue[PathInference[L]]
+  private var _traj_idx = -1
+  private var _sink: DataSink[TrackPiece[L]] = null
+  private val pcs = new Queue[ProbeCoordinate[L]]
+  private val pis = new Queue[PathInference[L]]
   // The last time sent to the sink
-  var current_time: Time = null
+  private var current_time: Time = null
 
-  def sink() = {
+  private def sink() = {
     if (_sink == null) {
       _traj_idx += 1
       _sink = traj_fun(vehicle, _traj_idx)
@@ -68,12 +68,16 @@ class Merger[L <: Link](
     _sink
   }
 
-  def closeSink() {
+  private def closeSink() {
     if (_sink != null) {
       _sink.close()
       _sink = null
     }
   }
+
+  def numProbeCoordinates = pcs.size
+
+  def numPathInferences = pis.size
 
   def addProbeCoordinate(pc: ProbeCoordinate[L]): Unit = {
     pcs += pc
@@ -320,6 +324,8 @@ This assumes the network uses generic links.
     writer_pc.close()
   }
 
+  private[this] val numCountsPrint = 1000
+
   def mapTrajectory[L <: Link](serializer: Serializer[L], net_type: String,
     findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
     import findex._
@@ -350,23 +356,38 @@ This assumes the network uses generic links.
       val fname_trajs_out = TrajectoryViterbi.fileName(feed, nid, date, net_type, vehicle, traj_idx)
       serializer.writerTrack(fname_trajs_out, extended_information)
     }
+    logInfo("Created data sources")
 
     // Perform the merge
     val mergers = MMap.empty[String, Merger[L]]
 
+    var counter = 0
     while (mg_pis.hasNext || mg_pcs.hasNext) {
+      // TODO(tjh) collect the last seen time
+      counter += 1
+      if (counter >= numCountsPrint) {
+        val num_mergers = mergers.size
+        val num_inside_pis = mergers.values.map(_.numPathInferences).sum
+        val num_inside_pcs = mergers.values.map(_.numProbeCoordinates).sum
+        logInfo("%d mergers: %d total pcs, %d total pis" format (num_mergers, num_inside_pcs, num_inside_pis))
+        counter = 0
+      }
       if (mg_pis.hasNext) {
         val mg_pi = mg_pis.next()
-        val vehicle = mg_pi.id
-        val merger = mergers.getOrElseUpdate(vehicle, new Merger(writer_trajs_fun, vehicle))
+        val vehicle_id = mg_pi.id
+        val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
         merger.addPathInference(mg_pi)
       }
       if (mg_pcs.hasNext) {
         val mg_pc = mg_pcs.next()
-        val vehicle = mg_pc.id
-        val merger = mergers.getOrElseUpdate(vehicle, new Merger(writer_trajs_fun, vehicle))
+        val vehicle_id = mg_pc.id
+        val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
         merger.addProbeCoordinate(mg_pc)
       }
+      // Do some cleanup
+      // We assume that the values are written in block.
+      // We add a timeout of 1 hour: if we have not seen a value for this id during the
+      // previous hour, we assume it is stopped, and we flush the trajectory.
     }
     for (merger <- mergers.values) {
       merger.finish()

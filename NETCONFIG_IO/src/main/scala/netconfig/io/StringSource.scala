@@ -24,13 +24,8 @@ import java.util.zip.GZIPInputStream
 import java.io.InputStreamReader
 
 class LineIterator(private[this] val reader: Reader) extends Iterator[String] {
-  private[this] val buffered_reader = new BufferedReader(reader)
 
-  // Constructor logic
-  //  {
-  //    // Skip the first line
-  //    buffered_reader.readLine()
-  //  }
+  private[this] val buffered_reader = new BufferedReader(reader)
 
   private[this] var current_line: String = buffered_reader.readLine()
 
