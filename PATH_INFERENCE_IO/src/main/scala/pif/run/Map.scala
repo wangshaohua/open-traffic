@@ -104,6 +104,7 @@ class Merger[L <: Link](
         val point = pc
         val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
         sink().put(tp)
+        logInfo("Starting merger id %s at time %s".format(pc.id, pc.time.toString))
         pcs.dequeue()
         true // Potentially more work.
       } else {
@@ -115,6 +116,7 @@ class Merger[L <: Link](
             // We missed a PC to start the PI.
             // There is a disconnect that should not have happened.
             logError("Wrong PC before this PI!\nPC: %s\nCurrent PI:\n%s" format (pc.toString(), pi.toString()))
+            pis.dequeue()
             false
           } else if (pi.endTime == pc.time) {
             // We can create a new track piece here.
