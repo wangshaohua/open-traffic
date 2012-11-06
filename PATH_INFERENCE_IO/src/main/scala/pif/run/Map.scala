@@ -110,11 +110,11 @@ class Merger[L <: Link](
         // Try to find a PI that finishes at the pc.
         pis.headOption.map(pi => {
           if (pi.endTime < pc.time) {
-//            // PI is younger than PC
-//            // Should not happen.
-//            // We missed a PC to start the PI.
-//            // There is a disconnect that should not have happened.
-//            logWarning("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
+            // PI is younger than PC
+            // Should not happen.
+            // We missed a PC to start the PI.
+            // There is a disconnect that should not have happened.
+            logError("Wrong PC before this PI!\nPC: %s\nCurrent PI:\n%s" format (pc.toString(), pi.toString()))
             false
           } else if (pi.endTime == pc.time) {
             // We can create a new track piece here.
