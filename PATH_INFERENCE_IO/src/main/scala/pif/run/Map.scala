@@ -128,7 +128,7 @@ class Merger[L <: Link](
             val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
             val point = pc
             val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-            sink().put(tp)
+//            sink().put(tp) // DEBUG
             pcs.dequeue()
             //              logInfo("Dequeuing start point:\n%s" format pc.toString())
             current_time = pc.time
@@ -150,7 +150,7 @@ class Merger[L <: Link](
                 val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
                 val point = pc
                 val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-                sink.put(tp)
+//                sink.put(tp) // DEBUG
                 pcs.dequeue()
                 pis.dequeue()
                 //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
@@ -376,13 +376,13 @@ This assumes the network uses generic links.
         val mg_pi = mg_pis.next()
         val vehicle_id = mg_pi.id
         val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-//        merger.addPathInference(mg_pi)
+        merger.addPathInference(mg_pi)
       }
       if (mg_pcs.hasNext) {
         val mg_pc = mg_pcs.next()
         val vehicle_id = mg_pc.id
         val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-//        merger.addProbeCoordinate(mg_pc)
+        merger.addProbeCoordinate(mg_pc)
       }
       // Do some cleanup
       // We assume that the values are written in block.
