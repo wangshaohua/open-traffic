@@ -55,6 +55,7 @@ class Merger[L <: Link](
 
   private var _traj_idx = -1
   private var _sink: DataSink[TrackPiece[L]] = null
+  private var no_pc_so_far = true
   private val pcs = new Queue[ProbeCoordinate[L]]
   private val pis = new Queue[PathInference[L]]
   // The last time sent to the sink
@@ -64,6 +65,7 @@ class Merger[L <: Link](
     if (_sink == null) {
       _traj_idx += 1
       _sink = traj_fun(vehicle, _traj_idx)
+      no_pc_so_far = true
     }
     _sink
   }
@@ -72,6 +74,7 @@ class Merger[L <: Link](
     if (_sink != null) {
       _sink.close()
       _sink = null
+      no_pc_so_far = true
     }
   }
 
@@ -82,13 +85,64 @@ class Merger[L <: Link](
   def addProbeCoordinate(pc: ProbeCoordinate[L]): Unit = {
     pcs += pc
     // Update as far as we can.
-    while (update()) {}
+    while (update2()) {}
   }
 
   def addPathInference(pi: PathInference[L]): Unit = {
     pis += pi
     // Update as far as we can.
-    while (update()) {}
+    while (update2()) {}
+  }
+
+  private def update2(): Boolean = {
+    pcs.headOption.map(pc => {
+      if (no_pc_so_far) {
+        no_pc_so_far = false
+        val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+        val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
+        val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+        val point = pc
+        val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+        sink().put(tp)
+        pcs.dequeue()
+        true // Potentially more work.
+      } else {
+        // Try to find a PI that finishes at the pc.
+        pis.headOption.map(pi => {
+          if (pi.endTime < pc.time) {
+            // PI is younger than PC
+            // Should not happen.
+            // We missed a PC to start the PI.
+            // There is a disconnect that should not have happened.
+            logWarning("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
+            false
+          } else if (pi.endTime == pc.time) {
+            // We can create a new track piece here.
+            // Assuming there is a single projection and
+            // a single path (that should be relaxed at some point
+            // but easier to reason with).
+            assert(pc.spots.size == 1)
+            assert(pi.routes.size == 1)
+            val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+            val routes = ImmutableList.of(pi.routes.head)
+            val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+            val point = pc
+            val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+            sink.put(tp)
+            pcs.dequeue()
+            pis.dequeue()
+            true // Potentially more progress possible
+          } else {
+            assert(pi.endTime > pc.time)
+            // The PI is older than the current PC
+            // This happens if there is a disconnect.
+            // Remove the last point and stop the current trajectory.
+            closeSink()
+            true // Potentially more progress.
+          }
+        }).getOrElse(false) // Nothing to do if no PI
+      }
+    }).getOrElse(false) // Nothing to do if no PC
   }
 
   def update(): Boolean = {
@@ -232,7 +286,7 @@ This assumes the network uses generic links.
 
     assert(!actions.isEmpty, "You must specify one action or more")
     assert(!net_type.isEmpty, "You must specify a network type or more")
-    logInfo("Actions: " + actions mkString " ")
+    logInfo("Actions: " + actions.mkString(" "))
     logInfo("Network type: " + net_type)
 
     val date_range: Seq[LocalDate] = {
