@@ -145,97 +145,97 @@ class Merger[L <: Link](
     }).getOrElse(false) // Nothing to do if no PC
   }
 
-  def update(): Boolean = {
-    // Check if we received a PI object to attach to:
-    (pis.headOption, pcs.headOption) match {
-      case (Some(pi), Some(pc)) => {
-        // Checking invariants
-        // We require the time to go strictly forward.
-        // Some feeds have some peculiar points that get sent instantly.
-        if (pi.endTime == pi.startTime) {
-          logWarning("The following PI object has a 0 delta:\n%s" format pi.toString)
-          if (pc.time == pi.endTime) {
-            logWarning("Also discarding the following PC:\n%s" format pc.toString())
-          }
-          pis.dequeue()
-          pcs.dequeue()
-          true
-        } else {
-          if (current_time != null) {
-            assert(pi.startTime >= current_time)
-            assert(pc.time > current_time)
-          }
-          if (pc.time < pi.startTime) {
-            // There is a disconnect with a single point somewhere
-            // We drop this point for now.
-            logInfo("Dropping orphan point:\n%s" format pc.toString)
-            pcs.dequeue()
-            true
-          } else if (pc.time == pi.startTime) {
-            // There is disconnect in the trajectory.
-            // We start a new trajectory.
-            // We know this PC is not orphan since there is
-            // a PI right behind it.
-            closeSink()
-            val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
-            val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
-            val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
-            val point = pc
-            val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-            sink().put(tp)
-            pcs.dequeue()
-            //              logInfo("Dequeuing start point:\n%s" format pc.toString())
-            current_time = pc.time
-            true
-          } else {
-            // The PC is somewhere after the PI started.
-            // It cannot be during the PI
-            assert(pc.time >= pi.endTime)
-            if (pc.time == pi.endTime) {
-              if (current_time != null && pi.startTime == current_time) {
-                // We can create a new track piece here.
-                // Assuming there is a single projection and
-                // a single path (that should be relaxed at some point
-                // but easier to reason with).
-                assert(pc.spots.size == 1)
-                assert(pi.routes.size == 1)
-                val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
-                val routes = ImmutableList.of(pi.routes.head)
-                val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
-                val point = pc
-                val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-                sink.put(tp)
-                pcs.dequeue()
-                pis.dequeue()
-                //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
-                current_time = pc.time
-                true
-              } else {
-                // We missed a PC to start the PI.
-                // There is a disconnect that should not have happened.
-                logError("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
-                false
-              }
-            } else if (pc.time > pi.endTime) {
-              // Ooops we lost a PC??
-              logError("Received a PC after a PI: \n %s\n===========\n%s\n" format (pc.toString(), pi.toString()))
-              assert(false)
-              false
-            } else {
-              // Error case already covered above.
-              assert(false)
-              false
-            }
-          }
-        }
-      }
-      case _ => {
-        // One of the queues is empty, nothing we can do
-        // for now.
-        false
-      }
-    }
-  }
+//  def update_old(): Boolean = {
+//    // Check if we received a PI object to attach to:
+//    (pis.headOption, pcs.headOption) match {
+//      case (Some(pi), Some(pc)) => {
+//        // Checking invariants
+//        // We require the time to go strictly forward.
+//        // Some feeds have some peculiar points that get sent instantly.
+//        if (pi.endTime == pi.startTime) {
+//          logWarning("The following PI object has a 0 delta:\n%s" format pi.toString)
+//          if (pc.time == pi.endTime) {
+//            logWarning("Also discarding the following PC:\n%s" format pc.toString())
+//          }
+//          pis.dequeue()
+//          pcs.dequeue()
+//          true
+//        } else {
+//          if (current_time != null) {
+//            assert(pi.startTime >= current_time)
+//            assert(pc.time > current_time)
+//          }
+//          if (pc.time < pi.startTime) {
+//            // There is a disconnect with a single point somewhere
+//            // We drop this point for now.
+//            logInfo("Dropping orphan point:\n%s" format pc.toString)
+//            pcs.dequeue()
+//            true
+//          } else if (pc.time == pi.startTime) {
+//            // There is disconnect in the trajectory.
+//            // We start a new trajectory.
+//            // We know this PC is not orphan since there is
+//            // a PI right behind it.
+//            closeSink()
+//            val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+//            val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
+//            val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+//            val point = pc
+//            val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+//            sink().put(tp)
+//            pcs.dequeue()
+//            //              logInfo("Dequeuing start point:\n%s" format pc.toString())
+//            current_time = pc.time
+//            true
+//          } else {
+//            // The PC is somewhere after the PI started.
+//            // It cannot be during the PI
+//            assert(pc.time >= pi.endTime)
+//            if (pc.time == pi.endTime) {
+//              if (current_time != null && pi.startTime == current_time) {
+//                // We can create a new track piece here.
+//                // Assuming there is a single projection and
+//                // a single path (that should be relaxed at some point
+//                // but easier to reason with).
+//                assert(pc.spots.size == 1)
+//                assert(pi.routes.size == 1)
+//                val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+//                val routes = ImmutableList.of(pi.routes.head)
+//                val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+//                val point = pc
+//                val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+//                sink.put(tp)
+//                pcs.dequeue()
+//                pis.dequeue()
+//                //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
+//                current_time = pc.time
+//                true
+//              } else {
+//                // We missed a PC to start the PI.
+//                // There is a disconnect that should not have happened.
+//                logError("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
+//                false
+//              }
+//            } else if (pc.time > pi.endTime) {
+//              // Ooops we lost a PC??
+//              logError("Received a PC after a PI: \n %s\n===========\n%s\n" format (pc.toString(), pi.toString()))
+//              assert(false)
+//              false
+//            } else {
+//              // Error case already covered above.
+//              assert(false)
+//              false
+//            }
+//          }
+//        }
+//      }
+//      case _ => {
+//        // One of the queues is empty, nothing we can do
+//        // for now.
+//        false
+//      }
+//    }
+//  }
 
   def finish(): Unit = {
     closeSink()
