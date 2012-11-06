@@ -41,7 +41,7 @@ private[path_inference] abstract class AbstractCRF(
    *
    * FIFO => head = oldest, last = most recent
    */
-  private val queue: Queue[CRFFrame] = new Queue[CRFFrame]()
+  private[this] val queue: Queue[CRFFrame] = new Queue[CRFFrame]()
   /**
    * The number of forward frames already computed.
    * This number decreases whenever a frame is pulled.
@@ -57,6 +57,8 @@ private[path_inference] abstract class AbstractCRF(
    * The output of the queue.
    */
   protected val out_queue: Queue[CRFFrame] = new Queue[CRFFrame]()
+  
+  def numStoredFrames = queue.size
 
   /**
    * Filter will die after an internal exception.

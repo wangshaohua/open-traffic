@@ -43,11 +43,13 @@ class DefaultManager(
   /**
    * Filter for the individual vehicles.
    */
-  private[this] var v_filters = HashMap.empty[String, VehicleFilter3]
+  private[this] var v_filters = Map.empty[String, VehicleFilter3]
 
   private[this] val internal_storage = new InternalStorage(parameters)
 
-  private[this] val active_trackers_counter = new AtomicInteger(0)
+  private[this] var point_counter = 0
+  
+  private val printMessageCounter = 100000
 
   override def addPoint(point: ProbeCoordinate[Link]): Unit = synchronized {
     // This method is snchronized because it updates the state of the tracker.
@@ -61,7 +63,7 @@ class DefaultManager(
         val dt = (t - last_seen)
         dt < parameters.filterTimeoutWindow
     })
-    v_filters = new_v_filters
+    v_filters = new_v_filters.toArray.toMap
 
     // Terminate the old filters
     for (filter <- old_v_filters.values) {
@@ -82,6 +84,14 @@ class DefaultManager(
       // It will be automatically sent to the internal storage object.
       // Check how recent the point is and discard too old trackers
     }
+    
+    point_counter += 1
+    if (point_counter > printMessageCounter) {
+      val num_filters = v_filters.size
+      val num_frames = v_filters.values.map(_.crf.numStoredFrames).sum
+      logInfo("%d points processed, %d active tracks, %d active frames" format(point_counter, v_filters, num_frames))
+      point_counter = 0
+    }
   }
 
   override def getProbeCoordinates = internal_storage.getProbeCoordinates
@@ -99,7 +109,7 @@ class DefaultManager(
     for (filter <- v_filters.values)
       filter.finalizeTracker
     // Discard all the filters, since we are done with them.
-    v_filters.clear
+    v_filters = Map.empty
     // Make sure the cache is flushed to the disk, if necessary.
     common_path_discovery.finalizeOperations
   }

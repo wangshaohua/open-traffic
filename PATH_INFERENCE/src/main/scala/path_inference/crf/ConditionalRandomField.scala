@@ -32,6 +32,8 @@ private[path_inference] trait ConditionalRandomField {
   def finalizeComputationsAndRestart(point: ProbeCoordinate[Link]): Unit
 
   def outputQueue(): Seq[CRFFrame]
+
+  def numStoredFrames: Int
 }
 
 /**
