@@ -39,7 +39,8 @@ private[path_inference] class ViterbiFrame(
   forward: DenseVector[Double],
   backward: DenseVector[Double],
   posterior: DenseVector[Double],
-  sp_transition_next: Array[(Int, Int)],
+  sp_transition_from: Array[Int],
+  sp_transition_to: Array[Int],
   val most_likely_previous: Array[Int])
   extends CRFFrame(
     payload,
@@ -48,7 +49,8 @@ private[path_inference] class ViterbiFrame(
     forward,
     backward,
     posterior,
-    sp_transition_next) {
+    sp_transition_from,
+    sp_transition_to) {
 }
 
 private[path_inference] class ViterbiDecoder(
@@ -74,8 +76,11 @@ private[path_inference] class ViterbiDecoder(
     if (!vqueue.isEmpty) {
       val delta: Delta = vqueue.last.payload.asInstanceOf[Delta]
       val transitions = CRFUtils.findTransitionsDeltaToPC2(delta, point)
+      val transitions_from = transitions.map(_._1)
+      val transitions_to = transitions.map(_._2)
       val old_frame = vqueue.last
-      old_frame.sp_transition = transitions
+      old_frame.sp_transition_from = transitions_from
+      old_frame.sp_transition_to = transitions_to
     }
 
     // Wrap the array in a vector
@@ -93,6 +98,7 @@ private[path_inference] class ViterbiDecoder(
       DenseVectorCol.zeros[Double](nspots),
       DenseVectorCol.zeros[Double](nspots),
       wrapper_vec,
+      null,
       null,
       Array.fill(nspots)(0)) // Putting a default value for uniform probas
 
@@ -131,7 +137,10 @@ private[path_inference] class ViterbiDecoder(
     assert(delta.points.last.time <= point.time)
 
     val transitions = CRFUtils.findTransitionsPCToDelta(previous_point, delta)
-    vqueue.last.sp_transition = transitions
+    val transitions_from = transitions.map(_._1)
+    val transitions_to = transitions.map(_._2)
+    vqueue.last.sp_transition_from = transitions_from
+    vqueue.last.sp_transition_to = transitions_to
 
     // Compute the vector of weights / probabilities of the paths
     val path_weights = delta.paths.map(trans_model.logTrans(_)).toArray
@@ -150,7 +159,7 @@ private[path_inference] class ViterbiDecoder(
       DenseVectorCol.zeros[Double](npaths),
       DenseVectorCol.zeros[Double](npaths),
       wrapper_vec,
-      null, Array.fill(npaths)(0)) //Putting some default value, in case all probas are uniform
+      null, null, Array.fill(npaths)(0)) //Putting some default value, in case all probas are uniform
 
     //    logDebug("Adding frame to VHMM: "+frame)
     this addFrame frame
@@ -226,7 +235,7 @@ private[path_inference] class ViterbiDecoder(
       next.forward := this.init_empty_value
 
       {
-        var i = prev.sp_transition.size - 1
+        var i = prev.sp_transition_from.size - 1
         while (i >= 0) {
           val previdx = prev.sp_transition_from(i)
           val nextidx = prev.sp_transition_to(i)

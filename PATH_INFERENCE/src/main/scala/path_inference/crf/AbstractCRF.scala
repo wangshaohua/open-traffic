@@ -57,7 +57,7 @@ private[path_inference] abstract class AbstractCRF(
    * The output of the queue.
    */
   protected val out_queue: Queue[CRFFrame] = new Queue[CRFFrame]()
-  
+
   def numStoredFrames = queue.size
 
   /**
@@ -85,8 +85,12 @@ private[path_inference] abstract class AbstractCRF(
     if (!queue.isEmpty) {
       val delta: Delta = queue.last.payload.asInstanceOf[Delta]
       val transitions2 = CRFUtils.findTransitionsDeltaToPC2(delta, point)
+      val transitions2_from = transitions2.map(_._1)
+      val transitions2_to = transitions2.map(_._2)
       val old_frame = queue.last
-      old_frame.sp_transition = transitions2
+      //      old_frame.sp_transition = transitions2
+      old_frame.sp_transition_from = transitions2_from
+      old_frame.sp_transition_to = transitions2_to
     }
 
     // Wrap the array in a vector
@@ -104,7 +108,7 @@ private[path_inference] abstract class AbstractCRF(
       DenseVectorCol.zeros[Double](nspots),
       DenseVectorCol.zeros[Double](nspots),
       wrapper_vec,
-      null)
+      null, null)
     this += frame
   }
 
@@ -134,7 +138,10 @@ private[path_inference] abstract class AbstractCRF(
     assert(delta.points.head.time <= point.time)
     assert(delta.points.last.time <= point.time)
     val transitions2 = CRFUtils.findTransitionsPCToDelta(previous_point, delta)
-    queue.last.sp_transition = transitions2
+    val transitions2_from = transitions2.map(_._1)
+    val transitions2_to = transitions2.map(_._2)
+    queue.last.sp_transition_from = transitions2_from
+    queue.last.sp_transition_to = transitions2_to
     // Compute the vector of weights / probabilities of the paths
     val path_weights = delta.paths.map(trans_model.logTrans(_)).toArray
     val wrapper_trans_log = new DenseVectorCol(path_weights)
@@ -152,7 +159,7 @@ private[path_inference] abstract class AbstractCRF(
       DenseVectorCol.zeros[Double](npaths),
       DenseVectorCol.zeros[Double](npaths),
       wrapper_vec,
-      null)
+      null, null)
     this += frame
     // Insert the next point
     this setFirstPoint point
@@ -277,12 +284,12 @@ private[path_inference] abstract class AbstractCRF(
 
       // Perform the transition evaluation
       // Compact (slower) code:
-//       for ((previdx, nextidx) <- prev.sp_transition) {
-//         next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
-//       }
+      //       for ((previdx, nextidx) <- prev.sp_transition) {
+      //         next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+      //       }
 
       {
-        var i = prev.sp_transition.size - 1
+        var i = prev.sp_transition_from.size - 1
         while (i >= 0) {
           val previdx = prev.sp_transition_from(i)
           val nextidx = prev.sp_transition_to(i)
@@ -344,11 +351,11 @@ private[path_inference] abstract class AbstractCRF(
 
       // Perform the transition evaluation
       // Compact code:
-//       for ((previdx, nextidx) <- prev.sp_transition) {
-//         prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
-//       }
+      //       for ((previdx, nextidx) <- prev.sp_transition) {
+      //         prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+      //       }
       {
-        var i = prev.sp_transition.size - 1
+        var i = prev.sp_transition_from.size - 1
         while (i >= 0) {
           val previdx = prev.sp_transition_from(i)
           val nextidx = prev.sp_transition_to(i)
@@ -474,7 +481,7 @@ private[path_inference] abstract class AbstractCRF(
     val n = x.length
     // Unrolling the loop, this check is done often.
     var i = n - 1
-    while(i >= 0) {
+    while (i >= 0) {
       if (x(i) == Double.NaN) {
         return true
       }

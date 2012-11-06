@@ -48,7 +48,7 @@ class DefaultManager(
   private[this] val internal_storage = new InternalStorage(parameters)
 
   private[this] var point_counter = 0
-  
+
   private val printMessageCounter = 100000
 
   override def addPoint(point: ProbeCoordinate[Link]): Unit = synchronized {
@@ -84,12 +84,12 @@ class DefaultManager(
       // It will be automatically sent to the internal storage object.
       // Check how recent the point is and discard too old trackers
     }
-    
+
     point_counter += 1
     if (point_counter > printMessageCounter) {
       val num_filters = v_filters.size
       val num_frames = v_filters.values.map(_.crf.numStoredFrames).sum
-      logInfo("%d points processed, %d active tracks, %d active frames" format(point_counter, v_filters, num_frames))
+      logInfo("%d points processed, %d active tracks, %d active frames" format (point_counter, v_filters, num_frames))
       point_counter = 0
     }
   }

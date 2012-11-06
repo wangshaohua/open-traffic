@@ -24,7 +24,7 @@ import core_extensions.MMLogging
 
 final class DefaultCachedPathGenerator(
   private[this] val path_gen: PathGenerator2,
-  private[this] val printMessageValue: Int = 10000) extends PathGenerator2 with MMLogging {
+  private[this] val printMessageValue: Int = 100000) extends PathGenerator2 with MMLogging {
 
   private[this] val pathCache: ConcurrentMap[PathKey, Array[Link]] = (new MapMaker()).softValues().makeMap()
   private[this] val pathsCache: ConcurrentMap[PathKey, Array[Array[Link]]] = (new MapMaker()).softValues().makeMap()

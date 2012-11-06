@@ -32,7 +32,7 @@ class CRFFrame(
   final val forward: DenseVector[Double],
   final val backward: DenseVector[Double],
   final val posterior: DenseVector[Double],
-  var sp_transition: Array[(Int, Int)]) {
-  lazy val sp_transition_from = sp_transition.map(_._1)
-  lazy val sp_transition_to = sp_transition.map(_._2)
+  var sp_transition_from: Array[Int],
+  var sp_transition_to: Array[Int]
+  ) {
 }
