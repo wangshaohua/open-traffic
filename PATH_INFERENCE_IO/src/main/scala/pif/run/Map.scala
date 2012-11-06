@@ -376,13 +376,13 @@ This assumes the network uses generic links.
         val mg_pi = mg_pis.next()
         val vehicle_id = mg_pi.id
         val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-        merger.addPathInference(mg_pi)
+//        merger.addPathInference(mg_pi)
       }
       if (mg_pcs.hasNext) {
         val mg_pc = mg_pcs.next()
         val vehicle_id = mg_pc.id
         val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-        merger.addProbeCoordinate(mg_pc)
+//        merger.addProbeCoordinate(mg_pc)
       }
       // Do some cleanup
       // We assume that the values are written in block.

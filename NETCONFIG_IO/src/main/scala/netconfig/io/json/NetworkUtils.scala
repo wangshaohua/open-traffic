@@ -37,7 +37,10 @@ object NetworkUtils extends MMLogging {
     val fname = SerializedNetwork.fileName(network_id, net_typesource_name)
     val glrs = JSonSerializer.getGenericLinks(fname)
     val builder = new NetworkBuilder
-    builder.build(glrs)
+    logInfo("Building network source=%s, nid=%d" format(net_typesource_name, network_id))
+    val links = builder.build(glrs)
+    logInfo("Building network done")
+    links
   }
 
   /**
