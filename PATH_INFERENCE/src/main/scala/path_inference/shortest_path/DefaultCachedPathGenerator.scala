@@ -21,31 +21,36 @@ import collection.JavaConversions._
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 import core_extensions.MMLogging
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.Cache
 
 final class DefaultCachedPathGenerator(
   private[this] val path_gen: PathGenerator2,
-  private[this] val printMessageValue: Int = 100000) extends PathGenerator2 with MMLogging {
+  private[this] val printMessageValue: Int = 100000,
+  path_cache_size: Int) extends PathGenerator2 with MMLogging {
 
-  private[this] val pathCache: ConcurrentMap[PathKey, Array[Link]] = (new MapMaker()).softValues().makeMap()
-  private[this] val pathsCache: ConcurrentMap[PathKey, Array[Array[Link]]] = (new MapMaker()).softValues().makeMap()
+  val x: Cache[PathKey, Array[Link]] = (CacheBuilder.newBuilder()).maximumSize(path_cache_size).build()
+
+  private[this] val pathCache: Cache[PathKey, Array[Link]] = (CacheBuilder.newBuilder()).maximumSize(path_cache_size).build()
+  private[this] val pathsCache: Cache[PathKey, Array[Array[Link]]] = (CacheBuilder.newBuilder()).maximumSize(path_cache_size).build()
 
   private[this] var total_queries = 0
   private[this] var cache_misses = 0
   private[this] var num_paths_computed = 0
 
   def getPathInCache(key: PathKey): Option[Array[Link]] = {
-    val res = pathCache.get(key)
+    val res = pathCache.getIfPresent(key)
     if (res == null)
       None
     else Some(res)
   }
 
   def putPathInCache(key: PathKey, path: Array[Link]): Unit = {
-    pathCache.putIfAbsent(key, path)
+    pathCache.put(key, path)
   }
 
   def getPathsInCache(key: PathKey): Option[Array[Array[Link]]] = {
-    val res = pathsCache.get(key)
+    val res = pathsCache.getIfPresent(key)
     if (res == null) {
       None
     } else {
@@ -54,12 +59,12 @@ final class DefaultCachedPathGenerator(
   }
 
   def putPathsInCache(key: PathKey, paths: Array[Array[Link]]): Unit = {
-    pathsCache.putIfAbsent(key, paths)
+    pathsCache.put(key, paths)
   }
 
-  def getApproximatePathsCacheSize: Int = pathsCache.size
+  def getApproximatePathsCacheSize: Int = pathsCache.size.toInt
 
-  def getApproximatePathCacheSize: Int = pathCache.size
+  def getApproximatePathCacheSize: Int = pathCache.size.toInt
 
   def getShortestPath(start_link: Link, end_link: Link): Array[Link] = {
     val key = PathKey(start_link, end_link)

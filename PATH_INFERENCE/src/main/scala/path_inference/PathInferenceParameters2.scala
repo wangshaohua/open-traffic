@@ -197,6 +197,13 @@ class PathInferenceParameters2 extends Serializable {
   @BeanProperty var minProjectionProbability = 0.0;
 
   /**
+   * The size of the cache for the paths.
+   * TODO(tjh) document
+   * A reasonable value for a very large network should be 1-10M
+   */
+  @BeanProperty var pathsCacheSize: Int = 100000
+
+  /**
    * If set to true, the projections in the output probe coordinates will be
    * sorted by decreasing order of probability.
    *

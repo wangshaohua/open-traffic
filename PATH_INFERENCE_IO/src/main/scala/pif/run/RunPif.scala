@@ -153,6 +153,7 @@ object RunPif extends MMLogging {
     params.setMinProjectionProbability(0.1)
     params.setShuffleProbeCoordinateSpots(true)
     params.setComputingStrategy(ComputingStrategy.Viterbi)
+    params.setPathsCacheSize(6000000) // 6M elements
     params
   }
 

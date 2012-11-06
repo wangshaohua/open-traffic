@@ -64,7 +64,9 @@ private[path_inference] class ViterbiDecoder(
    *
    * FIFO => head = oldest, last = most recent
    */
-  val vqueue: Queue[ViterbiFrame] = new Queue[ViterbiFrame]() //private
+  private[this] val vqueue: Queue[ViterbiFrame] = new Queue[ViterbiFrame]() //private
+
+  override def numStoredFrames = vqueue.size
 
   // Adding a point
   override def setFirstPoint(point: ProbeCoordinate[Link]) {
