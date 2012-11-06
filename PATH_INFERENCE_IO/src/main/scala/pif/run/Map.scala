@@ -128,7 +128,7 @@ class Merger[L <: Link](
             val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
             val point = pc
             val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-//            sink().put(tp) // DEBUG
+            sink().put(tp)
             pcs.dequeue()
             //              logInfo("Dequeuing start point:\n%s" format pc.toString())
             current_time = pc.time
@@ -150,7 +150,7 @@ class Merger[L <: Link](
                 val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
                 val point = pc
                 val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-//                sink.put(tp) // DEBUG
+                sink.put(tp)
                 pcs.dequeue()
                 pis.dequeue()
                 //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
