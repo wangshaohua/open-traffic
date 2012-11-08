@@ -294,6 +294,8 @@ This assumes the network uses generic links.
     }
     parser.parse(args)
 
+    out_network_id = if (out_network_id == -1) { network_id } else (out_network_id)
+
     assert(!actions.isEmpty, "You must specify one action or more")
     assert(!net_type.isEmpty, "You must specify a network type or more")
     logInfo("Actions: " + actions.mkString(" "))
@@ -333,13 +335,13 @@ This assumes the network uses generic links.
     for (action <- actions) {
       action match {
         case "tspot" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTSpot(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
+          mapTSpot(serializer_in, serializer_out, spotConverter _, out_network_id, net_type, fidx, extended_info)
         }
         case "traj" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTrajectory(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
+          mapTrajectory(serializer_in, serializer_out, spotConverter _, out_network_id, net_type, fidx, extended_info)
         }
         case "routett" => for (fidx <- PathInferenceViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapRouteTT(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
+          mapRouteTT(serializer_in, serializer_out, spotConverter _, out_network_id, net_type, fidx, extended_info)
         }
         case _ => {
           logInfo("Unknown action " + action)
@@ -379,6 +381,7 @@ This assumes the network uses generic links.
     serializer_in: Serializer[L1],
     serializer_out: Serializer[L2],
     spot_converter: Spot[L1] => Option[Spot[L2]],
+    out_nid: Int,
     net_type: String,
     findex: PathInferenceViterbi.FileIndex,
     extended_information: Boolean): Unit = {
@@ -393,7 +396,7 @@ This assumes the network uses generic links.
     logInfo("Opening for reading : " + fname_pis)
     val data = serializer_in.readPathInferences(fname_pis)
 
-    val fname_pis_out = RouteTTViterbi.fileName(feed = findex.feed, nid = findex.nid,
+    val fname_pis_out = RouteTTViterbi.fileName(feed = findex.feed, nid = out_nid,
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pis_out)
@@ -414,6 +417,7 @@ This assumes the network uses generic links.
     serializer_in: Serializer[L1],
     serializer_out: Serializer[L2],
     spot_converter: Spot[L1] => Option[Spot[L2]],
+    out_nid: Int,
     net_type: String,
     findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = findex.feed, nid = findex.nid,
@@ -426,7 +430,7 @@ This assumes the network uses generic links.
     logInfo("Opening for reading : " + fname_pcs)
     val data = serializer_in.readProbeCoordinates(fname_pcs)
 
-    val fname_pcs_out = TSpotViterbi.fileName(feed = findex.feed, nid = findex.nid,
+    val fname_pcs_out = TSpotViterbi.fileName(feed = findex.feed, nid = out_nid,
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pcs_out)
@@ -448,6 +452,7 @@ This assumes the network uses generic links.
     serializer_in: Serializer[L1],
     serializer_out: Serializer[L2],
     spot_converter: Spot[L1] => Option[Spot[L2]],
+    out_nid: Int,
     net_type: String,
     findex: ProbeCoordinateViterbi.FileIndex,
     extended_information: Boolean): Unit = {
@@ -476,7 +481,7 @@ This assumes the network uses generic links.
       serializer_in.readPathInferences(fname_pis).iterator
     }
     def writer_trajs_fun(vehicle: String, traj_idx: Int) = {
-      val fname_trajs_out = TrajectoryViterbi.fileName(feed, nid, date, net_type, vehicle, traj_idx)
+      val fname_trajs_out = TrajectoryViterbi.fileName(feed, out_nid, date, net_type, vehicle, traj_idx)
       serializer_out.writerTrack(fname_trajs_out, extended_information)
     }
     logInfo("Created data sources")
