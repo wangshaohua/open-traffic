@@ -39,7 +39,7 @@ class GenericTest {
     val l2 = GenericLinkRepresentation(LinkIDRepr(1, 0), n2, n3)
     val glrs = Seq(l1, l2)
     val builder = new NetworkBuilder()
-    val links = builder.build(glrs).sortBy(_.toString())
+    val links = builder.build(glrs).map(_._2).sortBy(_.toString())
     assertEquals(2, links.length)
     assertTrue(links.head.toString, links.head.inLinks().isEmpty())
     assertTrue(links.last.outLinks().isEmpty())

@@ -22,6 +22,7 @@ import network.gen.NetworkBuilder
 import netconfig.io.Serializer
 import netconfig.storage.LinkIDRepr
 import network.gen.GenericLink
+import netconfig.storage.LinkIDRepr
 
 /**
  * A collection of utilities to materialize a network from a JSON representation on disk, using generic links.
@@ -33,14 +34,14 @@ object NetworkUtils extends MMLogging {
   /**
    * Materializes links from a network ID and a network type.
    */
-  def getLinks(network_id: Int, net_typesource_name: String): Seq[Link] = {
+  def getLinks(network_id: Int, net_typesource_name: String): Map[LinkIDRepr, Link] = {
     val fname = SerializedNetwork.fileName(network_id, net_typesource_name)
     val glrs = JSonSerializer.getGenericLinks(fname)
     val builder = new NetworkBuilder
-    logInfo("Building network source=%s, nid=%d" format(net_typesource_name, network_id))
+    logInfo("Building network source=%s, nid=%d" format (net_typesource_name, network_id))
     val links = builder.build(glrs)
     logInfo("Building network done")
-    links
+    links.toMap
   }
 
   /**
@@ -48,12 +49,8 @@ object NetworkUtils extends MMLogging {
    *
    * TODO(tjh) this function could be moved somewhere else.
    */
-  def getSerializer(links: Seq[Link]): Serializer[Link] = {
-    val map: Map[LinkIDRepr, Link] = Map.empty ++ links.map(l => {
-      val linkId = l.asInstanceOf[GenericLink].idRepr
-      (linkId, l)
-    })
-    JSonSerializer.from(map)
+  def getSerializer(links: Map[LinkIDRepr, Link]): Serializer[Link] = {
+    JSonSerializer.from(links)
   }
 
   /**

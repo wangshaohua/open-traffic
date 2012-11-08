@@ -44,6 +44,11 @@ import netconfig_extensions.ProbeCoordinateUtils
 import netconfig.Link
 import netconfig.Route
 import netconfig.io.Dates
+import netconfig.Spot
+import network.gen.GenericLink
+import scala.collection.JavaConversions._
+import netconfig.Datum.RouteTT
+import netconfig_extensions.CollectionUtils._
 
 /**
  * A stateful object that merges streams of ProbeCoordinate and PathInference objects belonging
@@ -148,97 +153,97 @@ class Merger[L <: Link](
     }).getOrElse(false) // Nothing to do if no PC
   }
 
-    def update(): Boolean = {
-      // Check if we received a PI object to attach to:
-      (pis.headOption, pcs.headOption) match {
-        case (Some(pi), Some(pc)) => {
-          // Checking invariants
-          // We require the time to go strictly forward.
-          // Some feeds have some peculiar points that get sent instantly.
-          if (pi.endTime == pi.startTime) {
-            logWarning("The following PI object has a 0 delta:\n%s" format pi.toString)
-            if (pc.time == pi.endTime) {
-              logWarning("Also discarding the following PC:\n%s" format pc.toString())
-            }
-            pis.dequeue()
+  def update(): Boolean = {
+    // Check if we received a PI object to attach to:
+    (pis.headOption, pcs.headOption) match {
+      case (Some(pi), Some(pc)) => {
+        // Checking invariants
+        // We require the time to go strictly forward.
+        // Some feeds have some peculiar points that get sent instantly.
+        if (pi.endTime == pi.startTime) {
+          logWarning("The following PI object has a 0 delta:\n%s" format pi.toString)
+          if (pc.time == pi.endTime) {
+            logWarning("Also discarding the following PC:\n%s" format pc.toString())
+          }
+          pis.dequeue()
+          pcs.dequeue()
+          true
+        } else {
+          if (current_time != null) {
+            assert(pi.startTime >= current_time)
+            assert(pc.time > current_time)
+          }
+          if (pc.time < pi.startTime) {
+            // There is a disconnect with a single point somewhere
+            // We drop this point for now.
+            logInfo("Dropping orphan point:\n%s" format pc.toString)
             pcs.dequeue()
             true
+          } else if (pc.time == pi.startTime) {
+            // There is disconnect in the trajectory.
+            // We start a new trajectory.
+            // We know this PC is not orphan since there is
+            // a PI right behind it.
+            closeSink()
+            val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+            val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
+            val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
+            val point = pc
+            val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+            sink().put(tp)
+            pcs.dequeue()
+            //              logInfo("Dequeuing start point:\n%s" format pc.toString())
+            current_time = pc.time
+            true
           } else {
-            if (current_time != null) {
-              assert(pi.startTime >= current_time)
-              assert(pc.time > current_time)
-            }
-            if (pc.time < pi.startTime) {
-              // There is a disconnect with a single point somewhere
-              // We drop this point for now.
-              logInfo("Dropping orphan point:\n%s" format pc.toString)
-              pcs.dequeue()
-              true
-            } else if (pc.time == pi.startTime) {
-              // There is disconnect in the trajectory.
-              // We start a new trajectory.
-              // We know this PC is not orphan since there is
-              // a PI right behind it.
-              closeSink()
-              val firstConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
-              val routes: ImmutableList[Route[L]] = ImmutableList.of[Route[L]]
-              val secondConnections: ImmutableList[TrackPieceConnection] = Array.empty[TrackPieceConnection]
-              val point = pc
-              val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-              sink().put(tp)
-              pcs.dequeue()
-              //              logInfo("Dequeuing start point:\n%s" format pc.toString())
-              current_time = pc.time
-              true
-            } else {
-              // The PC is somewhere after the PI started.
-              // It cannot be during the PI
-              assert(pc.time >= pi.endTime)
-              if (pc.time == pi.endTime) {
-                if (current_time != null && pi.startTime == current_time) {
-                  // We can create a new track piece here.
-                  // Assuming there is a single projection and
-                  // a single path (that should be relaxed at some point
-                  // but easier to reason with).
-                  assert(pc.spots.size == 1)
-                  assert(pi.routes.size == 1)
-                  val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
-                  val routes = ImmutableList.of(pi.routes.head)
-                  val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
-                  val point = pc
-                  val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
-                  sink.put(tp)
-                  pcs.dequeue()
-                  pis.dequeue()
-                  //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
-                  current_time = pc.time
-                  true
-                } else {
-                  // We missed a PC to start the PI.
-                  // There is a disconnect that should not have happened.
-                  logError("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
-                  false
-                }
-              } else if (pc.time > pi.endTime) {
-                // Ooops we lost a PC??
-                logError("Received a PC after a PI: \n %s\n===========\n%s\n" format (pc.toString(), pi.toString()))
-                assert(false)
-                false
+            // The PC is somewhere after the PI started.
+            // It cannot be during the PI
+            assert(pc.time >= pi.endTime)
+            if (pc.time == pi.endTime) {
+              if (current_time != null && pi.startTime == current_time) {
+                // We can create a new track piece here.
+                // Assuming there is a single projection and
+                // a single path (that should be relaxed at some point
+                // but easier to reason with).
+                assert(pc.spots.size == 1)
+                assert(pi.routes.size == 1)
+                val firstConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+                val routes = ImmutableList.of(pi.routes.head)
+                val secondConnections = ImmutableList.of(new TrackPieceConnection(0, 0))
+                val point = pc
+                val tp = TrackPiece.from(firstConnections, routes, secondConnections, point)
+                sink.put(tp)
+                pcs.dequeue()
+                pis.dequeue()
+                //                  logInfo("Dequeuing point and path:\n%s\n" format (pc.toString(), pi.toString()))
+                current_time = pc.time
+                true
               } else {
-                // Error case already covered above.
-                assert(false)
+                // We missed a PC to start the PI.
+                // There is a disconnect that should not have happened.
+                logError("Missing a PC before this PI!\nPrevious time: %s\nCurrent PI:\n%s" format (current_time, pi.toString()))
                 false
               }
+            } else if (pc.time > pi.endTime) {
+              // Ooops we lost a PC??
+              logError("Received a PC after a PI: \n %s\n===========\n%s\n" format (pc.toString(), pi.toString()))
+              assert(false)
+              false
+            } else {
+              // Error case already covered above.
+              assert(false)
+              false
             }
           }
         }
-        case _ => {
-          // One of the queues is empty, nothing we can do
-          // for now.
-          false
-        }
+      }
+      case _ => {
+        // One of the queues is empty, nothing we can do
+        // for now.
+        false
       }
     }
+  }
 
   def finish(): Unit = {
     closeSink()
@@ -268,6 +273,7 @@ This assumes the network uses generic links.
     import Dates._
     // All the options
     var network_id: Int = -1
+    var out_network_id: Int = -1
     var net_type: String = ""
     var actions: Seq[String] = Seq.empty
     var date: LocalDate = null
@@ -276,6 +282,7 @@ This assumes the network uses generic links.
     var extended_info = false
     val parser = new OptionParser("test") {
       intOpt("nid", "the net id", network_id = _)
+      intOpt("out-nid", "the net id", out_network_id = _)
       opt("date", "the date", { s: String => { for (d <- parseDate(s)) { date = d } } })
       opt("range", "the date", (s: String) => for (r <- parseRange(s)) { range = r })
       opt("feed", "data feed", feed = _)
@@ -306,18 +313,33 @@ This assumes the network uses generic links.
     logInfo("Actions: %s" format actions.mkString(" "))
     logInfo("Networks: %s" format net_type)
 
-    val serializer = NetworkUtils.getSerializer(net_type, network_id)
+    val net_in = NetworkUtils.getLinks(network_id, net_type)
+    val net_out = if (out_network_id == network_id) { net_in } else { NetworkUtils.getLinks(out_network_id, net_type) }
+
+    val serializer_in = NetworkUtils.getSerializer(net_in)
+    val serializer_out = if (out_network_id == network_id) { serializer_in } else { NetworkUtils.getSerializer(net_out) }
+
+    def spotConverter(sp: Spot[Link]): Option[Spot[Link]] = {
+      if (net_in == net_out) {
+        Some(sp)
+      } else {
+        val id = sp.link().asInstanceOf[GenericLink].idRepr
+        net_out.get(id).map(l => {
+          Some(Spot.from(l, sp.offset, sp.lane))
+        }).getOrElse(None)
+      }
+    }
 
     for (action <- actions) {
       action match {
         case "tspot" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTSpot(serializer, net_type, fidx, extended_info)
+          mapTSpot(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
         }
         case "traj" => for (fidx <- ProbeCoordinateViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapTrajectory(serializer, net_type, fidx, extended_info)
+          mapTrajectory(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
         }
         case "routett" => for (fidx <- PathInferenceViterbi.list(feed = feed, nid = network_id, net_type = net_type, dates = date_range)) {
-          mapRouteTT(serializer, net_type, fidx, extended_info)
+          mapRouteTT(serializer_in, serializer_out, spotConverter _, net_type, fidx, extended_info)
         }
         case _ => {
           logInfo("Unknown action " + action)
@@ -327,8 +349,40 @@ This assumes the network uses generic links.
     logInfo("Done")
   }
 
-  def mapRouteTT[L <: Link](serializer: Serializer[L], net_type: String,
-    findex: PathInferenceViterbi.FileIndex, extended_information: Boolean): Unit = {
+  def optionRoute[L1 <: Link, L2 <: Link](route: Route[L1], spot_converter: Spot[L1] => Option[Spot[L2]]): Option[Route[L2]] = {
+    val mapped_spots = route.spots.flatMap(sp => spot_converter(sp))
+    if (mapped_spots.size == route.spots.size) {
+      val mapped_route = Route.fromSpots(mapped_spots)
+      Some(mapped_route)
+    } else { None }
+  }
+
+  def optionPI[L1 <: Link, L2 <: Link](pi: PathInference[L1], spot_converter: Spot[L1] => Option[Spot[L2]]): Option[PathInference[L2]] = {
+    val new_routes: ImmutableList[Route[L2]] = pi.routes.flatMap(optionRoute(_, spot_converter))
+    if (new_routes.size == pi.routes.size) {
+      Some(pi.clone(new_routes))
+    } else {
+      None
+    }
+  }
+
+  def optionPC[L1 <: Link, L2 <: Link](pc: ProbeCoordinate[L1], spot_converter: Spot[L1] => Option[Spot[L2]]): Option[ProbeCoordinate[L2]] = {
+    val new_spots: ImmutableList[Spot[L2]] = pc.spots().flatMap(sp => spot_converter(sp))
+    if (new_spots.size == pc.spots.size) {
+      Some(pc.clone(new_spots))
+    } else {
+      None
+    }
+  }
+
+  def mapRouteTT[L1 <: Link, L2 <: Link](
+    serializer_in: Serializer[L1],
+    serializer_out: Serializer[L2],
+    spot_converter: Spot[L1] => Option[Spot[L2]],
+    net_type: String,
+    findex: PathInferenceViterbi.FileIndex,
+    extended_information: Boolean): Unit = {
+
     val fname_pis = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
       net_type = net_type)
@@ -337,24 +391,30 @@ This assumes the network uses generic links.
       return
     }
     logInfo("Opening for reading : " + fname_pis)
-    val data = serializer.readPathInferences(fname_pis)
+    val data = serializer_in.readPathInferences(fname_pis)
 
     val fname_pis_out = RouteTTViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pis_out)
-    val writer_pi = serializer.writerPathInference(fname_pis_out, extended_information)
+    val writer_pi = serializer_out.writerPathInference(fname_pis_out, extended_information)
 
     for (
       pi <- data;
-      rtt <- PathInferenceUtils.projectPathInferenceToRouteTT(pi)
+      rtt <- PathInferenceUtils.projectPathInferenceToRouteTT(pi);
+      mapped_route <- optionRoute(rtt.route, spot_converter)
     ) {
-      writer_pi.put(rtt.toPathInference)
+      val mapped_rtt = rtt.clone(mapped_route)
+      writer_pi.put(mapped_rtt.toPathInference)
     }
     writer_pi.close()
   }
 
-  def mapTSpot[L <: Link](serializer: Serializer[L], net_type: String,
+  def mapTSpot[L1 <: Link, L2 <: Link](
+    serializer_in: Serializer[L1],
+    serializer_out: Serializer[L2],
+    spot_converter: Spot[L1] => Option[Spot[L2]],
+    net_type: String,
     findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
     val fname_pcs = ProbeCoordinateViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
@@ -364,27 +424,33 @@ This assumes the network uses generic links.
       return
     }
     logInfo("Opening for reading : " + fname_pcs)
-    val data = serializer.readProbeCoordinates(fname_pcs)
+    val data = serializer_in.readProbeCoordinates(fname_pcs)
 
     val fname_pcs_out = TSpotViterbi.fileName(feed = findex.feed, nid = findex.nid,
       date = findex.date,
       net_type = net_type)
     logInfo("Opening for writing : " + fname_pcs_out)
-    val writer_pc = serializer.writerProbeCoordinate(fname_pcs_out, extended_information)
+    val writer_pc = serializer_out.writerProbeCoordinate(fname_pcs_out, extended_information)
 
     for (
       pc <- data;
-      tsp <- ProbeCoordinateUtils.projectProbeCoordinateToTSpot(pc)
+      tsp <- ProbeCoordinateUtils.projectProbeCoordinateToTSpot(pc);
+      sp2 <- spot_converter(tsp.spot)
     ) {
-      writer_pc.put(tsp.toProbeCoordinate)
+      writer_pc.put(tsp.clone(sp2).toProbeCoordinate)
     }
     writer_pc.close()
   }
 
   private[this] val numCountsPrint = 1000
 
-  def mapTrajectory[L <: Link](serializer: Serializer[L], net_type: String,
-    findex: ProbeCoordinateViterbi.FileIndex, extended_information: Boolean): Unit = {
+  def mapTrajectory[L1 <: Link, L2 <: Link](
+    serializer_in: Serializer[L1],
+    serializer_out: Serializer[L2],
+    spot_converter: Spot[L1] => Option[Spot[L2]],
+    net_type: String,
+    findex: ProbeCoordinateViterbi.FileIndex,
+    extended_information: Boolean): Unit = {
     import findex._
     logInfo("Mapping traj: %s" format findex.toString())
     val mg_pcs = {
@@ -396,7 +462,7 @@ This assumes the network uses generic links.
         logInfo("File " + fname_pcs + " does not exists, skipping.")
         return
       }
-      serializer.readProbeCoordinates(fname_pcs).iterator
+      serializer_in.readProbeCoordinates(fname_pcs).iterator
     }
     val mg_pis = {
       val fname_pis = PathInferenceViterbi.fileName(feed = findex.feed, nid = findex.nid,
@@ -407,20 +473,19 @@ This assumes the network uses generic links.
         logInfo("File " + fname_pis + " does not exists, skipping.")
         return
       }
-      serializer.readPathInferences(fname_pis).iterator
+      serializer_in.readPathInferences(fname_pis).iterator
     }
     def writer_trajs_fun(vehicle: String, traj_idx: Int) = {
       val fname_trajs_out = TrajectoryViterbi.fileName(feed, nid, date, net_type, vehicle, traj_idx)
-      serializer.writerTrack(fname_trajs_out, extended_information)
+      serializer_out.writerTrack(fname_trajs_out, extended_information)
     }
     logInfo("Created data sources")
 
     // Perform the merge
-    val mergers = MMap.empty[String, Merger[L]]
+    val mergers = MMap.empty[String, Merger[L2]]
 
     var counter = 0
     while (mg_pis.hasNext || mg_pcs.hasNext) {
-      // TODO(tjh) collect the last seen time
       counter += 1
       if (counter >= numCountsPrint) {
         val num_mergers = mergers.size
@@ -431,20 +496,20 @@ This assumes the network uses generic links.
       }
       if (mg_pis.hasNext) {
         val mg_pi = mg_pis.next()
-        val vehicle_id = mg_pi.id
-        val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-        merger.addPathInference(mg_pi)
+        for (pi2 <- optionPI(mg_pi, spot_converter)) {
+          val vehicle_id = pi2.id
+          val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
+          merger.addPathInference(pi2)
+        }
       }
       if (mg_pcs.hasNext) {
         val mg_pc = mg_pcs.next()
-        val vehicle_id = mg_pc.id
-        val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
-        merger.addProbeCoordinate(mg_pc)
+        for (pc2 <- optionPC(mg_pc, spot_converter)) {
+          val vehicle_id = mg_pc.id
+          val merger = mergers.getOrElseUpdate(vehicle_id, new Merger(writer_trajs_fun, vehicle_id))
+          merger.addProbeCoordinate(pc2)
+        }
       }
-      // Do some cleanup
-      // We assume that the values are written in block.
-      // We add a timeout of 1 hour: if we have not seen a value for this id during the
-      // previous hour, we assume it is stopped, and we flush the trajectory.
     }
     for (merger <- mergers.values) {
       merger.finish()

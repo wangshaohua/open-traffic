@@ -85,9 +85,10 @@ object RunPif extends MMLogging {
     val parameters = pifParameters()
 
     logInfo("Loading links...")
-    var links: Seq[Link] = NetworkUtils.getLinks(network_id, net_type)
+    var net = NetworkUtils.getLinks(network_id, net_type)
+    val links = net.values.toIndexedSeq
 
-    val serializer: Serializer[Link] = NetworkUtils.getSerializer(links)
+    val serializer: Serializer[Link] = NetworkUtils.getSerializer(net)
 
     logInfo("Building projector...")
     val projection_hook: ProjectionHookInterface = ProjectionHook.create(links, parameters)

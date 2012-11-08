@@ -56,7 +56,7 @@ public class RouteTT<LINK extends Link> {
      *             null.
      */
     private RouteTT(Route<LINK> route, Time startTime, Time endTime, String id,
-            Boolean hired) throws NetconfigException {
+            Boolean hired) {
         this.route_ = route;
         this.startTime_ = startTime;
         this.endTime_ = endTime;
@@ -152,5 +152,9 @@ public class RouteTT<LINK extends Link> {
      */
     public Boolean hired() {
         return hired_;
+    }
+    
+    public <LINK2 extends Link> RouteTT<LINK2> clone(Route<LINK2> r) {
+        return new RouteTT<LINK2>(r, startTime(), endTime(), id(), hired());
     }
 } // RouteTT

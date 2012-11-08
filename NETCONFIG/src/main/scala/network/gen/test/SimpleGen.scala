@@ -56,6 +56,9 @@ object SimpleGen {
       GenericLinkRepresentation(lr, n1, n2, Some(geom), Some(length))
     }
     val builder = new NetworkBuilder()
-    builder.build(glrs).toIndexedSeq
+    builder.build(glrs)
+      .sortBy(_._1.toString)
+      .map(_._2)
+      .toIndexedSeq
   }
 }

@@ -36,7 +36,7 @@ class SimpleTest extends MMLogging {
     val l1 = GenericLinkRepresentation(LinkIDRepr(0, 0), n1, n2, None, None)
     val glrs = Seq(l1)
     val builder = new NetworkBuilder()
-    val links = builder.build(glrs)
+    val links = builder.build(glrs).map(_._2)
     JSonSerializer.storeLinks(fname, links)
 
     // Rebuilding the network

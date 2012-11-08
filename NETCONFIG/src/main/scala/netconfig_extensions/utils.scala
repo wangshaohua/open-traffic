@@ -40,16 +40,16 @@ package netconfig_extensions
  *
  */
 object NetconfigUtils {
-  
+
   /**
    * Instance for java users. Call this method to access all the methods defined
    * in this object.
-   * 
+   *
    * Example: NetconfigUtils.instance().routeTT(...)
    */
   def instance = this
-  
-  import ProbeCoordinateUtils._  
+
+  import ProbeCoordinateUtils._
   import PathInferenceUtils._
   import SpotUtils._
   import RouteUtils._
