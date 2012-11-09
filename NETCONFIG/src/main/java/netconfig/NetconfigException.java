@@ -5,8 +5,6 @@
 
 package netconfig;
 
-import core.*;
-
 /**
  * Base class of all exceptions thrown in this package, all other exceptions
  * should be caught and re-packeged as a (sub)class of this exception.
@@ -18,16 +16,6 @@ import core.*;
  * The other advantage is that it will by default print the stacktrace, and any
  * other messages (the NID) we want.
  * <p/>
- * Basically the message should be as complete a picture of what happened as
- * possible, so people can just call: <code><pre>
- *      Monitor.err( netconfigException );
- * </pre></code> and see everything, hence the overidden {@link #toString()},
- * {@link #getMessage()}, and {@link #getLocalizedMessage()} methods. The other
- * way, like for all throwables, will also work: <code><pre>
- *      Monitor.err( Monitor.getMessageAndStackTrace ( netconfigException ) );
- * </pre><code>
- * 
- * @see Monitor
  * @author Saneesh.Apte, samitha, Ryan Herring
  */
 @SuppressWarnings("serial")
