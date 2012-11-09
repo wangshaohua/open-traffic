@@ -49,7 +49,7 @@ private[path_inference] class OnlineHMM(obs_model: ObservationModel,
   def finalize_computations {
     // To ensure all the points go out, call a forward backward
     // This just pushes out whatever we have left in the filter
-    forward
+    forback
     push_all_out
   }
 
