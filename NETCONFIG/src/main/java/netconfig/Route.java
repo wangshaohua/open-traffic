@@ -25,9 +25,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import core.Coordinate;
+import org.apache.log4j.Logger;
 
 import core.GeoMultiLine;
-import core.Monitor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -43,6 +43,8 @@ import com.google.common.collect.UnmodifiableIterator;
 public class Route<LINK extends Link> implements Serializable {
 
     public static final long serialVersionUID = 2L;
+
+    private static final Logger log = Logger.getLogger(Route.class);
 
     /** The list of spots that defines this route. */
     private final ImmutableList<Spot<LINK>> spots_;
@@ -315,12 +317,12 @@ public class Route<LINK extends Link> implements Serializable {
     public static <LINK extends Link> Route<LINK> from(List<LINK> links,
             double startOffset, double endOffset) throws NetconfigException {
         if (links == null) {
-            Monitor.debug("The links of a route cannot be null");
+            log.debug("The links of a route cannot be null");
             throw new NetconfigException(null,
                     "The links of a route cannot be null or zero length");
         }
         if (links.size() == 0) {
-            Monitor.debug("zero length");
+            log.debug("zero length");
             throw new NetconfigException(null,
                     "The links of a route cannot be null or zero length");
         }
