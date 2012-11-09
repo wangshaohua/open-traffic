@@ -32,4 +32,7 @@ object CollectionUtils {
   implicit def asImmutableList2[T: Manifest](xs: Array[T]): ImmutableList[T] = {
     ImmutableList.copyOf(JavaConversions.asJavaIterable(xs.toSeq))
   }
+  implicit def asSeq[T](xs: ImmutableList[T]): IndexedSeq[T] = {
+    xs.toIndexedSeq
+  }
 }

@@ -16,7 +16,6 @@
 
 package pif.run
 import java.io.File
-import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.mutable.{ Map => MMap }
 import scala.collection.mutable.Queue
 import com.google.common.collect.ImmutableList
@@ -38,7 +37,6 @@ import netconfig.Datum.TrackPiece
 import netconfig.Datum.TrackPiece.TrackPieceConnection
 import netconfig.io.DataSink
 import netconfig.io.Serializer
-import netconfig_extensions.CollectionUtils.asImmutableList2
 import netconfig_extensions.PathInferenceUtils
 import netconfig_extensions.ProbeCoordinateUtils
 import netconfig.Link
@@ -46,7 +44,6 @@ import netconfig.Route
 import netconfig.io.Dates
 import netconfig.Spot
 import network.gen.GenericLink
-import scala.collection.JavaConversions._
 import netconfig.Datum.RouteTT
 import netconfig_extensions.CollectionUtils._
 
