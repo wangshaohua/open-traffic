@@ -16,12 +16,14 @@
 
 package netconfig.io.files
 import java.io.File
-
 import org.joda.time.LocalDate
-
 import netconfig.io.Dates
+import core_extensions.MMLogging
 
-object TrajectoryViterbif {
+object TrajectoryViterbi extends MMLogging {
+  val day_regex = """(.*)/(\d\d\d\d-\d\d-\d\d).*""".r
+  val regex = """(.*)(\d\d\d\d-\d\d-\d\d)/(\w*)_(\d\d\d\d).json.gz""".r
+
   def sanitizeVehicleId(s: String): String = s.filter(_.isLetterOrDigit)
 
   case class FileIndex(val feed: String,
@@ -38,12 +40,10 @@ object TrajectoryViterbif {
     val dic_dates = dates.toSet
     val dic_drivers = drivers.toSet
     val dic_tidxs = traj_indexes.toSet
-    val dir_name = "%s/%s/viterbi_pcs_nid%d_%s/".format(Files.dataDir(), feed, nid, net_type)
+    val dir_name = "%s/%s/viterbi_trajs_nid%d_%s/".format(Files.dataDir(), feed, nid, net_type)
     val dir = new File(dir_name)
     if (dir.exists()) {
-      val day_regex = """(.*)/(\d\d\d\d-\d\d-\d\d)/""".r
-      val regex = """(.*)(\d\d\d\d-\d\d-\d\d)/(\w*)_(\d\d\d\d).json.gz""".r
-      val good_dates = dir.listFiles().map(_.getAbsolutePath()).flatMap(p => p match {
+      val good_dates = dir.listFiles().map(_.getAbsolutePath()).map(p => { logInfo("p:" + p); p }).flatMap(p => p match {
         case day_regex(base, ymd) => Dates.parseDate(ymd) match {
           case Some(date) if (dic_dates.isEmpty || dic_dates.contains(date)) => {
             val f = new File(p)
@@ -52,10 +52,11 @@ object TrajectoryViterbif {
             else
               None
           }
-          case None => None
+          case _ => None
         }
         case _ => None
       })
+      logInfo("good dates: " + good_dates.mkString(" "))
       good_dates.flatMap(f => {
         f.listFiles().map(_.getAbsolutePath()).flatMap(p => p match {
           case regex(base, ymd, vehicle, tr_idx) => (Dates.parseDate(ymd), Dates.convertInt(tr_idx)) match {
@@ -72,6 +73,7 @@ object TrajectoryViterbif {
         }).toSeq.sortBy(_.vehicle)
       }).toSeq.sortBy(_.date.toString)
     } else {
+      logInfo("Trajectory directory does not exist:" + dir_name)
       Nil
     }
   }
@@ -82,4 +84,8 @@ object TrajectoryViterbif {
         sanitizeVehicleId(vehicle), traj_idx)
   }
 
+  def fileName(findex: FileIndex): String = {
+    import findex._
+    fileName(feed, nid, date, netType, vehicle, trajIndex)
+  }
 }

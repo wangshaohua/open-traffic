@@ -30,7 +30,7 @@ import path_inference.VehicleFilter
 import java.util.concurrent.atomic.AtomicInteger
 
 class DefaultManager(
-    val parameters: PathInferenceParameters2,
+  val parameters: PathInferenceParameters2,
   val obs_model: ObservationModel,
   val trans_model: TransitionModel,
   val common_path_discovery: PathGenerator2,
@@ -43,26 +43,54 @@ class DefaultManager(
   /**
    * Filter for the individual vehicles.
    */
-  private val v_filters = HashMap.empty[String, VehicleFilter3]
+  private[this] var v_filters = Map.empty[String, VehicleFilter3]
 
-  val internal_storage = new InternalStorage(parameters)
+  private[this] val internal_storage = new InternalStorage(parameters)
 
-  val active_trackers_counter = new AtomicInteger(0)
+  private[this] var point_counter = 0
+
+  private val printMessageCounter = 1000
 
   override def addPoint(point: ProbeCoordinate[Link]): Unit = synchronized {
+    // This method is snchronized because it updates the state of the tracker.
+    val t = point.time()
+    // Remove all the filters with timeouts
+    // TODO(?) this implementation is very naive (O(N))
+    // Should be done using an auxiliary binary search tree on time stamps (O(logN)), much better when there is a log of vehicles.
+    val (new_v_filters, old_v_filters) = v_filters.partition({
+      case (key, filter) =>
+        val last_seen = filter.last_seen_time
+        val dt = (t - last_seen)
+        dt < parameters.filterTimeoutWindow
+    })
+    v_filters = new_v_filters.toArray.toMap
+
+    // Terminate the old filters
+    for (filter <- old_v_filters.values) {
+      logInfo("Evicting tracker for id %s due to timeout." format filter.id)
+      filter.finalizeTracker
+    }
+
     val id = point.id
     v_filters.get(id) match {
       case None =>
         logInfo("creating new tracker for id " + id)
-        val filter = VehicleFilter.createVehicleFilter(parameters, point, obs_model, trans_model, internal_storage, projection_hook)
+        val filter = VehicleFilter.createVehicleFilter(parameters, point, obs_model, trans_model, internal_storage, projection_hook, common_path_discovery)
         v_filters += id -> filter
       // No need to add the point, it is already included in the constructor.
       case Some(filter) =>
-        //        logInfo("Adding point to tracker\n"+point)
         filter addProbeCoordinate point
       // No need to check the output of the filter
       // It will be automatically sent to the internal storage object.
       // Check how recent the point is and discard too old trackers
+    }
+
+    point_counter += 1
+    if (point_counter > printMessageCounter) {
+      val num_filters = v_filters.size
+      val num_frames = v_filters.values.map(_.crf.numStoredFrames).sum
+      logInfo("%d points processed, %d active tracks, %d active frames" format (point_counter, num_filters, num_frames))
+      point_counter = 0
     }
   }
 
@@ -72,7 +100,7 @@ class DefaultManager(
 
   override def getRouteTTs = internal_storage.getRouteTTs
 
-//  override def getTrajectories = internal_storage.getTrajectories
+  //  override def getTrajectories = internal_storage.getTrajectories
 
   override def getTSpots = internal_storage.getTSpots
 
@@ -81,7 +109,7 @@ class DefaultManager(
     for (filter <- v_filters.values)
       filter.finalizeTracker
     // Discard all the filters, since we are done with them.
-    v_filters.clear
+    v_filters = Map.empty
     // Make sure the cache is flushed to the disk, if necessary.
     common_path_discovery.finalizeOperations
   }

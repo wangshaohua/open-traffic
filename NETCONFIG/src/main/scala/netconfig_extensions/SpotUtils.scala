@@ -22,13 +22,6 @@ import core_extensions.MMLogging
 
 object SpotUtils extends MMLogging {
   /**
-   * Returns -1 if not found.
-   */
-  def findSpotInSpotSeq[L <: Link](sp: Spot[L], sps: Seq[Spot[L]]): Int = {
-    sps.indexWhere(x => (sp.link == x.link && sp.lane == x.lane && sp.offset == x.offset))
-  }
-
-  /**
    * Tolerance allowed in the distance between two point projections.
    *
    * If the points are further than this distance, you can assume your

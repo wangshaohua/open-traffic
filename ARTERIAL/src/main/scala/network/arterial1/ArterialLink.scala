@@ -27,7 +27,8 @@ class ArterialLink(
   val geoMultiLine: GeoMultiLine,
   val endFeature: LinkFeature,
   val speedLimit: Double,
-  num_lanes: Short) extends Link {
+  num_lanes: Short,
+  length_ :Double) extends Link {
 
   def inLinks = startNode.incomingLinks
 
@@ -35,7 +36,7 @@ class ArterialLink(
 
   def numLanesAtOffset(off: Double) = num_lanes
 
-  lazy val length = geoMultiLine.getLength()
+  val length = length_
 
   override def toString = "ArterialLink[%s,%s]" format (key.primary.toString, key.secondary.toString)
 

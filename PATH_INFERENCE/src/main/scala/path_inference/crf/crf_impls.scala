@@ -19,7 +19,7 @@ package path_inference.crf
 import path_inference.models.ObservationModel
 import path_inference.models.TransitionModel
 
-class OfflineHMM(
+private[path_inference] class OfflineHMM(
   obs_model: ObservationModel,
   trans_model: TransitionModel)
   extends AbstractCRF(obs_model, trans_model) {
@@ -35,7 +35,7 @@ class OfflineHMM(
 
 }
 
-class OnlineHMM(obs_model: ObservationModel,
+private[path_inference] class OnlineHMM(obs_model: ObservationModel,
   trans_model: TransitionModel)
   extends AbstractCRF(obs_model, trans_model) {
   def perform_computations {
@@ -55,7 +55,7 @@ class OnlineHMM(obs_model: ObservationModel,
 
 }
 
-class LookAheadHMM(obs_model: ObservationModel,
+private[path_inference] class LookAheadHMM(obs_model: ObservationModel,
   trans_model: TransitionModel, window_size: Int)
   extends AbstractCRF(obs_model, trans_model) {
 
@@ -76,7 +76,7 @@ class LookAheadHMM(obs_model: ObservationModel,
   }
 }
 
-class WindowHMM(obs_model: ObservationModel,
+private[path_inference] class WindowHMM(obs_model: ObservationModel,
   trans_model: TransitionModel, window_size: Int)
   extends AbstractCRF(obs_model, trans_model) {
   def perform_computations {

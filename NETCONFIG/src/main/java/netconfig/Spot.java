@@ -70,7 +70,7 @@ public class Spot<LINK extends Link> implements Serializable {
         this.offset_ = offset;
         this.lane_ = lane;
     }
-    
+
     /*
      * Returns the coordinate corresponding to this spot on the network, or null
      * if the conversion could not be done.
@@ -105,6 +105,36 @@ public class Spot<LINK extends Link> implements Serializable {
         } else {
             return false;
         }
+    }
+
+    /**
+     * This is the equality test most users should care about. The lengths are
+     * approximate up to link length precision. If lane information is missing,
+     * it is assumed to be equal to the other lane.
+     * 
+     * @param o
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public boolean equalsApprox(Object o) {
+        if ((null == o) || (this.getClass() != o.getClass())
+                || (this.link().getClass() != ((Spot) o).link().getClass())) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        Spot<LINK> that = (Spot<LINK>) o;
+        if (!this.link().equals(that.link())) {
+            return false;
+        }
+        if (this.lane() != -1 && that.lane() != -1
+                && this.lane() != that.lane()) {
+            return false;
+        }
+        if (Math.abs(this.offset() - that.offset()) > Link.LENGTH_PRECISION) {
+            return false;
+        }
+        return true;
     }
 
     @Override

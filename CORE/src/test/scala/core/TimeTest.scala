@@ -13,23 +13,22 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package netconfig.io
 
-import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.PathInference
-import core.Coordinate
-import com.google.common.collect.ImmutableList
+package core
+
+import org.junit._
+import org.junit.Assert._
 import org.joda.time.Duration
-import core.Time
+import core_extensions.MMLogging
 
-case class Connection(val from: Int, val to: Int)
+class TimeTest extends MMLogging {
 
-trait TrackPiece[L <: Link] {
-  def firstConnections: ImmutableList[Connection]
-  def routes: ImmutableList[Route[L]]
-  def secondConnections: ImmutableList[Connection]
-  def point: ProbeCoordinate[L]
+  @Test
+  def test1(): Unit = {
+    val t = new Time
+    val dt = t.toDateTime()
+    val t2 = Time.from(dt)
+    assert(t2 == t)
+  }
+
 }

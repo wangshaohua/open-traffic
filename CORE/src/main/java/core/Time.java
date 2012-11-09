@@ -21,8 +21,6 @@ import java.util.TimeZone;
 import java.util.Locale;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -30,7 +28,7 @@ import org.joda.time.DateTimeZone;
  * This should be the way that MM programs refer to time in the world.
  * Conversion, or even making sure one is in the right timezone and locale over
  * disparate processes, is hard. This class aims to be easy to use and fast for
- * all things that an MM program might need the date and time for.
+ * all things that an BOTS program might need the date and time for.
  * 
  * You shouldn't need System.currentTimeMillis(), instead just call: <code><pre>
  *      Time time = new Time();
@@ -39,11 +37,15 @@ import org.joda.time.DateTimeZone;
  * @see <a target="_top" href="http://www.odi.ch/prog/design/datetime.php">
  *      http://www.odi.ch/prog/design/datetime.php</a>
  * @author Saneesh Apte
+ * @author tjhunter
+ * 
+ *         TODO(?) make all the internals of this class thread-safe (by using
+ *         joda-time for example) TODO(?) deprecate this class?
  */
 @SuppressWarnings("serial")
 public class Time extends GregorianCalendar {
 
-    /** The timezone that all MM things should use. */
+    /** The timezone that all BOTS things should use, for now. */
     public static final TimeZone timeZone = TimeZone
             .getTimeZone("America/Los_Angeles");
     /** Java conveniently already has one for the USA. */
@@ -52,6 +54,8 @@ public class Time extends GregorianCalendar {
      * Static instance, time on static instantiation, but really just used to
      * pass into other functions that require an instance to pull the timezone
      * and locale. (Should not be serialized.)
+     * 
+     * TODO(?) deprecate
      */
     public static final transient Time staticInstantiationTime = new Time();
 
@@ -97,8 +101,7 @@ public class Time extends GregorianCalendar {
         // and ... methods.
         if (!Time.timeZone.equals(timeZone) || !Time.locale.equals(locale)) {
             throw new java.lang.IllegalArgumentException(
-                    "Sorry, only US/Los_Angeles and en_US are currently supported."
-                            + "Please email the systems team to get this implemented.");
+                    "Sorry, only US/Los_Angeles and en_US are currently supported.");
         }
     } // end constructor
 
@@ -188,9 +191,9 @@ public class Time extends GregorianCalendar {
      *            with the formatted string.
      * @return a newly constructed Time Object.
      * @throws IllegalArgumentException
-     *             on any parse error. 
+     *             on any parse error.
      * 
-     * TODO(?) accept more lenient input formats.
+     *             TODO(?) accept more lenient input formats.
      */
     public static Time newTimeFromStringLikeBerkeleyDB(String str) {
         if (null == Time.stringLikeBerkeleyDBSDF) {
@@ -220,63 +223,6 @@ public class Time extends GregorianCalendar {
      */
     public static Time newTimeFromTime(Time oldTime) {
         return (Time) oldTime.clone();
-    }
-
-    /** Just so we don't instantiate one every time. */
-    private static Matcher matcherForStaticWaterFeed = null;
-
-    /**
-     * Returns a time object from the string received from the static water
-     * sensors. This is assumed to already be in Berkeley time.
-     * <p/>
-     * Examples: "03/31/2010 15:45" and "03/01/2010 07:45".
-     * 
-     * @param str
-     *            to parse.
-     * @return a newly constructed Time object.
-     * @throws IllegalArgumentException
-     *             if pattern does not match (could be the subclass
-     *             NumberFormatException).
-     */
-    public static Time newTimeFromStaticWaterFeed(String str) {
-        if (null == Time.matcherForStaticWaterFeed) {
-            Time.matcherForStaticWaterFeed = Pattern.compile(
-                    "^([01][0-9])/([0123][0-9])/([12][0-9]{3})"
-                            + " ([012][0-9]):([0-5][0-9])$").matcher("");
-        }
-        // Do some checks inside the regex.
-        Time.matcherForStaticWaterFeed.reset(str);
-        if ((!Time.matcherForStaticWaterFeed.matches())
-                || (Time.matcherForStaticWaterFeed.groupCount() != 5)) {
-            throw new IllegalArgumentException(
-                    "Given pattern did not match regex for the static water: "
-                            + str);
-        }
-        // Ok, so assume that everything works.
-        // groups: 1=month 2=day 3=year 4=hour 5=min
-        // NumberFormatException is a subclass of IllegalArgumentException.
-        int mo = Integer.parseInt(Time.matcherForStaticWaterFeed.group(1));
-        int dy = Integer.parseInt(Time.matcherForStaticWaterFeed.group(2));
-        int yr = Integer.parseInt(Time.matcherForStaticWaterFeed.group(3));
-        int ho = Integer.parseInt(Time.matcherForStaticWaterFeed.group(4));
-        int mi = Integer.parseInt(Time.matcherForStaticWaterFeed.group(5));
-
-        return Time.newTimeFromBerkeleyDateTime(yr, mo, dy, ho, mi, 0, 0);
-    }
-
-    /**
-     * Return a new time from the Google XML Feed.
-     * 
-     * @param str
-     *            with the time (epoch.millis).
-     * @return a newly constructed Time object.
-     */
-    public static Time newTimeFromGoogleXMLFeed(String str) {
-        // String is seconds, plus millis.
-        Time ret = new Time();
-        ret.setTimeInMillis((long) (Double.parseDouble(str) * 1000));
-        ret.computeFields();
-        return ret;
     }
 
     /** Just so this is not created every time. */
@@ -748,7 +694,9 @@ public class Time extends GregorianCalendar {
      * @param that
      *            other Time instance to compare to.
      * @return The difference between two times, in seconds.
+     * @deprecated Users should use the Duration class in Joda-time.
      */
+    @Deprecated
     public float $minus(Time that) {
         return this.secondsSince(that);
     }
@@ -759,7 +707,9 @@ public class Time extends GregorianCalendar {
      * @param interval
      *            of time, in seconds.
      * @return The time plus the interval added.
+     * @deprecated Users should use the Duration class in Joda-time.
      */
+    @Deprecated
     public Time plus(float interval) {
         Time t = (Time) this.clone();
         t.add(interval);
@@ -772,24 +722,33 @@ public class Time extends GregorianCalendar {
      * @param interval
      *            of time, in seconds.
      * @return The time plus the interval added.
+     * @deprecated Users should use the Duration class in Joda-time.
      */
+    @Deprecated
     public Time $plus(float interval) {
         Time t = (Time) this.clone();
         t.add(interval);
         return t;
     }
-    
+
     /**
      * @return the equivalent time representation in Joda-time class.
      */
     public DateTime toDateTime() {
-        return new DateTime(getYear(),
-                getMonth(),
-                getDayOfMonth(),
-                getHour(), 
-                getMinute(),
-                getSecond(),
-                getMillisecond(),
+        return new DateTime(getYear(), getMonth(), getDayOfMonth(), getHour(),
+                getMinute(), getSecond(), getMillisecond(),
                 DateTimeZone.forID("America/Los_Angeles"));
     }
+
+    /**
+     * Returns the equivalent representation of a DateTime object in Time class.
+     * 
+     * @param dt
+     * @return
+     */
+    public static Time from(DateTime dt) {
+        Date d = dt.toDate();
+        return new Time(d, timeZone, locale);
+    }
+
 } // end class

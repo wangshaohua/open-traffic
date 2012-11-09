@@ -21,24 +21,26 @@ import netconfig.Link
 import path_inference.Delta
 import path_inference.PathInferenceParameters2
 
-trait ConditionalRandomField {
+private[path_inference] trait ConditionalRandomField {
 
-  def +=(point: ProbeCoordinate[Link]): Unit
+  def setFirstPoint(point: ProbeCoordinate[Link]): Unit
 
-  def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit
+  def addPair(delta: Delta, point: ProbeCoordinate[Link]): Unit
 
   def finalizeComputations(): Unit
 
   def finalizeComputationsAndRestart(point: ProbeCoordinate[Link]): Unit
 
   def outputQueue(): Seq[CRFFrame]
+
+  def numStoredFrames: Int
 }
 
 /**
  * Exception triggered when the probability model fails.
  * (Which may happen because the parameters were too restrictive or the model was too agressive).
  *
- * Note: with the new implmentation in the log domain, it should
+ * Note: with the new implementation in the log domain, it should
  * never happen.
  */
 class InternalMathException extends Exception

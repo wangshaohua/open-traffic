@@ -120,6 +120,12 @@ public class PathInference<LINK extends Link> implements Serializable {
                 new_routes, new_probs, hired());
     }
 
+    public <LINK2 extends Link> PathInference<LINK2> clone(
+            ImmutableList<Route<LINK2>> new_routes) throws NetconfigException {
+        return new PathInference<LINK2>(id(), startTime(), endTime(),
+                new_routes, probabilities(), hired());
+    }
+
     public PathInference<LINK> clone(double[] new_probabilities)
             throws NetconfigException {
         ImmutableTensor1 new_probs = buildProbabilities(new_probabilities);

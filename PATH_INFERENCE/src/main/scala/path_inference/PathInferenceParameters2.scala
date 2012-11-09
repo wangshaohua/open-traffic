@@ -74,9 +74,9 @@ class PathInferenceParameters2 extends Serializable {
    * discards some data with filterTimeWindow is used and finalizes the computations
    * with vehicleTimeout.
    * <p>
-   * Default value: 10 hours
+   * Default value: 10 minutes
    */
-  @BeanProperty var filterTimeoutWindow = 60 * 60 * 10f;
+  @BeanProperty var filterTimeoutWindow = 60 * 10f;
 
   /**
    * Every path considered by the filter will last at least this time.
@@ -197,6 +197,13 @@ class PathInferenceParameters2 extends Serializable {
   @BeanProperty var minProjectionProbability = 0.0;
 
   /**
+   * The size of the cache for the paths.
+   * TODO(tjh) document
+   * A reasonable value for a very large network should be 1-10M
+   */
+  @BeanProperty var pathsCacheSize: Int = 100000
+
+  /**
    * If set to true, the projections in the output probe coordinates will be
    * sorted by decreasing order of probability.
    *
@@ -223,7 +230,6 @@ class PathInferenceParameters2 extends Serializable {
     computingStrategy = ComputingStrategy.Viterbi;
     maxSearchDepth = 10;
     pathLengthThresholdRatio = 2;
-    filterTimeoutWindow = 60 * 30;
     vehicleTimeout = 120;
     minTravelOffset = -20;
     pathOffsetMinLength = 400;
@@ -236,7 +242,6 @@ class PathInferenceParameters2 extends Serializable {
     computingStrategy = ComputingStrategy.LookAhead10;
     maxSearchDepth = 3;
     pathLengthThresholdRatio = 2;
-    filterTimeoutWindow = 60 * 30;
     vehicleTimeout = 120;
     minTravelOffset = -20;
     pathOffsetMinLength = 400;
@@ -252,7 +257,6 @@ class PathInferenceParameters2 extends Serializable {
     computingStrategy = ComputingStrategy.LookAhead10;
     maxSearchDepth = 3;
     pathLengthThresholdRatio = 2;
-    filterTimeoutWindow = 60 * 30;
     vehicleTimeout = 120;
     minTravelOffset = -20;
     pathOffsetMinLength = 400;
@@ -276,7 +280,6 @@ class PathInferenceParameters2 extends Serializable {
     maxSearchDepth = 60;
     pathLengthThresholdRatio = 3;
     pathOffsetMinLength = 300;
-    filterTimeoutWindow = 60 * 30; // 1/2 hour
     vehicleTimeout = 130;
     minTravelOffset = -20;
     maxPaths = 100;
@@ -290,7 +293,6 @@ class PathInferenceParameters2 extends Serializable {
     maxSearchDepth = 60;
     pathLengthThresholdRatio = 3;
     pathOffsetMinLength = 300;
-    filterTimeoutWindow = 60 * 30; // 1/2 hour
     vehicleTimeout = 130;
     minTravelOffset = -20;
     maxPaths = 40;
@@ -299,27 +301,23 @@ class PathInferenceParameters2 extends Serializable {
     //    returnRoutes = false;
   }
 
-  def getGoodTransitionModelForCabspotting =
-    {
-      val weights = Array(-1.0 / 30.0, 0.0)
-      new SimpleFeatureModel(new FeatureTransitionModelParameters(weights));
-    }
+  def getGoodTransitionModelForCabspotting = {
+    val weights = Array(-1.0 / 30.0, 0.0)
+    new SimpleFeatureModel(new FeatureTransitionModelParameters(weights));
+  }
 
-  def getGoodObservationModelForCabspotting =
-    {
-      val std_dev = 10.0;
-      new IsoGaussianObservationModel(new IsoGaussianObservationParameters(std_dev * std_dev));
-    }
+  def getGoodObservationModelForCabspotting = {
+    val std_dev = 10.0;
+    new IsoGaussianObservationModel(new IsoGaussianObservationParameters(std_dev * std_dev));
+  }
 
-  def getGoodTransitionModelForGPSLogger =
-    {
-      val weights = Array(-1.0 / 10)
-      new BasicFeatureModel(new FeatureTransitionModelParameters(weights));
-    }
+  def getGoodTransitionModelForGPSLogger = {
+    val weights = Array(-1.0 / 10)
+    new BasicFeatureModel(new FeatureTransitionModelParameters(weights));
+  }
 
-  def getGoodObservationModelForGPSLogger =
-    {
-      val std_dev = 10.0;
-      new IsoGaussianObservationModel(new IsoGaussianObservationParameters(std_dev * std_dev));
-    }
+  def getGoodObservationModelForGPSLogger = {
+    val std_dev = 10.0;
+    new IsoGaussianObservationModel(new IsoGaussianObservationParameters(std_dev * std_dev));
+  }
 }

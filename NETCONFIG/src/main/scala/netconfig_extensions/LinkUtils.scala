@@ -56,12 +56,4 @@ object LinkUtils {
   def getAllNeighboursFromLink[L <: Link](link: L, depth: Int)(implicit manifest: Manifest[L]): Array[L] = {
     getAllNeighboursFromLinks(Array(link), depth)
   }
-
-  /**
-   * Convenience function for Java/Python.
-   */
-  def getAllNeighboursFromLinks(links: Array[_ <: Link], depth: Int): Array[Link] = {
-    getAllNeighboursFromLinks(links.asInstanceOf[Array[Link]], depth)
-  }
-
 }

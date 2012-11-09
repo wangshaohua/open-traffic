@@ -63,7 +63,6 @@ trait PathGenerator2 {
 object PathGenerator2 {
   def getDefaultPathGenerator(parameters: PathInferenceParameters2): PathGenerator2 = {
     val max_distance_meters = 2400
-    new CachedPathGenerator3(new AStar2(parameters.maxSearchDepth, max_distance_meters))
-    //     new AStar(new DefaultHeuristic, parameters.maxSearchDepth)
+    new DefaultCachedPathGenerator(new AStar2(parameters.maxSearchDepth, max_distance_meters), path_cache_size=parameters.pathsCacheSize)
   }
 }

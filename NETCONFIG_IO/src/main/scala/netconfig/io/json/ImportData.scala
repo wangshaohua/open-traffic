@@ -40,15 +40,6 @@ import netconfig.io.DataSinks
 
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.
- *
- * --nid 108 --feed telenav --file /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb \
- * --start-time "2012-04-29 16:30:00" --end-time "2012-04-29 17:30:00" --use-geo-filter true
- *
- * mvn install
- * MAVEN_OPTS="-Xmx1g -verbose:gc -Dmm.data.dir=/windows/D/arterial_data" mvn exec:java -pl NETCONFIG \
- * -Dexec.mainClass="netconfig_extensions.io.ImportProbeData" -Dexec.args="--nid 108 --feed telenav --file \
- * /windows/D/arterial_data/telenav/dailydump.csv.gz --format paulb --start-time \"2012-04-29 16:30:00\" \
- * --end-time \"2012-04-29 17:30:00\" --use-geo-filter true"
  */
 object ImportProbeData extends MMLogging {
   type ParseFun = String => Option[ProbeCoordinateRepr]

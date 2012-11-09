@@ -16,25 +16,46 @@
 
 package path_inference.shortest_path
 
-import netconfig.Link
+import collection.mutable.ArrayBuffer
+import collection.mutable.{ WeakHashMap => WHashMap }
+import collection.mutable.PriorityQueue
 import collection.JavaConversions._
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
+
+import netconfig.Link
 import core_extensions.MMLogging
 
-trait CachedPathGenerator extends PathGenerator2 {
+/**
+ * The heuristic used in the A* algorithm.
+ * <p>
+ * The heuristic is assumed to be admissible.
+ *
+ * @author tjhunter
+ */
+trait AStarHeuristic {
   /**
-   * Caching methods
+   * The cost of the path discovered so far.
    */
-  def getPathInCache(key: PathKey): Option[Array[Link]]
+  def cost(path: Seq[Link]): Double =
+    {
+      path.map(_.length).sum
+    }
 
-  def putPathInCache(key: PathKey, path: Array[Link]): Unit
+  /**
+   * The expected cost for the rest of the travel. It has to be admissible.
+   *
+   * This cost is >= 0 and ==0 iff the last element of the path is equal to
+   * the target.
+   */
+  def heuristicCost(path: Seq[Link], target: Link): Double
 
-  def getPathsInCache(key: PathKey): Option[Array[Array[Link]]]
+  /**
+   * The complete estimated cost.
+   */
+  def estimatedCost(path: Seq[Link], target: Link): Double =
+    {
+      cost(path) + heuristicCost(path, target)
+    }
 
-  def putPathsInCache(key: PathKey, path: Array[Array[Link]]): Unit
-
-  def getApproximatePathsCacheSize: Int
-
-  def getApproximatePathCacheSize: Int
 }

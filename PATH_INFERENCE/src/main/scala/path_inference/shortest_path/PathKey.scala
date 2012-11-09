@@ -22,7 +22,7 @@ import netconfig.Link
  *
  * @author tjhunter
  */
-case class PathKey(
+final case class PathKey(
   start_link: Link,
   end_link: Link) {
   override lazy val toString = "PathKey(" +

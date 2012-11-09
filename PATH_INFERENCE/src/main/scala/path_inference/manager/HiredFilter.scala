@@ -23,9 +23,7 @@ import netconfig.Link
 trait HiredFilter extends PathInferenceManager with MMLogging {
   override def addPoint(point:ProbeCoordinate[Link]): Unit = {
     if (point.hired != null && point.hired.booleanValue() == true) {
-       // logInfo("Dropping non hired point:\n"+point)
       } else {
-     // logInfo("Calling super")
       super.addPoint(point)
     }
   }

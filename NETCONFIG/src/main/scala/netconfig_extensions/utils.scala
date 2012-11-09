@@ -16,7 +16,7 @@
 package netconfig_extensions
 
 /**
- * Some documentaiton on methodoclogies:
+ * Some documentation on methods:
  *
  * projectXXXToYYY[L]: tries to convert some data from data structure XXX to data
  * structure YYY. In the cases the conversion may fail because the data content
@@ -40,10 +40,17 @@ package netconfig_extensions
  *
  */
 object NetconfigUtils {
+
+  /**
+   * Instance for java users. Call this method to access all the methods defined
+   * in this object.
+   *
+   * Example: NetconfigUtils.instance().routeTT(...)
+   */
+  def instance = this
+
   import ProbeCoordinateUtils._
   import PathInferenceUtils._
-  import TSpotUtils._
-  import RouteTTUtils._
   import SpotUtils._
   import RouteUtils._
   import LinkUtils._

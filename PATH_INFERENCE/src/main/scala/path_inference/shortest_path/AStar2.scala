@@ -29,7 +29,9 @@ import collection.JavaConversions._
 /**
  * max_travel in meters.
  */
-class AStar2(val max_iters: Int, val max_travel: Double) extends PathGenerator2 {
+final class AStar2(
+  private[this] val max_iters: Int,
+  private[this] val max_travel: Double) extends PathGenerator2 {
 
   // Link, path length so far, heuristic cost of the path
   private[this]type LinkWithCosts = (Link, Double, Double)

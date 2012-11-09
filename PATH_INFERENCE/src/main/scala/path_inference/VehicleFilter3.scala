@@ -35,8 +35,8 @@ import path_inference.manager.ProjectionHookInterface
 import com.google.common.collect.Ordering
 import scala.collection.JavaConversions._
 
-class VehicleFilter3(
-  val hmm: ConditionalRandomField,
+private[path_inference] class VehicleFilter3(
+  val crf: ConditionalRandomField,
   path_gen: PathGenerator2,
   val parameters: PathInferenceParameters2,
   first_point: ProbeCoordinate[Link],
@@ -73,7 +73,7 @@ class VehicleFilter3(
   // Constructor logic
   // Make sure it is put *after* the declaration of all the variables.
   {
-    assert(hmm != null)
+    assert(crf != null)
     assert(path_gen != null)
     assert(parameters != null)
     assert(first_point != null)
@@ -94,8 +94,8 @@ class VehicleFilter3(
     last_seen_time = point.time
 
     if (point.spots.isEmpty) {
-//       logWarning("Point has no projection:")
-//       logWarning(point.toString)
+      //       logWarning("Point has no projection:")
+      //       logWarning(point.toString)
     } else {
       /**
        * Special case for the constructor
@@ -103,7 +103,7 @@ class VehicleFilter3(
       if (lastPoints.isEmpty) {
         lastPoints = lastPoints.enqueue(point)
         reachable_links = Set.empty[Link] ++ point.spots.map(_.link)
-        hmm += point
+        crf setFirstPoint point
       } else {
         assert(point.id.equals(this.id)) //Tracker works on one vehicle only
         if (lastPoints.last.time > point.time) {
@@ -130,7 +130,7 @@ class VehicleFilter3(
     // Flush out everything we can
     performComputaitons(lastPoints, reachable_links, 0, 1)
     // Finish the computations on the CRF side
-    hmm.finalizeComputations
+    crf.finalizeComputations
     //And we see if anything got out
     exportOutput
   }
@@ -142,7 +142,7 @@ class VehicleFilter3(
   private def exportOutput: Unit = {
     // See if there is some new output to take care of
     // Send it to the output for processing
-    for (frame <- hmm.outputQueue)
+    for (frame <- crf.outputQueue)
       output.addFrame(frame)
   }
 
@@ -156,20 +156,17 @@ class VehicleFilter3(
     reachable_links: Set[Link],
     attempted_so_far: Int,
     wanted_queue_size: Int): (Queue[ProbeCoordinate[Link]], Set[Link]) = {
-    //    logInfo("Queue analyzis: "+ (queue.length, attempted_so_far, wanted_queue_size))
     if (attempted_so_far > queue.size) {
       throw new IllegalArgumentException("!!")
     }
     // The queue has size one: the last point we added to the CRF.
     // Nothing else to do for now.
     if (queue.size == 1) {
-      //      logInfo("Queue size is 1, done")
       return (queue, reachable_links)
     }
     // Queue is not full and we cannot perform computation further: we stop.
     if (attempted_so_far >= queue.size - 1 &&
       queue.size < wanted_queue_size) {
-      //      logInfo("Queue not full and nothing left to do")
       return (queue, reachable_links)
     }
     // We have tried to connect the first point in the queue with all the other
@@ -180,15 +177,14 @@ class VehicleFilter3(
     if (attempted_so_far >= queue.size - 1 &&
       queue.size >= wanted_queue_size) {
       // Drop the oldest point
-      //      logInfo("Queue full: dropping a point and starting again")
       val res_queue = queue.drop(1)
       val new_reachable_links = res_queue.head.spots.map(_.link).toSet
       assert(!new_reachable_links.isEmpty)
       val new_first_point = res_queue.head
-      hmm.finalizeComputationsAndRestart(new_first_point)
+      crf.finalizeComputationsAndRestart(new_first_point)
       // Try again from there to reconnect the points.
       return performComputaitons(res_queue, new_reachable_links,
-          0, wanted_queue_size)
+        0, wanted_queue_size)
     }
     // Check if we can create a set of path between the first point in the
     // queue and the current point that we are considuering.
@@ -197,26 +193,20 @@ class VehicleFilter3(
     // If we cannot, we simply return, the queue will eventually spill over.
     // Compute the paths between the first and the last point in the buffer:
     val first_point = queue.head
-    //    logInfo("First point:\n"+first_point)
     val current_point = queue(attempted_so_far + 1)
-    //    logInfo("Current point:\n"+current_point)
     val best_paths: Array[Path] = ShortestPaths.getPathsBetweenFast(
       first_point, current_point, previous_paths_regrouped, parameters, path_gen)
     // Check if the paths repect the minimum length constraint
     // If at least one path is too short, do not add the delta and continue
     // The point will eventually get cleared out by timeout.
     if (best_paths.isEmpty) {
-      //      logInfo("No path found.")
       // No good paths, let us try to go further in the queue.
       return performComputaitons(queue, reachable_links, attempted_so_far + 1, wanted_queue_size)
     }
     if (best_paths.exists(_.length < parameters.minTravelOffset)) {
-      //      logInfo("One path has too small length.")
       // No good paths, let us try to go further in the queue.
       return performComputaitons(queue, reachable_links, attempted_so_far + 1, wanted_queue_size)
     }
-    //    logInfo("New paths found:")
-    //    logInfo(best_paths.mkString("\n"))
     // Some new paths could be found, this point is reachable
     // Add the delta and the point to the markov model
     assert(best_paths.length <= parameters.maxPaths)
@@ -225,13 +215,12 @@ class VehicleFilter3(
     val new_reachable_links = Set.empty[Link] ++ best_paths.filter(p => {
       reachable_links.contains(p.links.head)
     }).map(_.links.last)
-    //    logInfo("new reachable set: "+new_reachable_links.mkString(", "))
     // If we do not, the track is broken: we finalize the ongoing computations
     // in the filter and we restart from the current point.
     // The paths we just computed are dropped.
     if (new_reachable_links.isEmpty) {
       logInfo("Logical flow break in track for driver " + id)
-      hmm.finalizeComputationsAndRestart(current_point)
+      crf.finalizeComputationsAndRestart(current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
       // Restart the reachable set from the current point.
@@ -240,8 +229,7 @@ class VehicleFilter3(
     } else {
       val delta_pcs = queue.take(attempted_so_far + 2).toArray
       val delta = new Delta(delta_pcs, best_paths)
-      //      logInfo(" Adding to CRF: "+(delta, current_point))
-      hmm += (delta, current_point)
+      crf addPair (delta, current_point)
       // Evict the poinhts before the current point
       val new_queue = queue.drop(attempted_so_far + 1)
       performComputaitons(new_queue, new_reachable_links, 0, wanted_queue_size)
@@ -249,15 +237,16 @@ class VehicleFilter3(
   }
 }
 
-object VehicleFilter {
+private[path_inference] object VehicleFilter {
 
   def createVehicleFilter(params: PathInferenceParameters2,
     first_point: ProbeCoordinate[Link],
     obs_model: ObservationModel,
     trans_model: TransitionModel,
-    output: FilterOutputInterface, projection_hook: ProjectionHookInterface): VehicleFilter3 = {
+    output: FilterOutputInterface,
+    projection_hook: ProjectionHookInterface,
+    path_gen: PathGenerator2): VehicleFilter3 = {
     val crf = createCRF(params, obs_model, trans_model)
-    val path_gen = PathGenerator2.getDefaultPathGenerator(params)
     new VehicleFilter3(crf, path_gen, params, first_point, output, projection_hook)
   }
 
@@ -300,18 +289,14 @@ object VehicleFilter {
 /**
  * This is one ugly mess that better get some explanations...
  */
-object ShortestPaths extends MMLogging {
+private[path_inference] object ShortestPaths extends MMLogging {
 
-  // TODO: explain this data type...
+  // TODO(tjh) explain this data type...
   type RegroupedPathsMap = MMap[(Link, Link), Map[(Double, Double), Array[Path]]]
 
   private lazy val ord: Ordering[(Path, Double)] = {
     val comp = new Comparator[(Path, Double)] {
       def compare(o1: (Path, Double), o2: (Path, Double)): Int = o1._2.compare(o2._2)
-
-//      override def equals(o: Any) = {
-//        o == this
-//      }
     }
     Ordering.from(comp)
   }
@@ -466,7 +451,7 @@ object ShortestPaths extends MMLogging {
     previous_paths_regrouped ++= paths_regrouped
 
     val filtered_paths: Seq[Path] = paths_regrouped.values.flatMap(_.values.toSeq.flatten.toSeq).toSeq
-//    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
+    //    logInfo("fast paths computation: %d link pairs, %d paths found (%d/%d hits)" format (paths_regrouped.size, filtered_paths.size, new_pairs, all_pairs))
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
@@ -523,7 +508,7 @@ object ShortestPaths extends MMLogging {
     // Somehow, the toArray is necessary to prevent some superslow conversions to java linkedlist
     val best_paths_with_length = ord.leastOf(filtered_paths.map(p => (p, p.length)).toArray.toSeq, maxPaths)
     val best_paths = best_paths_with_length.map(_._1)
-//     logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
+    //     logInfo("All paths found:%d , best filtered paths: %d".format(paths.length, best_paths.length))
     return best_paths.toArray
   }
 }

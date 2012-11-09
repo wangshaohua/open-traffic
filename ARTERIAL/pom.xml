@@ -22,11 +22,6 @@
 			<artifactId>netconfig_${scala.version}</artifactId>
 			<version>0.2-SNAPSHOT</version>
 		</dependency>
-    <dependency>
-      <groupId>edu.berkeley.path</groupId>
-      <artifactId>netconfig-io_${scala.version}</artifactId>
-      <version>0.2-SNAPSHOT</version>
-    </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>

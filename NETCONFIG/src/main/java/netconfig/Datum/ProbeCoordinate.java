@@ -166,6 +166,12 @@ public class ProbeCoordinate<LINK extends Link> implements Serializable {
                 new_probs, speed(), heading(), hired(), hdop());
     }
 
+    public <LINK2 extends Link> ProbeCoordinate<LINK2> clone(
+            ImmutableList<Spot<LINK2>> new_spots) throws NetconfigException {
+        return new ProbeCoordinate<LINK2>(id(), time(), coordinate(),
+                new_spots, probabilities(), speed(), heading(), hired(), hdop());
+    }
+
     /**
      * Returns a copy of this probe coordinate object with a new timestamp.
      * 

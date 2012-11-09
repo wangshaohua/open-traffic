@@ -23,13 +23,13 @@ package netconfig;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import core.Coordinate;
 
 import core.GeoMultiLine;
 import core.Monitor;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.UnmodifiableIterator;
 
 /**
  * This class represents a route object. A route is defined a possible way of
@@ -173,32 +173,64 @@ public class Route<LINK extends Link> implements Serializable {
     public ImmutableList<LINK> links() {
         return links_;
     }
-    
-//     /**
-//      * Returns the concatenation of a route with another one.
-//      * @param other
-//      * @return
-//      * @throws NetconfigException if the first spot of other is different from
-//      * the last spot of the other route.
-//      */
-//     public Route<LINK> concatenate(Route<LINK> other) throws NetconfigException {
-//         int n = this.spots().size();
-//         if (!other.spots().get(0).equals(this.spots().get(n-1))) {
-//             throw new NetconfigException(null, "Routes are not joined");
-//         }
-//         int num_links = other.links().size();
-//         ImmutableList.Builder<LINK> link_builder = new ImmutableList.Builder<LINK>();
-//         for (LINK l:this.links()) {
-//             link_builder.add(l);
-//         }
-//         UnmodifiableIterator<LINK> it = other.links().iterator();
-//         it.next();
-//         while(it.hasNext()) {
-//             //FINISH
-//         }
-// 
-//     }
-    
+
+    /**
+     * Returns the concatenation of a route with another one.
+     * 
+     * @param other
+     * @return
+     * @throws NetconfigException
+     *             if the first spot of other is different from the last spot of
+     *             the other route.
+     */
+    public Route<LINK> concatenate(Route<LINK> other) throws NetconfigException {
+        int n = this.spots().size();
+        if (!other.spots().get(0).equalsApprox(this.spots().get(n - 1))) {
+            // More informative messages
+            Spot<LINK> s1 = this.spots().get(n - 1);
+            Spot<LINK> s2 = other.spots().get(0);
+            if (s1.link() != s2.link()) {
+                throw new NetconfigException(null,
+                        "Routes are not joined: route1 = " + this
+                                + " and route2 = " + other
+                                + " Reason: the links are different.");
+            }
+            if (s1.offset() != s2.offset())
+                throw new NetconfigException(null,
+                        "Routes are not joined: route1 = " + this
+                                + " and route2 = " + other
+                                + " Reason: the offsets are different, dx="
+                                + (s1.offset() - s2.offset()));
+        }
+        // int num_links = other.links().size();
+        ImmutableList.Builder<LINK> link_builder = new ImmutableList.Builder<LINK>();
+        for (LINK l : this.links()) {
+            link_builder.add(l);
+        }
+        UnmodifiableIterator<LINK> it = other.links().iterator();
+        // Skip the first link, it should be the same as the last link of the
+        // previous route.
+        it.next();
+        while (it.hasNext()) {
+            // TODO(?) this is false.
+            // We need to eliminate some spots that may be in wrong order
+            // between the two links.
+            // Due to length imprecision.
+            link_builder.add(it.next());
+        }
+        // If something fails, trying to be informative.
+        try {
+            // Taking a shortcut for now by dropping the intermediate points.
+            // TODO(?) build a list of spots the same way.
+            return Route.from(link_builder.build(), this.startOffset(),
+                    other.endOffset());
+
+        } catch (Throwable e) {
+            throw new NetconfigException(e, "Failed to concatenate: route1 = "
+                    + this + " route2=" + other);
+        }
+    }
+
     /********** Static factory methods **************/
     // These should be the only methods avaialable to the user to create a Route
     // object.
@@ -302,7 +334,8 @@ public class Route<LINK extends Link> implements Serializable {
                     "Argument startOffset negative.  Distance beyond link is "
                             + startOffset + " meters");
         }
-        if (startOffset < 0 || startOffset > links.get(0).length() + 1e-3) {
+        if (startOffset < 0
+                || startOffset > links.get(0).length() + Link.LENGTH_PRECISION) {
             throw new NetconfigException(null,
                     "Argument startOffset outside of 1st link.  Distance beyond link is "
                             + (startOffset - links.get(0).length()) + " meters");
@@ -318,7 +351,8 @@ public class Route<LINK extends Link> implements Serializable {
                     + " start=" + startOffset + ", end=" + endOffset);
         }
         if (endOffset < 0
-                || endOffset > links.get(links.size() - 1).length() + 1e-3) {
+                || endOffset > links.get(links.size() - 1).length()
+                        + Link.LENGTH_PRECISION) {
             throw new NetconfigException(
                     null,
                     "Argument endOffset outside of last link.  Distance beyond link is "
@@ -407,15 +441,17 @@ public class Route<LINK extends Link> implements Serializable {
                         + spots + "," + links);
             }
         }
+        // The following test is wrong since some vehicles may come back on the
+        // same link.
         // Links are not unique
-        HashSet<LINK> links0 = new HashSet<LINK>();
-        for (LINK l : links) {
-            if (links0.contains(l)) {
-                throw new NetconfigException(null, "Found duplicate link " + l
-                        + " in " + links);
-            }
-            links0.add(l);
-        }
+        // HashSet<LINK> links0 = new HashSet<LINK>();
+        // for (LINK l : links) {
+        // if (links0.contains(l)) {
+        // throw new NetconfigException(null, "Found duplicate link " + l
+        // + " in " + links);
+        // }
+        // links0.add(l);
+        // }
     }
 
     // ********* SCALA CONVENIENCE FUNCTIONS ***********

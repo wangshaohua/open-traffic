@@ -25,7 +25,6 @@ import path_inference.Delta
 import path_inference.models.ObservationModel
 import path_inference.models.TransitionModel
 import scalala.tensor.dense.DenseVectorCol
-// import scalala.tensor.dense.DenseVector
 import scalala.operators.Implicits._
 
 /**
@@ -33,7 +32,7 @@ import scalala.operators.Implicits._
  * one of the most complicated of the path inference project.
  * TODO: carefully document what is going on here.
  */
-abstract class AbstractCRF(
+private[path_inference] abstract class AbstractCRF(
   obs_model: ObservationModel,
   trans_model: TransitionModel)
   extends ConditionalRandomField with MMLogging {
@@ -42,7 +41,7 @@ abstract class AbstractCRF(
    *
    * FIFO => head = oldest, last = most recent
    */
-  private val queue: Queue[CRFFrame] = new Queue[CRFFrame]()
+  private[this] val queue: Queue[CRFFrame] = new Queue[CRFFrame]()
   /**
    * The number of forward frames already computed.
    * This number decreases whenever a frame is pulled.
@@ -59,6 +58,8 @@ abstract class AbstractCRF(
    */
   protected val out_queue: Queue[CRFFrame] = new Queue[CRFFrame]()
 
+  def numStoredFrames = queue.size
+
   /**
    * Filter will die after an internal exception.
    * No exception should be thrown anymore now.
@@ -72,8 +73,8 @@ abstract class AbstractCRF(
    */
   protected val init_empty_value = -1e200
 
-  def +=(point: ProbeCoordinate[Link]) {
-    logInfo("Adding point: " + point)
+  def setFirstPoint(point: ProbeCoordinate[Link]) {
+    logDebug("Adding point: " + point)
     val nspots = point.spots.size
     val payload = point
     val obs_log = obs_model.logObs(point)
@@ -84,8 +85,12 @@ abstract class AbstractCRF(
     if (!queue.isEmpty) {
       val delta: Delta = queue.last.payload.asInstanceOf[Delta]
       val transitions2 = CRFUtils.findTransitionsDeltaToPC2(delta, point)
+      val transitions2_from = transitions2.map(_._1)
+      val transitions2_to = transitions2.map(_._2)
       val old_frame = queue.last
-      old_frame.sp_transition = transitions2
+      //      old_frame.sp_transition = transitions2
+      old_frame.sp_transition_from = transitions2_from
+      old_frame.sp_transition_to = transitions2_to
     }
 
     // Wrap the array in a vector
@@ -103,14 +108,14 @@ abstract class AbstractCRF(
       DenseVectorCol.zeros[Double](nspots),
       DenseVectorCol.zeros[Double](nspots),
       wrapper_vec,
-      null)
+      null, null)
     this += frame
   }
 
-  def +=(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
-    logInfo("Adding delta and point")
-    logInfo("Delta:\n" + delta)
-    logInfo("Point:\n" + point)
+  def addPair(delta: Delta, point: ProbeCoordinate[Link]): Unit = {
+    logDebug("Adding delta and point")
+    logDebug("Delta:\n" + delta)
+    logDebug("Point:\n" + point)
     // Should never be called with an empty queue, a point should
     // always have been added first.
     assert(!queue.isEmpty)
@@ -133,7 +138,10 @@ abstract class AbstractCRF(
     assert(delta.points.head.time <= point.time)
     assert(delta.points.last.time <= point.time)
     val transitions2 = CRFUtils.findTransitionsPCToDelta(previous_point, delta)
-    queue.last.sp_transition = transitions2
+    val transitions2_from = transitions2.map(_._1)
+    val transitions2_to = transitions2.map(_._2)
+    queue.last.sp_transition_from = transitions2_from
+    queue.last.sp_transition_to = transitions2_to
     // Compute the vector of weights / probabilities of the paths
     val path_weights = delta.paths.map(trans_model.logTrans(_)).toArray
     val wrapper_trans_log = new DenseVectorCol(path_weights)
@@ -151,10 +159,10 @@ abstract class AbstractCRF(
       DenseVectorCol.zeros[Double](npaths),
       DenseVectorCol.zeros[Double](npaths),
       wrapper_vec,
-      null)
+      null, null)
     this += frame
     // Insert the next point
-    this += point
+    this setFirstPoint point
   }
 
   private def +=(frame: CRFFrame): Unit = {
@@ -178,7 +186,7 @@ abstract class AbstractCRF(
         last_payload match {
           // Is there a better way to do it due to type erasure?
           case pc: ProbeCoordinate[_] => {
-            this += pc.asInstanceOf[ProbeCoordinate[Link]]
+            this setFirstPoint pc.asInstanceOf[ProbeCoordinate[Link]]
           }
           case _ => // Do nothing
         }
@@ -198,11 +206,10 @@ abstract class AbstractCRF(
    * Used to manually finalize the computations in the filter.
    */
   def finalizeComputationsAndRestart(point: ProbeCoordinate[Link]): Unit = {
-    logInfo("CRF " + this + " attempts to hot finalize")
+    logDebug("CRF " + this + " attempts to hot finalize")
     finalizeComputations
-    logInfo("CRF done finalizing, restarting a new track.")
-    //    logInfo("CRF: received " + point)
-    this += point
+    logDebug("CRF done finalizing, restarting a new track.")
+    this setFirstPoint point
   }
 
   /**
@@ -210,7 +217,7 @@ abstract class AbstractCRF(
    * If you want to continue to add things, use finalizeComputationsAndRestart.
    */
   def finalizeComputations: Unit = {
-    logInfo("CRF " + this + " in track finalization")
+    logDebug("CRF " + this + " in track finalization")
     try {
       finalize_computations
     } catch {
@@ -227,7 +234,7 @@ abstract class AbstractCRF(
     clearQueue
     num_forward = 0
     num_backward = 0
-    logInfo("CRF done finalizing")
+    logDebug("CRF done finalizing")
   }
 
   /**
@@ -276,24 +283,34 @@ abstract class AbstractCRF(
       next.forward := this.init_empty_value
 
       // Perform the transition evaluation
-      for ((previdx, nextidx) <- prev.sp_transition) {
-        if (next.forward.data.exists(_.isNaN)) {
-          logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
-          logWarning("Next frame payload:" + next.payload)
-          logWarning("faulty indexes: " + (previdx, nextidx))
-          throw new InternalMathException
+      // Compact (slower) code:
+      //       for ((previdx, nextidx) <- prev.sp_transition) {
+      //         next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+      //       }
+
+      {
+        var i = prev.sp_transition_from.size - 1
+        while (i >= 0) {
+          val previdx = prev.sp_transition_from(i)
+          val nextidx = prev.sp_transition_to(i)
+          next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
+          i -= 1
         }
-        next.forward(nextidx) = LogMath.logSumExp(prev.forward(previdx), next.forward(nextidx))
       }
-      //      prev.sp_transition_next.logDotInPlace(prev.forward.data, next.forward.data)
+
+      if (hasNaN(next.forward.data)) {
+        logWarning("Found a NaN in forward data during matrix multiply:" + next.forward.data.mkString)
+        logWarning("Next frame payload:" + next.payload)
+        throw new InternalMathException
+      }
       // Add the observations (already in log domain)
       next.forward :+= next.logObservations
       // Sanity check if any value is at least real
       if (next.forward.data.max == Double.NegativeInfinity) {
-        logInfo("zero prob in forward")
+        logDebug("zero prob in forward")
         throw new InternalMathException
       }
-      if (next.forward.data.exists(_.isNaN)) {
+      if (hasNaN(next.forward.data)) {
         logWarning("Found a NaN in forward data before normalization:" + next.forward.data.mkString)
         logWarning("Next frame payload:" + next.payload)
         throw new InternalMathException
@@ -302,7 +319,7 @@ abstract class AbstractCRF(
       LogMath.logNormalizeInPlace(next.forward.data)
       // Affect final value so that forward can be used standalone
       LogMath.normalize(next.forward.data, next.posterior.data)
-      if (next.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(next.posterior.data)) {
         logWarning("Found a NaN in posterior data:" + next.posterior.data.mkString)
         logWarning("Forward data:" + next.forward.data.mkString)
         logWarning("Next frame payload:" + next.payload)
@@ -331,18 +348,28 @@ abstract class AbstractCRF(
       // Initialize values
       // Sanity checks everywhere.
       prev.backward := this.init_empty_value
+
       // Perform the transition evaluation
-      for ((previdx, nextidx) <- prev.sp_transition) {
-        if (prev.backward.data.exists(_.isNaN)) {
-          logWarning("Found a NaN in backward data during matrix multiply:" + prev.backward.data.mkString)
-          logWarning("Prev frame payload:" + prev.payload)
-          logWarning("faulty indexes: " + (previdx, nextidx))
-          throw new InternalMathException
+      // Compact code:
+      //       for ((previdx, nextidx) <- prev.sp_transition) {
+      //         prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+      //       }
+      {
+        var i = prev.sp_transition_from.size - 1
+        while (i >= 0) {
+          val previdx = prev.sp_transition_from(i)
+          val nextidx = prev.sp_transition_to(i)
+          prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
+          i -= 1
         }
-        prev.backward(previdx) = LogMath.logSumExp(next.backward(nextidx), prev.backward(previdx))
       }
 
-      //      prev.sp_transition_next_t.logDotInPlace(next.backward.data, prev.backward.data)
+      if (hasNaN(prev.backward.data)) {
+        logWarning("Found a NaN in backward data during matrix multiply:" + prev.backward.data.mkString)
+        logWarning("Prev frame payload:" + prev.payload)
+        throw new InternalMathException
+      }
+
       // Add the observations (already in log domain)
       prev.backward :+= prev.logObservations
       // Sanity check if any value is at least real
@@ -350,14 +377,14 @@ abstract class AbstractCRF(
         logWarning("zero prob in backward")
         throw new InternalMathException
       }
-      if (prev.backward.data.exists(_.isNaN)) {
+      if (hasNaN(prev.backward.data)) {
         logWarning("Found a NaN in backward data before normalization:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
         throw new InternalMathException
       }
       // Normalize in log domain to prevent lgo numbers from straying too far
       LogMath.logNormalizeInPlace(prev.backward.data)
-      if (prev.backward.data.exists(_.isNaN)) {
+      if (hasNaN(prev.backward.data)) {
         logWarning("Found a NaN in backward data:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
         throw new InternalMathException
@@ -365,7 +392,7 @@ abstract class AbstractCRF(
       // Affect final value so that forward can be used standalone
       // All the computations stay in log domain
       LogMath.normalize(prev.backward.data, prev.posterior.data)
-      if (prev.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(prev.posterior.data)) {
         logWarning("Found a NaN in posterior data:" + prev.posterior.data.mkString)
         logWarning("Backward data:" + prev.backward.data.mkString)
         logWarning("Prev frame payload:" + prev.payload)
@@ -379,22 +406,18 @@ abstract class AbstractCRF(
     forward
     backward
     for (frame <- queue) {
-      //      logInfo("Processing frame:"+frame)
       assert(!frame.posterior.data.isEmpty, "" + frame.payload)
       frame.posterior := frame.forward
       frame.posterior :+= frame.backward
-      //      logInfo("Frame posterior : "+frame.posterior)
       if (frame.posterior.data.max == Double.NegativeInfinity) {
-        logInfo(" zero prob in post normalization " + frame.forward + " \n " + frame.backward)
+        logDebug(" zero prob in post normalization " + frame.forward + " \n " + frame.backward)
         throw new InternalMathException
       }
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" NaN detected in  post normalization ")
         throw new InternalMathException
       }
       LogMath.normalizeInPlace(frame.posterior.data)
-      //      logInfo("Frame posterior after normalization : "+frame.posterior)
-      //      logInfo("Frame posterior after normalization : "+frame+" @ "+frame.posterior.data)
     }
   }
 
@@ -418,8 +441,7 @@ abstract class AbstractCRF(
 
   protected def push_all_out: Unit = {
     for (frame <- queue) {
-//       logInfo("Pushing frame out")
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" Found a NaN in push_ll_out, this should not happen")
       } else {
         out_queue += frame
@@ -431,11 +453,11 @@ abstract class AbstractCRF(
     assert(n >= 0)
     assert(n < queue.length)
     val frame = queue(n)
-    if (frame.posterior.data.exists(_.isNaN)) {
+    if (hasNaN(frame.posterior.data)) {
       logWarning(" Found a NaN in push_out, this should not happen")
     } else {
-      logInfo("Pushing frame out")
-      logInfo("Frame payload:\n" + frame.payload)
+      logDebug("Pushing frame out")
+      logDebug("Frame payload:\n" + frame.payload)
       out_queue += frame
     }
   }
@@ -445,14 +467,27 @@ abstract class AbstractCRF(
     assert(n < queue.length)
     val frames = queue.take(n)
     for (frame <- frames) {
-      if (frame.posterior.data.exists(_.isNaN)) {
+      if (hasNaN(frame.posterior.data)) {
         logWarning(" Found a NaN in push_out_last, this should not happen")
       } else {
-        logInfo("Pushing last frame out")
-        logInfo("Last frame payload:\n" + frame.payload)
+        logDebug("Pushing last frame out")
+        logDebug("Last frame payload:\n" + frame.payload)
         out_queue += frame
       }
     }
+  }
+
+  private[this] def hasNaN(x: Array[Double]): Boolean = {
+    val n = x.length
+    // Unrolling the loop, this check is done often.
+    var i = n - 1
+    while (i >= 0) {
+      if (x(i) == Double.NaN) {
+        return true
+      }
+      i -= 1
+    }
+    false
   }
 
   def outputQueue = {

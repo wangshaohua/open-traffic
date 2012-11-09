@@ -28,6 +28,7 @@ import netconfig.storage.LinkIDRepr
 import netconfig.storage.NodeIDRepr
 import scala.collection.mutable.ArrayBuffer
 import netconfig.storage.NodeIDRepr
+import netconfig.storage.LinkIDRepr
 
 class NetworkBuilder {
 
@@ -79,7 +80,7 @@ class NetworkBuilder {
     n
   }
 
-  def build(glrs: Iterable[GenericLinkRepresentation]): Seq[GenericLink] = {
+  def build(glrs: Iterable[GenericLinkRepresentation]): Seq[(LinkIDRepr, GenericLink)] = {
     val links = Map.empty[LinkIDRepr, GenericLink]
     val nodes = Map.empty[NodeIDRepr, GenericNode[GenericLink]]
     val inLinks = Map.empty[NodeIDRepr, ArrayBuffer[GenericLink]]
@@ -107,6 +108,6 @@ class NetworkBuilder {
       outLinks(glr.startNodeId) += l
       links += glr.id -> l
     }
-    links.values.toSeq
+    links.toSeq
   }
 }
