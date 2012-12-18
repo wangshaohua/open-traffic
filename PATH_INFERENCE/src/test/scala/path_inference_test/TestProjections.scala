@@ -20,7 +20,7 @@ import org.junit.Assert._
 
 import edu.berkeley.path.bots.netconfig._
 import edu.berkeley.path.bots.netconfig.Datum._
-import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory
+import edu.berkeley.path.bots.netconfig.projection.ProjectorFactory
 import edu.berkeley.path.bots.core._
 
 object PIFUtils {
@@ -33,7 +33,7 @@ object PIFUtils {
 /**
  * Simple tests of the projector on a linaear network.
  *
- * @todo should be moved to netconfig_extensions, but somehow tests do not run
+ * @todo should be moved to netconfig, but somehow tests do not run
  * there...
  */
 class BasicProjectionTest {

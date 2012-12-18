@@ -14,13 +14,13 @@
  * under the License.
  */
 
-package network.arterial1
+package edu.berkeley.path.bots.network.arterial1
 
 import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
 import edu.berkeley.path.bots.netconfig.Node
 import com.google.common.collect.ImmutableList
 import collection.JavaConversions._
-import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig.CollectionUtils._
 
 class ArterialNode(id_ : NodeIDRepr,
   incoming: Seq[ArterialLink],

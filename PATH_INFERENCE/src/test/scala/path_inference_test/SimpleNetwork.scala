@@ -16,13 +16,13 @@
 
 package path_inference_test
 
-import network.simple._
+import edu.berkeley.path.bots.network.simple._
 import edu.berkeley.path.bots.core.Coordinate
-import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory
+import edu.berkeley.path.bots.netconfig.projection.ProjectorFactory
 import org.junit._
 import org.junit.Assert._
-import network.simple.SimpleNetwork
-import network.simple.SimpleNetworkBuilder
+import edu.berkeley.path.bots.network.simple.SimpleNetwork
+import edu.berkeley.path.bots.network.simple.SimpleNetworkBuilder
 
 object SyntheticNetworks {
 

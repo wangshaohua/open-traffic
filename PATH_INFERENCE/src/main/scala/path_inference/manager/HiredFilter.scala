@@ -16,7 +16,7 @@
 
 package path_inference.manager
 
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.Link
 

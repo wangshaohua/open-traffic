@@ -20,7 +20,7 @@
 
 package path_inference
 import edu.berkeley.path.bots.netconfig.{ Link, Route, Spot }
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import collection.JavaConversions._
 
 /**

@@ -18,11 +18,11 @@ package path_inference.output
 
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
 import edu.berkeley.path.bots.netconfig.Link
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import path_inference.PathInferenceParameters2
 import path_inference.Delta
 import path_inference.crf.CRFFrame
-import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig.CollectionUtils._
 
 object PathInferenceOuput extends MMLogging {
 

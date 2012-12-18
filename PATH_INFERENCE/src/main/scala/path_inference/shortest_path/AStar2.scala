@@ -21,9 +21,9 @@ package path_inference.shortest_path
 import collection.mutable.ArrayBuffer
 import collection.mutable.PriorityQueue
 
-import edu.berkeley.path.bots.netconfig_extensions.projection.{ EuclidianPoint, EuclidianMapping }
+import edu.berkeley.path.bots.netconfig.projection.{ EuclidianPoint, EuclidianMapping }
 import edu.berkeley.path.bots.netconfig.Link
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import collection.JavaConversions._
 
 /**

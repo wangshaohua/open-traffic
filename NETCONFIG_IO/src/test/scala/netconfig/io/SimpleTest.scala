@@ -14,17 +14,17 @@
  * under the License.
  */
 
-package netconfig.io
+package edu.berkeley.path.bots.netconfig.io
 
 import org.junit._
 import org.junit.Assert._
 import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
-import network.gen.GenericLinkRepresentation
+import edu.berkeley.path.bots.network.gen.GenericLinkRepresentation
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
-import network.gen.NetworkBuilder
+import edu.berkeley.path.bots.network.gen.NetworkBuilder
 import edu.berkeley.path.bots.netconfig.io.json.JSonSerializer
 import edu.berkeley.path.bots.netconfig.io.files.SerializedNetwork
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 
 class SimpleTest extends MMLogging {
 

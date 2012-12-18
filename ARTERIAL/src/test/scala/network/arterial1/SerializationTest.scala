@@ -14,11 +14,11 @@
  * under the License.
  */
 
-package network.arterial1
+package edu.berkeley.path.bots.network.arterial1
 import org.junit._
 import org.junit.Assert._
 import com.codahale.jerkson.Json._
-import network.gen.GenericLinkRepresentation
+import edu.berkeley.path.bots.network.gen.GenericLinkRepresentation
 
 class SerializationTest {
 

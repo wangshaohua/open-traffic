@@ -14,14 +14,14 @@
  * under the License.
  */
 
-package netconfig.io.json
-import edu.berkeley.path.bots.core_extensions.MMLogging
+package edu.berkeley.path.bots.netconfig.io.json
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.io.files.SerializedNetwork
-import network.gen.NetworkBuilder
+import edu.berkeley.path.bots.network.gen.NetworkBuilder
 import edu.berkeley.path.bots.netconfig.io.Serializer
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
-import network.gen.GenericLink
+import edu.berkeley.path.bots.network.gen.GenericLink
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 
 /**

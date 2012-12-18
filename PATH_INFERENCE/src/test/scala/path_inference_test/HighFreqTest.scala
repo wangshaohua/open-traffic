@@ -20,14 +20,14 @@ import org.junit._
 import org.junit.Assert._
 import edu.berkeley.path.bots.netconfig._
 import edu.berkeley.path.bots.netconfig.Datum._
-import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory
+import edu.berkeley.path.bots.netconfig.projection.ProjectorFactory
 import edu.berkeley.path.bots.core._
 import org.apache.commons.math.random.MersenneTwister
 import org.apache.commons.math.random.RandomDataImpl
 import path_inference.PathInferenceParameters2
 import path_inference.manager.PathInferenceManager
 import path_inference.PathInferenceFilter
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 
 /**
  * Tests the high frequency grid strategy.

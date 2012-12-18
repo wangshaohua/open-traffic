@@ -14,10 +14,10 @@
  * under the License.
  */
 
-package netconfig.io.json
+package edu.berkeley.path.bots.netconfig.io.json
 
 import scala.collection.mutable.{ Map => MMap }
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.core.Coordinate
 import edu.berkeley.path.bots.core.Time
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate

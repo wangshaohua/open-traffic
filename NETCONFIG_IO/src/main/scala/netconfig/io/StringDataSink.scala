@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package netconfig.io
+package edu.berkeley.path.bots.netconfig.io
 import java.io.OutputStream
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import java.io.File
 import java.util.zip.GZIPOutputStream
 import java.io.FileOutputStream

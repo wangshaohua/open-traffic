@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package network.arterial1
+package edu.berkeley.path.bots.network.arterial1
 
 /**
  * Encodes a specific feature at the end of the link.

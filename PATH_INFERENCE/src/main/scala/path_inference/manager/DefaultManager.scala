@@ -18,7 +18,7 @@ package path_inference.manager
 
 import collection.mutable.HashMap
 import collection.mutable.Queue
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.Link
 import path_inference.models.ObservationModel

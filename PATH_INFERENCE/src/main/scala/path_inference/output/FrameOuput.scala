@@ -18,7 +18,7 @@ package path_inference.output
 
 //import path_inference.{FilterOutputInterface,CRFFrame,PathInferenceManager3,Delta}
 //import scala.collection.mutable.{Queue}
-//import edu.berkeley.path.bots.core_extensions.MMLogging
+//import edu.berkeley.path.bots.core.MMLogging
 //
 //
 //class FrameOutputFilter extends FilterOutputInterface with MMLogging  {

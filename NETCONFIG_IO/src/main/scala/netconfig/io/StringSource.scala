@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package netconfig.io
+package edu.berkeley.path.bots.netconfig.io
 
 import java.io.BufferedReader
 import java.io.FileReader

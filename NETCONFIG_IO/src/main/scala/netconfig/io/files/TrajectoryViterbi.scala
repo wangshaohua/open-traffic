@@ -14,11 +14,11 @@
  * under the License.
  */
 
-package netconfig.io.files
+package edu.berkeley.path.bots.netconfig.io.files
 import java.io.File
 import org.joda.time.LocalDate
 import edu.berkeley.path.bots.netconfig.io.Dates
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 
 object TrajectoryViterbi extends MMLogging {
   val day_regex = """(.*)/(\d\d\d\d-\d\d-\d\d).*""".r

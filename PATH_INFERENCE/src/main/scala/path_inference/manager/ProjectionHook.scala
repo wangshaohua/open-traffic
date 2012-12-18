@@ -16,9 +16,9 @@
 
 package path_inference.manager
 
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import collection.JavaConversions._
-import edu.berkeley.path.bots.netconfig_extensions.projection.KDProjector
+import edu.berkeley.path.bots.netconfig.projection.KDProjector
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.Link
 import path_inference.PathInferenceParameters2

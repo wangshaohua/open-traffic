@@ -16,7 +16,7 @@
 
 package path_inference.output
 
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import collection.JavaConversions._
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.{ Link, Spot }

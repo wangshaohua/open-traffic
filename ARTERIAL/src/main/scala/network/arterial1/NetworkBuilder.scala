@@ -14,9 +14,9 @@
  * under the License.
  */
 
-package network.arterial1
+package edu.berkeley.path.bots.network.arterial1
 
-import network.gen.GenericLinkRepresentation
+import edu.berkeley.path.bots.network.gen.GenericLinkRepresentation
 import edu.berkeley.path.bots.core.GeoMultiLine
 import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 import edu.berkeley.path.bots.netconfig.NetconfigException

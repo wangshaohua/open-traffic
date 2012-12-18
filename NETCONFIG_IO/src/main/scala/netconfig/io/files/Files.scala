@@ -14,9 +14,9 @@
  * under the License.
  */
 
-package netconfig.io.files
+package edu.berkeley.path.bots.netconfig.io.files
 import scala.sys.SystemProperties
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 
 object Files extends MMLogging {
   def dataDir() = {

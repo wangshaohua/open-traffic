@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package netconfig.io.json
+package edu.berkeley.path.bots.netconfig.io.json
 
 import java.io.FileInputStream
 import java.io.FileReader
@@ -44,12 +44,12 @@ import edu.berkeley.path.bots.netconfig.io.Serializer
 import edu.berkeley.path.bots.netconfig.io.StringDataSink
 import edu.berkeley.path.bots.netconfig.io.StringSource
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
-import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils.asImmutableList1
+import edu.berkeley.path.bots.netconfig.CollectionUtils.asImmutableList1
 import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.Route
-import network.gen.GenericLink
-import network.gen.GenericLinkRepr
-import network.gen.GenericLinkRepresentation
+import edu.berkeley.path.bots.network.gen.GenericLink
+import edu.berkeley.path.bots.network.gen.GenericLinkRepr
+import edu.berkeley.path.bots.network.gen.GenericLinkRepresentation
 
 /**
  * Represents a file as a sequence of lines.

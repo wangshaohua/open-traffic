@@ -19,8 +19,8 @@ package path_inference.manager
 import collection.mutable.Queue
 import edu.berkeley.path.bots.netconfig.Datum._
 import edu.berkeley.path.bots.netconfig.Link
-import edu.berkeley.path.bots.netconfig_extensions.PathInferenceUtils
-import edu.berkeley.path.bots.netconfig_extensions.ProbeCoordinateUtils
+import edu.berkeley.path.bots.netconfig.PathInferenceUtils
+import edu.berkeley.path.bots.netconfig.ProbeCoordinateUtils
 import path_inference.crf.CRFFrame
 import path_inference.FilterOutputInterface
 import path_inference.PathInferenceParameters2

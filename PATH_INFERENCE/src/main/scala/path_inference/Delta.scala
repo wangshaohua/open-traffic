@@ -22,7 +22,7 @@ package path_inference
 import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
-import edu.berkeley.path.bots.netconfig_extensions.PathInferenceUtils
+import edu.berkeley.path.bots.netconfig.PathInferenceUtils
 
 /**
  * A delta: a list of paths and a sequence of points.

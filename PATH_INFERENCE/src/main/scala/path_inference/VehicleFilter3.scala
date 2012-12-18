@@ -23,7 +23,7 @@ package path_inference
 import collection.mutable.{ ArrayBuffer, HashMap => MMap, Queue => MQueue }
 import collection.immutable.Queue
 import edu.berkeley.path.bots.core.Time
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.netconfig.{ Link, NetconfigException }
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import java.util.Comparator

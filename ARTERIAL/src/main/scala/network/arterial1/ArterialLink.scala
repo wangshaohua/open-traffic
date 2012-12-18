@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package network.arterial1
+package edu.berkeley.path.bots.network.arterial1
 
 import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr

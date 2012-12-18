@@ -18,7 +18,7 @@ package pif.run
 
 import java.io.File
 import org.joda.time.LocalDate
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.core.TimeUtils.TimeOrdering
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.io.Dates.parseDate
@@ -32,8 +32,8 @@ import edu.berkeley.path.bots.netconfig.io.json.JSonSerializer
 import edu.berkeley.path.bots.netconfig.io.Serializer
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 import edu.berkeley.path.bots.netconfig.Link
-import network.gen.GenericLink
-import network.gen.NetworkBuilder
+import edu.berkeley.path.bots.network.gen.GenericLink
+import edu.berkeley.path.bots.network.gen.NetworkBuilder
 import path_inference.crf.ComputingStrategy
 import path_inference.manager.ProjectionHook
 import path_inference.manager.ProjectionHookInterface

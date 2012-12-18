@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package netconfig.test
+package edu.berkeley.path.bots.netconfig.test
 
 import org.scalatest.prop.Checkers
 import org.scalacheck.Arbitrary._
@@ -24,7 +24,7 @@ import org.scalacheck.Arbitrary
 import edu.berkeley.path.bots.netconfig.Route
 import edu.berkeley.path.bots.netconfig.Link
 import org.scalatest.junit.JUnitSuite
-import network.gen.test.SimpleGen
+import edu.berkeley.path.bots.network.gen.test.SimpleGen
 import collection.JavaConversions._
 import org.scalacheck.Gen
 

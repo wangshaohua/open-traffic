@@ -20,7 +20,7 @@ import edu.berkeley.path.bots.netconfig.Link
 import collection.JavaConversions._
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.Cache
 

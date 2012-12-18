@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package network.gen.test
+package edu.berkeley.path.bots.network.gen.test
 import org.junit.Test
 import org.junit.Assert._
 
 import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
-import network.gen.GenericLinkRepresentation
-import network.gen.NetworkBuilder
+import edu.berkeley.path.bots.network.gen.GenericLinkRepresentation
+import edu.berkeley.path.bots.network.gen.NetworkBuilder
 
 class GenericTest {
 

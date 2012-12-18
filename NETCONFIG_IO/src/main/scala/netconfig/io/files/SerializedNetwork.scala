@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package netconfig.io.files
+package edu.berkeley.path.bots.netconfig.io.files
 
 object SerializedNetwork {
   def fileName(nid: Int, net_type: String): String = {

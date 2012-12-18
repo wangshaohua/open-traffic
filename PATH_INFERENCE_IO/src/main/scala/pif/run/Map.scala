@@ -22,7 +22,7 @@ import scala.collection.mutable.Queue
 import com.google.common.collect.ImmutableList
 import org.joda.time.LocalDate
 import scopt.OptionParser
-import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.MMLogging
 import edu.berkeley.path.bots.core.Time
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
@@ -38,17 +38,17 @@ import edu.berkeley.path.bots.netconfig.Datum.TrackPiece
 import edu.berkeley.path.bots.netconfig.Datum.TrackPiece.TrackPieceConnection
 import edu.berkeley.path.bots.netconfig.io.DataSink
 import edu.berkeley.path.bots.netconfig.io.Serializer
-import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils.asImmutableList2
-import edu.berkeley.path.bots.netconfig_extensions.PathInferenceUtils
-import edu.berkeley.path.bots.netconfig_extensions.ProbeCoordinateUtils
+import edu.berkeley.path.bots.netconfig.CollectionUtils.asImmutableList2
+import edu.berkeley.path.bots.netconfig.PathInferenceUtils
+import edu.berkeley.path.bots.netconfig.ProbeCoordinateUtils
 import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.Route
 import edu.berkeley.path.bots.netconfig.io.Dates
 import edu.berkeley.path.bots.netconfig.Spot
-import network.gen.GenericLink
+import edu.berkeley.path.bots.network.gen.GenericLink
 import scala.collection.JavaConversions._
 import edu.berkeley.path.bots.netconfig.Datum.RouteTT
-import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig.CollectionUtils._
 
 /**
  * A stateful object that merges streams of ProbeCoordinate and PathInference objects belonging

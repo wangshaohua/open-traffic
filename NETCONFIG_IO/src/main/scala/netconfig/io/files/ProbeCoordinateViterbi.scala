@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package netconfig.io.files
+package edu.berkeley.path.bots.netconfig.io.files
 import org.joda.time.LocalDate
 import java.io.File
 import edu.berkeley.path.bots.netconfig.io.Dates
