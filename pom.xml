@@ -21,7 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<scala.version>2.9.1</scala.version>
     <!--  Will be shortened to 2.9 in future configurations    -->
-    <scala.version.release>2.9.1</scala.version.release>
+    <scala.version.release>2.9</scala.version.release>
 		<scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
 	</properties>
 
@@ -42,10 +42,10 @@
   <repositories>
     <!-- We cannot publish to maven central as long as we have external repositories. -->
     <!-- Would be nice to find a workaround. -->
-    <repository>
+<!--    <repository>
       <id>repo.codahale.com</id>
       <url>http://repo.codahale.com</url>
-    </repository>
+    </repository>-->
   </repositories>
 
 	<dependencies>
