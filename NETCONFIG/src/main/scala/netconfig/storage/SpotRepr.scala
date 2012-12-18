@@ -15,7 +15,7 @@
  */
 
 package netconfig.storage
-import core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
 
 /**
  * The storage representation of a spot.

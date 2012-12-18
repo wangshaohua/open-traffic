@@ -18,10 +18,10 @@ package path_inference_test
 import org.junit._
 import org.junit.Assert._
 
-import netconfig._
-import netconfig.Datum._
-import netconfig_extensions.projection.ProjectorFactory
-import core._
+import edu.berkeley.path.bots.netconfig._
+import edu.berkeley.path.bots.netconfig.Datum._
+import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory
+import edu.berkeley.path.bots.core._
 
 object PIFUtils {
   def createPC(x: Double, y: Double, id: String = "fakeid"): ProbeCoordinate[Link] = {

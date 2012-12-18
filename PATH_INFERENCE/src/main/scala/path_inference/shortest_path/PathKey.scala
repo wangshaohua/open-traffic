@@ -15,7 +15,7 @@
  */
 
 package path_inference.shortest_path
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Link
 
 /**
  * The paths are indexed using this key.

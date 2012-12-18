@@ -19,8 +19,8 @@
  */
 
 package path_inference
-import netconfig.{ Link, Route, Spot }
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.{ Link, Route, Spot }
+import edu.berkeley.path.bots.core_extensions.MMLogging
 import collection.JavaConversions._
 
 /**

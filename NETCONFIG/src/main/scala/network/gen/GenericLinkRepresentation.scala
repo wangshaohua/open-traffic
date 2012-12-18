@@ -14,10 +14,10 @@
  * under the License.
  */
 package network.gen
-import netconfig.storage.LinkIDRepr
-import netconfig.storage.NodeIDRepr
-import netconfig.storage.NodeIDRepr
-import core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 
 /**
  * A representation of a link that should be compatible with just about any

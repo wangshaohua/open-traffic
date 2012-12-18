@@ -18,9 +18,9 @@ package path_inference_test
 import org.junit._
 import org.junit.Assert._
 
-import netconfig._
-import netconfig.Datum._
-import core._
+import edu.berkeley.path.bots.netconfig._
+import edu.berkeley.path.bots.netconfig.Datum._
+import edu.berkeley.path.bots.core._
 import path_inference.PathInferenceFilter
 import path_inference.PathInferenceParameters2
 import path_inference.crf.ComputingStrategy

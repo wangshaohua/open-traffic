@@ -15,7 +15,7 @@
  */
 
 package netconfig.storage
-import core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 
 case class RouteRepr(
     var links: Seq[LinkIDRepr],

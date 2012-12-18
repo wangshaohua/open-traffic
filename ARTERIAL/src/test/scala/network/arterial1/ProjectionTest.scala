@@ -20,10 +20,10 @@ import org.junit._
 import org.junit.Assert._
 import com.codahale.jerkson.Json._
 import network.gen.GenericLinkRepresentation
-import netconfig.Route
-import netconfig.storage._
-import netconfig.io.json.JSonSerializer
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.Route
+import edu.berkeley.path.bots.netconfig.storage._
+import edu.berkeley.path.bots.netconfig.io.json.JSonSerializer
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 class ProjectionTest extends MMLogging {
 

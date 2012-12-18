@@ -22,10 +22,10 @@ package path_inference
 
 import collection.mutable.{ ArrayBuffer, HashMap => MMap, Queue => MQueue }
 import collection.immutable.Queue
-import core.Time
-import core_extensions.MMLogging
-import netconfig.{ Link, NetconfigException }
-import netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.core.Time
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.{ Link, NetconfigException }
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import java.util.Comparator
 import path_inference.shortest_path.PathGenerator2
 import path_inference.crf.ConditionalRandomField

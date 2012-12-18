@@ -16,7 +16,7 @@
 
 package path_inference.shortest_path
 
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Link
 import path_inference.PathInferenceParameters2
 
 /**

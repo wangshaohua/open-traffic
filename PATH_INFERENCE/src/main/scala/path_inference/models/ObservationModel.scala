@@ -19,8 +19,8 @@
  */
 
 package path_inference.models
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Link
 
 /**
  * Transition model.

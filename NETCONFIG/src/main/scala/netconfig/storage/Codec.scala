@@ -15,14 +15,14 @@
  */
 
 package netconfig.storage
-import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Spot
+import edu.berkeley.path.bots.netconfig.Route
 import collection.JavaConversions._
-import netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
 import com.google.common.collect.ImmutableList
-import core.storage.CoordinateRepresentation
-import core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 
 trait Codec[L <: Link] {
 

@@ -17,11 +17,11 @@
 package network.arterial1
 
 import network.gen.GenericLinkRepresentation
-import core.GeoMultiLine
-import core.storage.GeoMultiLineRepr
-import netconfig.NetconfigException
-import netconfig.storage.NodeIDRepr
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.core.GeoMultiLine
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.netconfig.NetconfigException
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 import scala.collection.mutable.ArrayBuffer
 import collection.mutable.{ Map => MMap }
 

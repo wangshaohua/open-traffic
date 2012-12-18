@@ -23,8 +23,8 @@ import collection.JavaConversions._
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 
-import netconfig.Link
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 /**
  * The heuristic used in the A* algorithm.

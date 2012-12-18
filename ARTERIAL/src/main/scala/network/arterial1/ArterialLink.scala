@@ -16,9 +16,9 @@
 
 package network.arterial1
 
-import netconfig.Link
-import netconfig.storage.LinkIDRepr
-import core.GeoMultiLine
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.core.GeoMultiLine
 
 class ArterialLink(
   key: LinkIDRepr,

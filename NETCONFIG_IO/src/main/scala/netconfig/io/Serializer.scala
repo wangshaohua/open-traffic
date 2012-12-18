@@ -15,14 +15,14 @@
  */
 package netconfig.io
 
-import netconfig.Link
-import netconfig.Spot
-import netconfig.Route
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.TrackPiece
-import netconfig.Datum.PathInference
-import core.Coordinate
-import core.Time
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Spot
+import edu.berkeley.path.bots.netconfig.Route
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Datum.TrackPiece
+import edu.berkeley.path.bots.netconfig.Datum.PathInference
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.Time
 import java.io.FileReader
 import java.io.FileInputStream
 import java.io.InputStreamReader

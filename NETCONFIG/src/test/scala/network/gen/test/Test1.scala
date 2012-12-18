@@ -17,8 +17,8 @@ package network.gen.test
 import org.junit.Test
 import org.junit.Assert._
 
-import netconfig.storage.LinkIDRepr
-import netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
 import network.gen.GenericLinkRepresentation
 import network.gen.NetworkBuilder
 

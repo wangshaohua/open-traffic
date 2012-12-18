@@ -14,7 +14,7 @@
  * under the License.
  */
 package netconfig.io
-import core.Time
+import edu.berkeley.path.bots.core.Time
 import org.joda.time.LocalDate
 
 object Dates {

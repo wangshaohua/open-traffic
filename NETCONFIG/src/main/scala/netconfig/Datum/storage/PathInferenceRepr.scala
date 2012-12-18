@@ -15,8 +15,8 @@
  */
 
 package netconfig.Datum.storage
-import core.storage.TimeRepr
-import netconfig.storage.RouteRepr
+import edu.berkeley.path.bots.core.storage.TimeRepr
+import edu.berkeley.path.bots.netconfig.storage.RouteRepr
 
 case class PathInferenceRepr(
   val id: String,

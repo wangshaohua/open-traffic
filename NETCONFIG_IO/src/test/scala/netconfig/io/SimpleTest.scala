@@ -18,13 +18,13 @@ package netconfig.io
 
 import org.junit._
 import org.junit.Assert._
-import netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
 import network.gen.GenericLinkRepresentation
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 import network.gen.NetworkBuilder
-import netconfig.io.json.JSonSerializer
-import netconfig.io.files.SerializedNetwork
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.io.json.JSonSerializer
+import edu.berkeley.path.bots.netconfig.io.files.SerializedNetwork
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 class SimpleTest extends MMLogging {
 

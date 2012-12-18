@@ -15,20 +15,20 @@
  */
 package network.gen
 
-import netconfig.Link
-import netconfig.storage.NodeIDRepr
-import netconfig.Node
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.Node
 import com.google.common.collect.ImmutableList
-import netconfig_extensions.CollectionUtils._
-import core.GeoMultiLine
-import netconfig.NetconfigException
-import core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.core.GeoMultiLine
+import edu.berkeley.path.bots.netconfig.NetconfigException
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 import collection.mutable.Map
-import netconfig.storage.LinkIDRepr
-import netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
 import scala.collection.mutable.ArrayBuffer
-import netconfig.storage.NodeIDRepr
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 
 class NetworkBuilder {
 

@@ -16,8 +16,8 @@
 
 package path_inference.crf
 
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Link
 import path_inference.Delta
 import path_inference.PathInferenceParameters2
 

@@ -15,7 +15,7 @@
  */
 package netconfig.io
 import java.io.OutputStream
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core_extensions.MMLogging
 import java.io.File
 import java.util.zip.GZIPOutputStream
 import java.io.FileOutputStream

@@ -17,7 +17,7 @@
 package path_inference.crf
 
 import scala.{math => m}
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 object LogMath extends MMLogging {
   /**

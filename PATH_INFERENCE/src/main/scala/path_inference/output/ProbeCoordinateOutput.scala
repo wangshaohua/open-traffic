@@ -16,10 +16,10 @@
 
 package path_inference.output
 
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core_extensions.MMLogging
 import collection.JavaConversions._
-import netconfig.Datum.ProbeCoordinate
-import netconfig.{ Link, Spot }
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.{ Link, Spot }
 import path_inference.PathInferenceParameters2
 import path_inference.crf.CRFFrame
 

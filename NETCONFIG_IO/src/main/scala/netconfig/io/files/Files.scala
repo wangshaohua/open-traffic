@@ -16,7 +16,7 @@
 
 package netconfig.io.files
 import scala.sys.SystemProperties
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 object Files extends MMLogging {
   def dataDir() = {

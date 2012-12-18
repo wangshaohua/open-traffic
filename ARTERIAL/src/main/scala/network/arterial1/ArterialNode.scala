@@ -16,11 +16,11 @@
 
 package network.arterial1
 
-import netconfig.storage.NodeIDRepr
-import netconfig.Node
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.Node
 import com.google.common.collect.ImmutableList
 import collection.JavaConversions._
-import netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
 
 class ArterialNode(id_ : NodeIDRepr,
   incoming: Seq[ArterialLink],

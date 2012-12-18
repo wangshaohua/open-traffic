@@ -15,9 +15,9 @@
  */
 
 package netconfig.Datum.storage
-import core.storage.CoordinateRepresentation
-import core.storage.TimeRepr
-import netconfig.storage.SpotRepr
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.core.storage.TimeRepr
+import edu.berkeley.path.bots.netconfig.storage.SpotRepr
 
 case class ProbeCoordinateRepr(
   var id: String,

@@ -15,18 +15,18 @@
  */
 
 package netconfig.Datum.storage
-import netconfig.Link
-import netconfig.Datum.ProbeCoordinate
-import core.storage.TimeRepr
-import core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.core.storage.TimeRepr
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
 import collection.JavaConversions._
-import netconfig.Datum.RouteTT
-import netconfig.Datum.PathInference
-import netconfig.Datum.TSpot
+import edu.berkeley.path.bots.netconfig.Datum.RouteTT
+import edu.berkeley.path.bots.netconfig.Datum.PathInference
+import edu.berkeley.path.bots.netconfig.Datum.TSpot
 import bots_math.ImmutableTensor1
 import com.google.common.collect.ImmutableCollection
-import netconfig.Spot
-import netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig.Spot
+import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
 
 trait Codec[L <: Link] extends netconfig.storage.Codec[L] {
 

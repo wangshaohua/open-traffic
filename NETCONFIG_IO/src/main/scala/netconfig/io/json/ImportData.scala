@@ -17,26 +17,26 @@
 package netconfig.io.json
 
 import scala.collection.mutable.{ Map => MMap }
-import core_extensions.MMLogging
-import core.Coordinate
-import core.Time
-import netconfig.Datum.ProbeCoordinate
-import netconfig.io.files.RawProbe
-import netconfig.io.DataSink
-import netconfig.io.Dates
-import netconfig.io.Serializer
-import netconfig.io.StringSource
-import netconfig.storage.LinkIDRepr
-import netconfig.NetconfigException
-import netconfig.Spot
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.Time
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.io.files.RawProbe
+import edu.berkeley.path.bots.netconfig.io.DataSink
+import edu.berkeley.path.bots.netconfig.io.Dates
+import edu.berkeley.path.bots.netconfig.io.Serializer
+import edu.berkeley.path.bots.netconfig.io.StringSource
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.NetconfigException
+import edu.berkeley.path.bots.netconfig.Spot
 import scopt.OptionParser
-import netconfig.Datum.storage.ProbeCoordinateRepr
-import core.storage.TimeRepr
-import core.storage.CoordinateRepresentation
-import netconfig.io.StringDataSink
+import edu.berkeley.path.bots.netconfig.Datum.storage.ProbeCoordinateRepr
+import edu.berkeley.path.bots.core.storage.TimeRepr
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.netconfig.io.StringDataSink
 import com.codahale.jerkson.Json._
-import netconfig.Datum.storage.ProbeCoordinateRepr
-import netconfig.io.DataSinks
+import edu.berkeley.path.bots.netconfig.Datum.storage.ProbeCoordinateRepr
+import edu.berkeley.path.bots.netconfig.io.DataSinks
 
 /**
  * Imports a file containing probe data into the proper JSON structures and directories.

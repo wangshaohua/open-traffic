@@ -15,8 +15,8 @@
  */
 package netconfig_extensions
 
-import netconfig._
-import netconfig.Datum._
+import edu.berkeley.path.bots.netconfig._
+import edu.berkeley.path.bots.netconfig.Datum._
 import java.lang.{ Boolean => JBool }
 import CollectionUtils._
 import com.google.common.collect.ImmutableList

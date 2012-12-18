@@ -16,8 +16,8 @@
 
 package netconfig.Datum.storage
 
-import netconfig.storage.RouteRepr
-import netconfig.Datum.TrackPiece.TrackPieceConnection
+import edu.berkeley.path.bots.netconfig.storage.RouteRepr
+import edu.berkeley.path.bots.netconfig.Datum.TrackPiece.TrackPieceConnection
 
 /**
  * Connection representation, since jerkson does not support tuples right now.

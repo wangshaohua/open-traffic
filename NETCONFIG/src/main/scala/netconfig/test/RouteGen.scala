@@ -16,9 +16,9 @@
 package netconfig.test
 import org.scalacheck.Gen
 import org.scalacheck.Choose._
-import netconfig.Link
-import netconfig.Route
-import netconfig.Spot
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Route
+import edu.berkeley.path.bots.netconfig.Spot
 import collection.JavaConversions._
 
 /**

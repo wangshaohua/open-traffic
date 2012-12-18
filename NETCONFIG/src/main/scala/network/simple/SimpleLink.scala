@@ -16,8 +16,8 @@
 package network.simple
 
 import scala.reflect.BeanProperty
-import netconfig.Link
-import core.{ GeoMultiLine, Coordinate }
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.core.{ GeoMultiLine, Coordinate }
 import collection.JavaConversions._
 import com.google.common.collect.ImmutableList
 

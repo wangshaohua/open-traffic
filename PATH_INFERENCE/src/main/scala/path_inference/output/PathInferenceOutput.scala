@@ -16,13 +16,13 @@
 
 package path_inference.output
 
-import netconfig.Datum.PathInference
-import netconfig.Link
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.Datum.PathInference
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.core_extensions.MMLogging
 import path_inference.PathInferenceParameters2
 import path_inference.Delta
 import path_inference.crf.CRFFrame
-import netconfig_extensions.CollectionUtils._
+import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
 
 object PathInferenceOuput extends MMLogging {
 

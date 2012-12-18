@@ -23,8 +23,8 @@ import edu.berkeley.path.bots.netconfig.Link
  * '''Note''': this can be used directly from java, do not ask me some crap
  * about writing a wrapper. Case in point:
  * {{{
- *  import netconfig_extensions.projection.ProjectorFactory;
- *  import netconfig_extensions.projection.Projector;
+ *  import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory;
+ *  import edu.berkeley.path.bots.netconfig_extensions.projection.Projector;
  *
  *  Projector<Link> projector = ProjectorFactory.fromLinks(...)
  *

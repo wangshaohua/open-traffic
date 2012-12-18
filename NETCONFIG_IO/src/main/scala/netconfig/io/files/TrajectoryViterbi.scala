@@ -17,8 +17,8 @@
 package netconfig.io.files
 import java.io.File
 import org.joda.time.LocalDate
-import netconfig.io.Dates
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.io.Dates
+import edu.berkeley.path.bots.core_extensions.MMLogging
 
 object TrajectoryViterbi extends MMLogging {
   val day_regex = """(.*)/(\d\d\d\d-\d\d-\d\d).*""".r

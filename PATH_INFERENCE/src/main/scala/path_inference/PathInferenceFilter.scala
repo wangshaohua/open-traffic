@@ -19,7 +19,7 @@
  */
 package path_inference
 
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Link
 import path_inference.manager.PathInferenceManager
 import path_inference.manager.ProjectionHookInterface
 import path_inference.manager._

@@ -21,7 +21,7 @@
 package path_inference
 import scala.reflect.BeanProperty
 import java.io.Serializable
-import netconfig.NetconfigException
+import edu.berkeley.path.bots.netconfig.NetconfigException
 import path_inference.models._
 import path_inference.crf.ComputingStrategy
 

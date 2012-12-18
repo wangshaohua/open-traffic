@@ -15,13 +15,13 @@
  */
 package network.gen.test
 
-import netconfig.Link
-import netconfig.storage.{ NodeIDRepr, LinkIDRepr }
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.storage.{ NodeIDRepr, LinkIDRepr }
 import network.gen.GenericLinkRepresentation
 import network.gen.NetworkBuilder
-import core.storage.CoordinateRepresentation
-import core.Coordinate
-import core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
 /**
  * Creates some simple networks useful for testing.
  */

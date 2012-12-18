@@ -17,7 +17,7 @@
 package netconfig.io.files
 import org.joda.time.LocalDate
 import java.io.File
-import netconfig.io.Dates
+import edu.berkeley.path.bots.netconfig.io.Dates
 
 object TSpotViterbi {
   case class FileIndex(val feed: String, val nid: Int, val date: LocalDate, val netType: String)

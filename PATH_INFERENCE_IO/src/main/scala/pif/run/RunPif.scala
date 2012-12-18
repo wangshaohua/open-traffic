@@ -18,20 +18,20 @@ package pif.run
 
 import java.io.File
 import org.joda.time.LocalDate
-import core_extensions.MMLogging
-import core.TimeUtils.TimeOrdering
-import netconfig.Datum.ProbeCoordinate
-import netconfig.io.Dates.parseDate
-import netconfig.io.Dates.parseRange
-import netconfig.io.files.PathInferenceViterbi
-import netconfig.io.files.ProbeCoordinateViterbi
-import netconfig.io.files.RawProbe
-import netconfig.io.files.SerializedNetwork
-import netconfig.io.files.TrajectoryViterbi
-import netconfig.io.json.JSonSerializer
-import netconfig.io.Serializer
-import netconfig.storage.LinkIDRepr
-import netconfig.Link
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.TimeUtils.TimeOrdering
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.io.Dates.parseDate
+import edu.berkeley.path.bots.netconfig.io.Dates.parseRange
+import edu.berkeley.path.bots.netconfig.io.files.PathInferenceViterbi
+import edu.berkeley.path.bots.netconfig.io.files.ProbeCoordinateViterbi
+import edu.berkeley.path.bots.netconfig.io.files.RawProbe
+import edu.berkeley.path.bots.netconfig.io.files.SerializedNetwork
+import edu.berkeley.path.bots.netconfig.io.files.TrajectoryViterbi
+import edu.berkeley.path.bots.netconfig.io.json.JSonSerializer
+import edu.berkeley.path.bots.netconfig.io.Serializer
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.Link
 import network.gen.GenericLink
 import network.gen.NetworkBuilder
 import path_inference.crf.ComputingStrategy
@@ -40,9 +40,9 @@ import path_inference.manager.ProjectionHookInterface
 import path_inference.PathInferenceFilter
 import path_inference.PathInferenceParameters2
 import scopt.OptionParser
-import netconfig.io.Dates
+import edu.berkeley.path.bots.netconfig.io.Dates
 import scala.actors.Futures._
-import netconfig.io.json.NetworkUtils
+import edu.berkeley.path.bots.netconfig.io.json.NetworkUtils
 import path_inference.shortest_path.PathGenerator2
 
 /**

@@ -15,14 +15,14 @@
  */
 
 package netconfig.io.json
-import core_extensions.MMLogging
-import netconfig.Link
-import netconfig.io.files.SerializedNetwork
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.io.files.SerializedNetwork
 import network.gen.NetworkBuilder
-import netconfig.io.Serializer
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.io.Serializer
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 import network.gen.GenericLink
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 
 /**
  * A collection of utilities to materialize a network from a JSON representation on disk, using generic links.

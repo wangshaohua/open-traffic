@@ -16,7 +16,7 @@
 
 package path_inference.crf
 
-import core.Time
+import edu.berkeley.path.bots.core.Time
 import scalala.tensor.dense.DenseVector
 
 /**

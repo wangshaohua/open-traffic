@@ -24,7 +24,7 @@ import scala.math.Ordering.LongOrdering
  * It is assumed that any link of any road network can be uniquely identified
  * by a pair of a long integer and of an integer.
  *
- * An ordering is defined on the linkID representations. import netconfig.storage._
+ * An ordering is defined on the linkID representations. import edu.berkeley.path.bots.netconfig.storage._
  */
 case class LinkIDRepr(
   var primary: Long,

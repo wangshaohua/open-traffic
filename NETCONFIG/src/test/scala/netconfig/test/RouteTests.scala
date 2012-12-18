@@ -21,8 +21,8 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 import _root_.org.junit.Test
 import org.scalacheck.Arbitrary
-import netconfig.Route
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Route
+import edu.berkeley.path.bots.netconfig.Link
 import org.scalatest.junit.JUnitSuite
 import network.gen.test.SimpleGen
 import collection.JavaConversions._

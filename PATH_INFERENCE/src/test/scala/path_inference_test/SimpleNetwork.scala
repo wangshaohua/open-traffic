@@ -17,8 +17,8 @@
 package path_inference_test
 
 import network.simple._
-import core.Coordinate
-import netconfig_extensions.projection.ProjectorFactory
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.netconfig_extensions.projection.ProjectorFactory
 import org.junit._
 import org.junit.Assert._
 import network.simple.SimpleNetwork

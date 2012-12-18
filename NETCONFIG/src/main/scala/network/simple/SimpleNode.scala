@@ -15,9 +15,9 @@
  */
 package network.simple
 
-import netconfig.Node
+import edu.berkeley.path.bots.netconfig.Node
 import java.io.Serializable
-import core.Coordinate
+import edu.berkeley.path.bots.core.Coordinate
 
 class SimpleNode(c: Coordinate, _id: NodeKey) extends Node with Serializable {
   val coordinate = c

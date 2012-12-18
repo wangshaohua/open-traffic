@@ -15,8 +15,8 @@
  */
 
 package network.gen
-import netconfig.Link
-import netconfig.storage.LinkIDRepr
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.storage.LinkIDRepr
 
 trait GenericLink extends Link {
   val idRepr:LinkIDRepr

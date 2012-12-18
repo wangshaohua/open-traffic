@@ -19,8 +19,8 @@ package path_inference.crf
 import collection.mutable.ArrayBuffer
 import collection.JavaConversions._
 import path_inference.Delta
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Link
 
 private[path_inference] object CRFUtils {
   def findTransitionsDeltaToPC2(delta: Delta, point: ProbeCoordinate[Link]): Array[(Int, Int)] = {

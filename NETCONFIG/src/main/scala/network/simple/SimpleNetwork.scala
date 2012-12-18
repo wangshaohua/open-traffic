@@ -17,8 +17,8 @@ package network.simple
 
 import collection.immutable.{ Map => IMap }
 import collection.mutable.{ Map => MMap, ArrayBuffer }
-import core_extensions.MMLogging
-import core.Coordinate
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.core.Coordinate
 
 trait SimpleNetwork {
 

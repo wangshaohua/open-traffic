@@ -16,13 +16,13 @@
 
 package path_inference.manager
 
-import netconfig.Datum.PathInference
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Datum.RouteTT
-//import netconfig.Datum.Trajectory
-import netconfig.Datum.TSpot
-import netconfig.Link
-import netconfig.NetconfigException
+import edu.berkeley.path.bots.netconfig.Datum.PathInference
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Datum.RouteTT
+//import edu.berkeley.path.bots.netconfig.Datum.Trajectory
+import edu.berkeley.path.bots.netconfig.Datum.TSpot
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.NetconfigException
 import java.util.{ Collection => JCollection }
 import scala.collection.JavaConversions._
 

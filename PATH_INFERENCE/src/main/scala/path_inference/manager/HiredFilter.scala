@@ -16,9 +16,9 @@
 
 package path_inference.manager
 
-import core_extensions.MMLogging
-import netconfig.Datum.ProbeCoordinate
-import netconfig.Link
+import edu.berkeley.path.bots.core_extensions.MMLogging
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Link
 
 trait HiredFilter extends PathInferenceManager with MMLogging {
   override def addPoint(point:ProbeCoordinate[Link]): Unit = {

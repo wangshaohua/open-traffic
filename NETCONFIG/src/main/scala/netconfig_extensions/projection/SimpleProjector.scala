@@ -15,9 +15,9 @@
  */
 package netconfig_extensions.projection
 
-import core.Coordinate
-import netconfig.{ Link, Spot }
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.netconfig.{ Link, Spot }
+import edu.berkeley.path.bots.core_extensions.MMLogging
 import collection.immutable.{ HashMap => IMap }
 import math.Ordering
 

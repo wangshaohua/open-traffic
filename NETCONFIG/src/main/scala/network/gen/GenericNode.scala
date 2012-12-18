@@ -14,9 +14,9 @@
  * under the License.
  */
 package network.gen
-import netconfig.Node
-import netconfig.Link
-import netconfig.storage.NodeIDRepr
+import edu.berkeley.path.bots.netconfig.Node
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.storage.NodeIDRepr
 
 // We are cheating a bit here: the underlying representation of the outgoing and incoming
 // links is mutable, but the client will not see it.
