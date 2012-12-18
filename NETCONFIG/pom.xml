@@ -9,12 +9,12 @@
 		<version>0.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>netconfig_${scala.version}</artifactId>
+	<artifactId>netconfig_${scala.version.release}</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>core_${scala.version}</artifactId>
+			<artifactId>core_${scala.version.release}</artifactId>
 			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>

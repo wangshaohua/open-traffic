@@ -20,8 +20,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<scala.version>2.9.1</scala.version>
-    <!--  Will be shortened to 2.9 in future configurations    -->
-    <scala.version.release>2.9.1</scala.version.release>
+		<!-- Will be shortened to 2.9 in future configurations -->
+		<scala.version.release>2.9</scala.version.release>
 		<scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
 	</properties>
 
@@ -39,14 +39,14 @@
 		<url>git@github.com:calpath/open-traffic.git</url>
 	</scm>
 
-  <repositories>
-    <!-- We cannot publish to maven central as long as we have external repositories. -->
-    <!-- Would be nice to find a workaround. -->
-    <repository>
-      <id>repo.codahale.com</id>
-      <url>http://repo.codahale.com</url>
-    </repository>
-  </repositories>
+	<repositories>
+		<!-- We cannot publish to maven central as long as we have external repositories. -->
+		<!-- Would be nice to find a workaround. -->
+		<repository>
+			<id>repo.codahale.com</id>
+			<url>http://repo.codahale.com</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -62,7 +62,9 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
+    <sourceDirectory>src/main/</sourceDirectory>
+    <testSourceDirectory>src/test/</testSourceDirectory>
+    <pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -103,28 +105,28 @@
 					</args>
 				</configuration>
 			</plugin>
-			
-          <plugin>
-            <groupId>org.scalastyle</groupId>
-            <artifactId>scalastyle-maven-plugin</artifactId>
-            <version>0.1.0</version>
-            <configuration>
-              <verbose>true</verbose>
-              <failOnViolation>true</failOnViolation>
-              <includeTestSourceDirectory>true</includeTestSourceDirectory>
-              <failOnWarning>false</failOnWarning>
-              <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
-              <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
-              <configLocation>scalastyle_config.xml</configLocation>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>			
+
+			<plugin>
+				<groupId>org.scalastyle</groupId>
+				<artifactId>scalastyle-maven-plugin</artifactId>
+				<version>0.1.0</version>
+				<configuration>
+					<verbose>true</verbose>
+					<failOnViolation>true</failOnViolation>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<failOnWarning>false</failOnWarning>
+					<sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
+					<testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
+					<configLocation>scalastyle_config.xml</configLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -147,6 +149,6 @@
 		<module>NETCONFIG_IO</module>
 		<module>PATH_INFERENCE</module>
 		<module>PATH_INFERENCE_IO</module>
-    <module>ARTERIAL</module>
+		<module>ARTERIAL</module>
 	</modules>
 </project>
