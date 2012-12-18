@@ -39,14 +39,14 @@
 		<url>git@github.com:calpath/open-traffic.git</url>
 	</scm>
 
-	<repositories>
-		<!-- We cannot publish to maven central as long as we have external repositories. -->
-		<!-- Would be nice to find a workaround. -->
-		<repository>
-			<id>repo.codahale.com</id>
-			<url>http://repo.codahale.com</url>
-		</repository>
-	</repositories>
+  <repositories>
+    <!-- We cannot publish to maven central as long as we have external repositories. -->
+    <!-- Would be nice to find a workaround. -->
+<!--    <repository>
+      <id>repo.codahale.com</id>
+      <url>http://repo.codahale.com</url>
+    </repository>-->
+  </repositories>
 
 	<dependencies>
 		<dependency>

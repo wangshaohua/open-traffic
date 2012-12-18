@@ -4,7 +4,7 @@
     http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<artifactId>path-inference-io_${scala.version.release}</artifactId>
+	<artifactId>path-inference-io</artifactId>
 	
 	<parent>
 		<groupId>edu.berkeley.path</groupId>
@@ -16,17 +16,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.berkeley.path</groupId>
-			<artifactId>netconfig-io_${scala.version.release}</artifactId>
+			<artifactId>netconfig-io</artifactId>
 			<version>0.2-SNAPSHOT</version>
 		</dependency>
     <dependency>
       <groupId>edu.berkeley.path</groupId>
-      <artifactId>path-inference_${scala.version.release}</artifactId>
+      <artifactId>path-inference</artifactId>
       <version>0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>edu.berkeley.path</groupId>
-      <artifactId>netconfig_${scala.version.release}</artifactId>
+      <artifactId>netconfig</artifactId>
       <version>0.2-SNAPSHOT</version>
     </dependency>
 		<dependency>
