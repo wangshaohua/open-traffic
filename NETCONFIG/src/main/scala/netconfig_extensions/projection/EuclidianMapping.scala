@@ -14,9 +14,10 @@
  * under the License.
  */
 package netconfig_extensions.projection
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.CoordinateGeometry
 
-import core.Coordinate
-import core_extensions.CoordinateGeometry
+
 /**
  * Converts a coordinate system into a cartesian coordinate system (assuming
  * small local variations).

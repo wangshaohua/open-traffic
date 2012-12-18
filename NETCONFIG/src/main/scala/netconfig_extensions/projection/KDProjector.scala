@@ -16,13 +16,14 @@
 
 package netconfig_extensions.projection
 
-import core.Coordinate
-import core_extensions.CoordinateGeometry
-import netconfig.{ Link, Spot }
-import core_extensions.MMLogging
+
 import collection.immutable.{ HashMap => IMap }
 import collection.mutable.{ HashMap => MMap, PriorityQueue }
 import math.Ordering
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.core.CoordinateGeometry
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.netconfig.Spot
 
 /**
  * Efficient projector that uses a KD-tree.

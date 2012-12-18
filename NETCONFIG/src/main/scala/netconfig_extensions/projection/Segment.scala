@@ -15,10 +15,10 @@
  */
 
 package netconfig_extensions.projection
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.MMLogging
+import edu.berkeley.path.bots.core.CoordinateGeometry
 
-import core.Coordinate
-import core_extensions.CoordinateGeometry
-import core_extensions.MMLogging
 
 /**
  * A segment in cartesian coordinates.

@@ -16,12 +16,14 @@
 
 package netconfig_extensions.projection
 
-import core.Coordinate
-import core_extensions.CoordinateGeometry
-import netconfig.{ Link, Spot }
-import core_extensions.MMLogging
+
 import collection.immutable.{ HashMap => IMap }
 import math.Ordering
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.core.MMLogging
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.netconfig.Spot
+import edu.berkeley.path.bots.core.CoordinateGeometry
 
 /**
  * A projector class.

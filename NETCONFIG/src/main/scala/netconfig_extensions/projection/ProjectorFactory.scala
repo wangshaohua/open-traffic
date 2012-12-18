@@ -15,7 +15,7 @@
  */
 
 package netconfig_extensions.projection
-import netconfig.Link
+import edu.berkeley.path.bots.netconfig.Link
 
 /**
  * A collection of methods to build projectors.

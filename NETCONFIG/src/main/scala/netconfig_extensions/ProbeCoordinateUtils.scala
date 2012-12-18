@@ -15,11 +15,13 @@
  */
 package netconfig_extensions
 
-import netconfig.{ Link, Spot }
-import core.{ Time, Coordinate }
-import netconfig.Datum._
-import core_extensions.MMLogging
+
 import collection.JavaConversions._
+import edu.berkeley.path.bots.core.MMLogging
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Datum.TSpot
+import edu.berkeley.path.bots.netconfig.Spot
 
 object ProbeCoordinateUtils extends MMLogging {
 
@@ -29,7 +31,7 @@ object ProbeCoordinateUtils extends MMLogging {
    */
   def projectProbeCoordinateToTSpot[L <: Link](pc: ProbeCoordinate[L], prob_ratio: Double = 1.0): Option[TSpot[L]] = {
     // Do not forget case when init values are dummy negative values.
-    if ((pc.probabilities.min <= -netconfig.Datum.ProbeCoordinate.probabilityPrecision)) {
+    if ((pc.probabilities.min <= - ProbeCoordinate.probabilityPrecision)) {
       logWarning("Invalid probability distribution (negative elements) " + pc)
       return None
     }

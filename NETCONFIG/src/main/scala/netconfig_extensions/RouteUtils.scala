@@ -14,12 +14,12 @@
  * under the License.
  */
 package netconfig_extensions
-import netconfig._
-import netconfig.Datum._
-//import netconfig.Datum.Trajectory.TrajectoryBuilder
-import core_extensions.MMLogging
+
 import collection.JavaConversions._
 import collection.mutable.{ ArrayBuffer, Map }
+import edu.berkeley.path.bots.core.MMLogging
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Route
 
 object RouteUtils extends MMLogging {
 

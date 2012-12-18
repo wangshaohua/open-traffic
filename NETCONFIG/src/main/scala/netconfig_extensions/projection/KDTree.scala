@@ -14,8 +14,9 @@
  * under the License.
  */
 package netconfig_extensions.projection
+import edu.berkeley.path.bots.core.MMLogging
 
-import core_extensions.MMLogging
+
 
 class KDTree(
   val segments: List[EuclidianSegment],

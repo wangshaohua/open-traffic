@@ -17,12 +17,17 @@ package netconfig_extensions
 
 import netconfig._
 import netconfig.Datum._
-import core_extensions.MMLogging
 import java.lang.{ Boolean => JBool }
-import bots_math.ImmutableTensor1
 import CollectionUtils._
 import com.google.common.collect.ImmutableList
 import collection.JavaConversions._
+import edu.berkeley.path.bots.core.MMLogging
+import edu.berkeley.path.bots.netconfig.Link
+import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
+import edu.berkeley.path.bots.netconfig.Route
+import edu.berkeley.path.bots.netconfig.Datum.PathInference
+import edu.berkeley.path.bots.netconfig.NetconfigException
+import edu.berkeley.path.bots.netconfig.Datum.RouteTT
 
 /**
  * Utilities related to Datum.PathInference, that should eventually go there.
@@ -70,8 +75,8 @@ object PathInferenceUtils extends MMLogging {
    * TODO(tjh) document
    */
   def projectPathInferenceToRouteTT[L <: Link](
-    pi: netconfig.Datum.PathInference[L],
-    paths_prob_ratio: Double = 1.0): Option[netconfig.Datum.RouteTT[L]] = {
+    pi: PathInference[L],
+    paths_prob_ratio: Double = 1.0): Option[RouteTT[L]] = {
 
     val idx = pi.getMostProbableIndex
     if (idx == null) {

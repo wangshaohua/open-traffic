@@ -14,11 +14,8 @@
  * under the License.
  */
 package netconfig_extensions
+import edu.berkeley.path.bots.core.MMLogging
 
-import netconfig._
-import core.Time
-import netconfig.Datum._
-import core_extensions.MMLogging
 
 object SpotUtils extends MMLogging {
   /**

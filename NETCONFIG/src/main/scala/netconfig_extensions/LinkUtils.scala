@@ -16,11 +16,10 @@
 package netconfig_extensions
 
 import netconfig._
-import core.Time
 import netconfig.Datum._
-
 import collection.mutable.HashSet
 import collection.JavaConversions._
+import edu.berkeley.path.bots.netconfig.Link
 
 /**
  * Some utility functions pertaining to links in general.
