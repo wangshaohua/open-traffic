@@ -6,9 +6,10 @@ import netconfig.Link;
 import netconfig.NetconfigException;
 import netconfig.Spot;
 import bots_math.ImmutableTensor1;
-import core.Coordinate;
-import core.Time;
 import com.google.common.collect.ImmutableList;
+
+import edu.berkeley.path.bots.core.Coordinate;
+import edu.berkeley.path.bots.core.Time;
 
 /**
  * The main representation of path inference data input. Each instance is based

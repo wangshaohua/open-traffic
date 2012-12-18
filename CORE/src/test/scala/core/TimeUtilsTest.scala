@@ -19,7 +19,9 @@ package core
 import org.junit._
 import org.junit.Assert._
 import org.joda.time.Duration
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core.Time
+import edu.berkeley.path.bots.core.TimeUtils;
+import edu.berkeley.path.bots.core.MMLogging
 
 class TimeUtilsTest extends MMLogging {
 

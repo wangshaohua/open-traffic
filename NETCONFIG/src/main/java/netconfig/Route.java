@@ -24,12 +24,13 @@ package netconfig;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import core.Coordinate;
 import org.apache.log4j.Logger;
 
-import core.GeoMultiLine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
+
+import edu.berkeley.path.bots.core.Coordinate;
+import edu.berkeley.path.bots.core.GeoMultiLine;
 
 /**
  * This class represents a route object. A route is defined a possible way of

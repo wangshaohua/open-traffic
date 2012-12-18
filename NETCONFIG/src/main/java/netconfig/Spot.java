@@ -22,7 +22,8 @@
 package netconfig;
 
 import java.io.Serializable;
-import core.Coordinate;
+
+import edu.berkeley.path.bots.core.Coordinate;
 
 /**
  * This is the base class for encoding locations on a network link.

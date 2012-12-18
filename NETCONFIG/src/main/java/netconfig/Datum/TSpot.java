@@ -5,7 +5,7 @@ import java.io.Serializable;
 import netconfig.Link;
 import netconfig.NetconfigException;
 import netconfig.Spot;
-import core.Time;
+import edu.berkeley.path.bots.core.Time;
 
 /**
  * A timestamped spot.

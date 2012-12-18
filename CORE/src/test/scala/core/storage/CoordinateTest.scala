@@ -17,7 +17,8 @@
 package core.storage
 import org.junit._
 import org.junit.Assert._
-import core.Coordinate
+import edu.berkeley.path.bots.core.Coordinate;
+import edu.berkeley.path.bots.core.storage.CoordinateRepresentation
 
 object CoordinateTestUtils {
   def assertEqual(c1: Coordinate, c2: Coordinate): Unit = {
@@ -28,7 +29,7 @@ object CoordinateTestUtils {
 }
 
 class CoordinateTest {
-  import CoordinateTestUtils._
+import CoordinateTestUtils._
 
   @Test def test1(): Unit = {
     val c = new Coordinate(1234, 1.0, 2.0)

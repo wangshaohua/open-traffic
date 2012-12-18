@@ -17,8 +17,9 @@
 package core.storage
 import org.junit._
 import org.junit.Assert._
-import core.Coordinate
-import core.GeoMultiLine
+import edu.berkeley.path.bots.core.storage.GeoMultiLineRepr
+import edu.berkeley.path.bots.core.Coordinate
+import edu.berkeley.path.bots.core.GeoMultiLine
 
 class GeoMultiLineTest {
 

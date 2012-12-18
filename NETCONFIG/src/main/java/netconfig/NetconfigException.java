@@ -5,7 +5,7 @@
 
 package netconfig;
 
-import core.*;
+import edu.berkeley.path.bots.core.*;
 
 /**
  * Base class of all exceptions thrown in this package, all other exceptions

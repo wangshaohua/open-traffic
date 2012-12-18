@@ -17,7 +17,8 @@
 package core.storage
 import org.junit._
 import org.junit.Assert._
-import core_extensions.MMLogging
+import edu.berkeley.path.bots.core.storage.TimeRepr;
+import edu.berkeley.path.bots.core.MMLogging
 
 class TimeReprTest extends MMLogging {
 

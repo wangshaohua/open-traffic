@@ -24,9 +24,10 @@ package netconfig;
 
 import java.io.Serializable;
 
-import core.GeoMultiLine;
 
 import com.google.common.collect.ImmutableList;
+
+import edu.berkeley.path.bots.core.GeoMultiLine;
 
 /**
  * Abstract class (must sub-class) for a link. Implements comparable (using the

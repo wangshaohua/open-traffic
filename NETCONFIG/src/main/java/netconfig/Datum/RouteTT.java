@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import netconfig.Link;
 import netconfig.NetconfigException;
 import netconfig.Route;
-import core.Time;
+import edu.berkeley.path.bots.core.Time;
 
 /**
  * Container class for a {@link Route} and a travel time. If startTime is after

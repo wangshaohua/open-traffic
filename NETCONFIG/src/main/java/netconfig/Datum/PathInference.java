@@ -6,8 +6,9 @@ import netconfig.Link;
 import netconfig.NetconfigException;
 import netconfig.Route;
 import bots_math.ImmutableTensor1;
-import core.Time;
 import com.google.common.collect.ImmutableList;
+
+import edu.berkeley.path.bots.core.Time;
 
 /**
  * This class represents possible paths between two GPS locations and the
