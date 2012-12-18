@@ -23,7 +23,7 @@ import collection.JavaConversions._
 import edu.berkeley.path.bots.netconfig.Datum.RouteTT
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
 import edu.berkeley.path.bots.netconfig.Datum.TSpot
-import bots_math.ImmutableTensor1
+import edu.berkeley.path.bots.math.ImmutableTensor1
 import com.google.common.collect.ImmutableCollection
 import edu.berkeley.path.bots.netconfig.Spot
 import edu.berkeley.path.bots.netconfig_extensions.CollectionUtils._
