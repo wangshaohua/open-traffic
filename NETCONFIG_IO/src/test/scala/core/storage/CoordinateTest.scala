@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package core.storage
+package edu.berkeley.path.bots.core.storage
 import org.junit._
 import org.junit.Assert._
 import edu.berkeley.path.bots.core.Coordinate
