@@ -15,11 +15,8 @@
  */
 package edu.berkeley.path.bots.netconfig
 
-import edu.berkeley.path.bots.netconfig._
-import edu.berkeley.path.bots.netconfig.Datum._
 import collection.mutable.HashSet
 import collection.JavaConversions._
-import edu.berkeley.path.bots.netconfig.Link
 
 /**
  * Some utility functions pertaining to links in general.

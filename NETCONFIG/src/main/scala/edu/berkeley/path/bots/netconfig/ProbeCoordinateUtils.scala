@@ -18,14 +18,11 @@ package edu.berkeley.path.bots.netconfig
 
 import collection.JavaConversions._
 import edu.berkeley.path.bots.core.MMLogging
-import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
 import edu.berkeley.path.bots.netconfig.Datum.TSpot
-import edu.berkeley.path.bots.netconfig.Spot
 
 object ProbeCoordinateUtils extends MMLogging {
 
-  import SpotUtils._
   /**
    * If possible, extracts the most probable spot in the form of a coordinateT object.
    */

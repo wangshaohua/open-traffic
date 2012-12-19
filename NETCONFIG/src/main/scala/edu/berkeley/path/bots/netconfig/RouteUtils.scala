@@ -16,14 +16,10 @@
 package edu.berkeley.path.bots.netconfig
 
 import collection.JavaConversions._
-import collection.mutable.{ ArrayBuffer, Map }
 import edu.berkeley.path.bots.core.MMLogging
-import edu.berkeley.path.bots.netconfig.Link
-import edu.berkeley.path.bots.netconfig.Route
 
 object RouteUtils extends MMLogging {
 
-  import SpotUtils._
 
   /**
    * Takes a route and segments it into a sequence of NT link / start offset / end offset

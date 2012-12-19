@@ -15,18 +15,11 @@
  */
 package edu.berkeley.path.bots.netconfig
 
-import edu.berkeley.path.bots.netconfig._
-import edu.berkeley.path.bots.netconfig.Datum._
 import java.lang.{ Boolean => JBool }
-import CollectionUtils._
-import com.google.common.collect.ImmutableList
 import collection.JavaConversions._
 import edu.berkeley.path.bots.core.MMLogging
-import edu.berkeley.path.bots.netconfig.Link
 import edu.berkeley.path.bots.netconfig.Datum.ProbeCoordinate
-import edu.berkeley.path.bots.netconfig.Route
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
-import edu.berkeley.path.bots.netconfig.NetconfigException
 import edu.berkeley.path.bots.netconfig.Datum.RouteTT
 
 /**
