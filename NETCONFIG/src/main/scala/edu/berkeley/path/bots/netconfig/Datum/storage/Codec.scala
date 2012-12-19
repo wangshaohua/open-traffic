@@ -24,16 +24,12 @@ import collection.JavaConversions._
 import edu.berkeley.path.bots.netconfig.Datum.RouteTT
 import edu.berkeley.path.bots.netconfig.Datum.PathInference
 import edu.berkeley.path.bots.netconfig.Datum.TSpot
-import edu.berkeley.path.bots.math.ImmutableTensor1
-import com.google.common.collect.ImmutableCollection
-import edu.berkeley.path.bots.netconfig.Spot
-import edu.berkeley.path.bots.netconfig.CollectionUtils._
 
 trait Codec[L <: Link] extends edu.berkeley.path.bots.netconfig.storage.Codec[L] {
 
   /**
    * @param extended_presentation: encodes redundant information like coordinates
-   *   (useful for interacting with matlab or python).
+   *                             (useful for interacting with matlab or python).
    */
   def toRepr(pc: ProbeCoordinate[L], extended_representation: Boolean): ProbeCoordinateRepr = {
     val speed = if (pc.speed == null) {
@@ -70,7 +66,7 @@ trait Codec[L <: Link] extends edu.berkeley.path.bots.netconfig.storage.Codec[L]
 
   /**
    * @param extended_presentation: encodes redundant information like coordinates
-   *   (useful for interacting with matlab or python).
+   *                             (useful for interacting with matlab or python).
    */
   def toRepr(tsp: TSpot[L], extended_representation: Boolean): ProbeCoordinateRepr = {
     toRepr(tsp.toProbeCoordinate(), extended_representation)
@@ -78,7 +74,7 @@ trait Codec[L <: Link] extends edu.berkeley.path.bots.netconfig.storage.Codec[L]
 
   /**
    * @param extended_presentation: encodes redundant information like coordinates
-   *   (useful for interacting with matlab or python).
+   *                             (useful for interacting with matlab or python).
    */
   def toRepr(rtt: RouteTT[L], extended_representation: Boolean): PathInferenceRepr = {
     toRepr(rtt.toPathInference(), extended_representation)
@@ -86,7 +82,7 @@ trait Codec[L <: Link] extends edu.berkeley.path.bots.netconfig.storage.Codec[L]
 
   /**
    * @param extended_presentation: encodes redundant information like coordinates
-   *   (useful for interacting with matlab or python).
+   *                             (useful for interacting with matlab or python).
    */
   def toRepr(pi: PathInference[L], extended_representation: Boolean): PathInferenceRepr = {
     new PathInferenceRepr(pi.id,
